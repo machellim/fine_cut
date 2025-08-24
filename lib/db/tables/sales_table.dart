@@ -1,0 +1,55 @@
+import 'package:drift/drift.dart';
+
+enum SaleStatus { active, deleted }
+
+class Sales extends Table {
+  // Primary key auto-increment
+  IntColumn get id => integer().autoIncrement()();
+
+  // Foreign key to the product sold
+  IntColumn get productId => integer()
+      .named('product_id')
+      .customConstraint('REFERENCES products(id) ON DELETE CASCADE')();
+
+  // Optional reference to unit used for the sale
+  IntColumn get unitId => integer()
+      .nullable()
+      .named('unit_id')
+      .customConstraint('REFERENCES units(id) ON DELETE SET NULL')();
+
+  // Quantity sold
+  RealColumn get quantity =>
+      real().named('quantity').withDefault(const Constant(0.0))();
+
+  // Total amount of the sale
+  RealColumn get totalAmount =>
+      real().named('total_amount').withDefault(const Constant(0.0))();
+
+  // Reference to cash register for daily sales
+  IntColumn get cashRegisterId => integer()
+      .nullable()
+      .named('cash_register_id')
+      .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
+
+  // Optional notes about the sale
+  TextColumn get notes =>
+      text().nullable().named('notes').withLength(min: 0, max: 1000)();
+
+  // Status: active/inactive (soft delete)
+  TextColumn get status => text()
+      .named('status')
+      .withLength(min: 1, max: 50)
+      .map(const EnumNameConverter(SaleStatus.values))
+      .withDefault(const Constant('active'))();
+
+  // Date of the sale
+  DateTimeColumn get saleDate =>
+      dateTime().named('sale_date').withDefault(currentDateAndTime)();
+
+  // Creation date
+  DateTimeColumn get createdAt =>
+      dateTime().named('created_at').withDefault(currentDateAndTime)();
+
+  // Last updated date
+  DateTimeColumn get updatedAt => dateTime().nullable().named('updated_at')();
+}

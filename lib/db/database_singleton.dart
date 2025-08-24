@@ -4,7 +4,7 @@ class AppDatabaseSingleton {
   static AppDatabase? _instance;
 
   static Future<AppDatabase> getInstance() async {
-    _instance ??= AppDatabase(); // tu constructor sigue funcionando igual
+    _instance ??= AppDatabase();
     return _instance!;
   }
 

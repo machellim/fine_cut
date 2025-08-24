@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
@@ -36,6 +37,15 @@ class AppInitializer extends StatelessWidget {
           );
         } else if (snapshot.hasData) {
           final database = snapshot.data!;
+
+          // to create db if not exists in the directory
+          /*  database.allTables.forEach((TableInfo table) async {
+            final count = await database.select(table).get();
+            print(
+              'Table ${table.actualTableName} has ${count.length} records.',
+            );
+          });*/
+
           // daos
           return MultiRepositoryProvider(
             providers: [
