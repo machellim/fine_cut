@@ -24,6 +24,17 @@ class Sales extends Table {
       .named('purchase_id')
       .customConstraint('REFERENCES purchases(id) ON DELETE SET NULL')();
 
+  // Reference to cash register for daily sales
+  IntColumn get cashRegisterId => integer()
+      .nullable()
+      .named('cash_register_id')
+      .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
+
+  // Reference to payment method used
+  IntColumn get paymentMethodId => integer()
+      .named('payment_method_id')
+      .customConstraint('REFERENCES payment_methods(id) ON DELETE SET NULL')();
+
   // Quantity sold
   RealColumn get quantity =>
       real().named('quantity').withDefault(const Constant(0.0))();
@@ -31,12 +42,6 @@ class Sales extends Table {
   // Total amount of the sale
   RealColumn get totalAmount =>
       real().named('total_amount').withDefault(const Constant(0.0))();
-
-  // Reference to cash register for daily sales
-  IntColumn get cashRegisterId => integer()
-      .nullable()
-      .named('cash_register_id')
-      .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
 
   // Optional notes about the sale
   TextColumn get notes =>
