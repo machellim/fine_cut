@@ -17,6 +17,13 @@ class Sales extends Table {
       .named('unit_id')
       .customConstraint('REFERENCES units(id) ON DELETE SET NULL')();
 
+  // Foreign key to the specific purchase (if applicable),
+  // only to products that track stock (i.e., trackStock = false)
+  IntColumn get purchaseId => integer()
+      .nullable()
+      .named('purchase_id')
+      .customConstraint('REFERENCES purchases(id) ON DELETE SET NULL')();
+
   // Quantity sold
   RealColumn get quantity =>
       real().named('quantity').withDefault(const Constant(0.0))();

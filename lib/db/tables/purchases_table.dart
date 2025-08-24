@@ -33,6 +33,11 @@ class Purchases extends Table {
   TextColumn get notes =>
       text().nullable().named('notes').withLength(min: 0, max: 1000)();
 
+  // Whether the purchased product is sold out,
+  // only to products that track stock (i.e., trackStock = false)
+  BoolColumn get isSoldOut =>
+      boolean().named('is_sold_out').withDefault(const Constant(false))();
+
   // Status: active/inactive (soft delete)
   TextColumn get status => text()
       .named('status')

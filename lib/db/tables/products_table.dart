@@ -29,6 +29,9 @@ class Products extends Table {
   IntColumn get stock =>
       integer().named('stock').withDefault(const Constant(0))();
 
+  // Whether to track stock for this product
+  BoolColumn get trackStock => boolean().withDefault(const Constant(true))();
+
   // Active/inactive status
   TextColumn get status => text()
       .named('status')
