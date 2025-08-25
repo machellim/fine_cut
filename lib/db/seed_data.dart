@@ -50,4 +50,36 @@ Future<void> insertInitialData(AppDatabase db) async {
         .into(db.units)
         .insert(UnitsCompanion.insert(name: 'Onzas', symbol: 'oz'));
   }
+
+  // Insert payment methods if they don't exist
+  final cashExists = await (db.select(
+    db.paymentMethods,
+  )..where((pm) => pm.name.equals('Efectivo'))).getSingleOrNull();
+  if (cashExists == null) {
+    await db
+        .into(db.paymentMethods)
+        .insert(
+          PaymentMethodsCompanion.insert(
+            name: 'Efectivo',
+            description: Value('Pago en efectivo'),
+            displayOrder: Value(1),
+          ),
+        );
+  }
+
+  // Example: Transferencia
+  final transferExists = await (db.select(
+    db.paymentMethods,
+  )..where((pm) => pm.name.equals('Transferencia'))).getSingleOrNull();
+  if (transferExists == null) {
+    await db
+        .into(db.paymentMethods)
+        .insert(
+          PaymentMethodsCompanion.insert(
+            name: 'Transferencia',
+            description: Value('Pago por transferencia bancaria'),
+            displayOrder: Value(2),
+          ),
+        );
+  }
 }

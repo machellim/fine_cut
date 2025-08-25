@@ -12,6 +12,11 @@ class Expenses extends Table {
       .named('cash_register_id')
       .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
 
+  // Reference to payment method used
+  IntColumn get paymentMethodId => integer()
+      .named('payment_method_id')
+      .customConstraint('REFERENCES payment_methods(id) ON DELETE SET NULL')();
+
   // Expense description (e.g., "Electricity bill", "Transport")
   TextColumn get description =>
       text().withLength(min: 1, max: 1000).named('description')();

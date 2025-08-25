@@ -17,6 +17,17 @@ class Purchases extends Table {
       .named('unit_id')
       .customConstraint('REFERENCES units(id) ON DELETE SET NULL')();
 
+  // Reference to cash register for daily sales
+  IntColumn get cashRegisterId => integer()
+      .nullable()
+      .named('cash_register_id')
+      .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
+
+  // Reference to payment method used
+  IntColumn get paymentMethodId => integer()
+      .named('payment_method_id')
+      .customConstraint('REFERENCES payment_methods(id) ON DELETE SET NULL')();
+
   // Quantity purchased
   RealColumn get quantity =>
       real().named('quantity').withDefault(const Constant(0.0))();

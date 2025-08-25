@@ -1704,6 +1704,18 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     requiredDuringInsert: false,
     $customConstraints: 'REFERENCES cash_registers(id) ON DELETE SET NULL',
   );
+  static const VerificationMeta _paymentMethodIdMeta = const VerificationMeta(
+    'paymentMethodId',
+  );
+  @override
+  late final GeneratedColumn<int> paymentMethodId = GeneratedColumn<int>(
+    'payment_method_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'REFERENCES payment_methods(id) ON DELETE SET NULL',
+  );
   static const VerificationMeta _descriptionMeta = const VerificationMeta(
     'description',
   );
@@ -1795,6 +1807,7 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
   List<GeneratedColumn> get $columns => [
     id,
     cashRegisterId,
+    paymentMethodId,
     description,
     amount,
     notes,
@@ -1826,6 +1839,17 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
           _cashRegisterIdMeta,
         ),
       );
+    }
+    if (data.containsKey('payment_method_id')) {
+      context.handle(
+        _paymentMethodIdMeta,
+        paymentMethodId.isAcceptableOrUnknown(
+          data['payment_method_id']!,
+          _paymentMethodIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_paymentMethodIdMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -1888,6 +1912,10 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         DriftSqlType.int,
         data['${effectivePrefix}cash_register_id'],
       ),
+      paymentMethodId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}payment_method_id'],
+      )!,
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}description'],
@@ -1933,6 +1961,7 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
 class Expense extends DataClass implements Insertable<Expense> {
   final int id;
   final int? cashRegisterId;
+  final int paymentMethodId;
   final String description;
   final double amount;
   final String? notes;
@@ -1943,6 +1972,7 @@ class Expense extends DataClass implements Insertable<Expense> {
   const Expense({
     required this.id,
     this.cashRegisterId,
+    required this.paymentMethodId,
     required this.description,
     required this.amount,
     this.notes,
@@ -1958,6 +1988,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     if (!nullToAbsent || cashRegisterId != null) {
       map['cash_register_id'] = Variable<int>(cashRegisterId);
     }
+    map['payment_method_id'] = Variable<int>(paymentMethodId);
     map['description'] = Variable<String>(description);
     map['amount'] = Variable<double>(amount);
     if (!nullToAbsent || notes != null) {
@@ -1982,6 +2013,7 @@ class Expense extends DataClass implements Insertable<Expense> {
       cashRegisterId: cashRegisterId == null && nullToAbsent
           ? const Value.absent()
           : Value(cashRegisterId),
+      paymentMethodId: Value(paymentMethodId),
       description: Value(description),
       amount: Value(amount),
       notes: notes == null && nullToAbsent
@@ -2004,6 +2036,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     return Expense(
       id: serializer.fromJson<int>(json['id']),
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
+      paymentMethodId: serializer.fromJson<int>(json['paymentMethodId']),
       description: serializer.fromJson<String>(json['description']),
       amount: serializer.fromJson<double>(json['amount']),
       notes: serializer.fromJson<String?>(json['notes']),
@@ -2021,6 +2054,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
+      'paymentMethodId': serializer.toJson<int>(paymentMethodId),
       'description': serializer.toJson<String>(description),
       'amount': serializer.toJson<double>(amount),
       'notes': serializer.toJson<String?>(notes),
@@ -2036,6 +2070,7 @@ class Expense extends DataClass implements Insertable<Expense> {
   Expense copyWith({
     int? id,
     Value<int?> cashRegisterId = const Value.absent(),
+    int? paymentMethodId,
     String? description,
     double? amount,
     Value<String?> notes = const Value.absent(),
@@ -2048,6 +2083,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     cashRegisterId: cashRegisterId.present
         ? cashRegisterId.value
         : this.cashRegisterId,
+    paymentMethodId: paymentMethodId ?? this.paymentMethodId,
     description: description ?? this.description,
     amount: amount ?? this.amount,
     notes: notes.present ? notes.value : this.notes,
@@ -2062,6 +2098,9 @@ class Expense extends DataClass implements Insertable<Expense> {
       cashRegisterId: data.cashRegisterId.present
           ? data.cashRegisterId.value
           : this.cashRegisterId,
+      paymentMethodId: data.paymentMethodId.present
+          ? data.paymentMethodId.value
+          : this.paymentMethodId,
       description: data.description.present
           ? data.description.value
           : this.description,
@@ -2081,6 +2120,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     return (StringBuffer('Expense(')
           ..write('id: $id, ')
           ..write('cashRegisterId: $cashRegisterId, ')
+          ..write('paymentMethodId: $paymentMethodId, ')
           ..write('description: $description, ')
           ..write('amount: $amount, ')
           ..write('notes: $notes, ')
@@ -2096,6 +2136,7 @@ class Expense extends DataClass implements Insertable<Expense> {
   int get hashCode => Object.hash(
     id,
     cashRegisterId,
+    paymentMethodId,
     description,
     amount,
     notes,
@@ -2110,6 +2151,7 @@ class Expense extends DataClass implements Insertable<Expense> {
       (other is Expense &&
           other.id == this.id &&
           other.cashRegisterId == this.cashRegisterId &&
+          other.paymentMethodId == this.paymentMethodId &&
           other.description == this.description &&
           other.amount == this.amount &&
           other.notes == this.notes &&
@@ -2122,6 +2164,7 @@ class Expense extends DataClass implements Insertable<Expense> {
 class ExpensesCompanion extends UpdateCompanion<Expense> {
   final Value<int> id;
   final Value<int?> cashRegisterId;
+  final Value<int> paymentMethodId;
   final Value<String> description;
   final Value<double> amount;
   final Value<String?> notes;
@@ -2132,6 +2175,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   const ExpensesCompanion({
     this.id = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
+    this.paymentMethodId = const Value.absent(),
     this.description = const Value.absent(),
     this.amount = const Value.absent(),
     this.notes = const Value.absent(),
@@ -2143,6 +2187,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   ExpensesCompanion.insert({
     this.id = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
+    required int paymentMethodId,
     required String description,
     this.amount = const Value.absent(),
     this.notes = const Value.absent(),
@@ -2150,10 +2195,12 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     this.expenseDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  }) : description = Value(description);
+  }) : paymentMethodId = Value(paymentMethodId),
+       description = Value(description);
   static Insertable<Expense> custom({
     Expression<int>? id,
     Expression<int>? cashRegisterId,
+    Expression<int>? paymentMethodId,
     Expression<String>? description,
     Expression<double>? amount,
     Expression<String>? notes,
@@ -2165,6 +2212,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
+      if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
       if (description != null) 'description': description,
       if (amount != null) 'amount': amount,
       if (notes != null) 'notes': notes,
@@ -2178,6 +2226,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   ExpensesCompanion copyWith({
     Value<int>? id,
     Value<int?>? cashRegisterId,
+    Value<int>? paymentMethodId,
     Value<String>? description,
     Value<double>? amount,
     Value<String?>? notes,
@@ -2189,6 +2238,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     return ExpensesCompanion(
       id: id ?? this.id,
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
+      paymentMethodId: paymentMethodId ?? this.paymentMethodId,
       description: description ?? this.description,
       amount: amount ?? this.amount,
       notes: notes ?? this.notes,
@@ -2207,6 +2257,9 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     }
     if (cashRegisterId.present) {
       map['cash_register_id'] = Variable<int>(cashRegisterId.value);
+    }
+    if (paymentMethodId.present) {
+      map['payment_method_id'] = Variable<int>(paymentMethodId.value);
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
@@ -2239,6 +2292,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     return (StringBuffer('ExpensesCompanion(')
           ..write('id: $id, ')
           ..write('cashRegisterId: $cashRegisterId, ')
+          ..write('paymentMethodId: $paymentMethodId, ')
           ..write('description: $description, ')
           ..write('amount: $amount, ')
           ..write('notes: $notes, ')
@@ -2849,6 +2903,30 @@ class $PurchasesTable extends Purchases
     requiredDuringInsert: false,
     $customConstraints: 'REFERENCES units(id) ON DELETE SET NULL',
   );
+  static const VerificationMeta _cashRegisterIdMeta = const VerificationMeta(
+    'cashRegisterId',
+  );
+  @override
+  late final GeneratedColumn<int> cashRegisterId = GeneratedColumn<int>(
+    'cash_register_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES cash_registers(id) ON DELETE SET NULL',
+  );
+  static const VerificationMeta _paymentMethodIdMeta = const VerificationMeta(
+    'paymentMethodId',
+  );
+  @override
+  late final GeneratedColumn<int> paymentMethodId = GeneratedColumn<int>(
+    'payment_method_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'REFERENCES payment_methods(id) ON DELETE SET NULL',
+  );
   static const VerificationMeta _quantityMeta = const VerificationMeta(
     'quantity',
   );
@@ -2955,6 +3033,8 @@ class $PurchasesTable extends Purchases
     id,
     productId,
     unitId,
+    cashRegisterId,
+    paymentMethodId,
     quantity,
     totalCost,
     purchaseDate,
@@ -2992,6 +3072,26 @@ class $PurchasesTable extends Purchases
         _unitIdMeta,
         unitId.isAcceptableOrUnknown(data['unit_id']!, _unitIdMeta),
       );
+    }
+    if (data.containsKey('cash_register_id')) {
+      context.handle(
+        _cashRegisterIdMeta,
+        cashRegisterId.isAcceptableOrUnknown(
+          data['cash_register_id']!,
+          _cashRegisterIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('payment_method_id')) {
+      context.handle(
+        _paymentMethodIdMeta,
+        paymentMethodId.isAcceptableOrUnknown(
+          data['payment_method_id']!,
+          _paymentMethodIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_paymentMethodIdMeta);
     }
     if (data.containsKey('quantity')) {
       context.handle(
@@ -3059,6 +3159,14 @@ class $PurchasesTable extends Purchases
         DriftSqlType.int,
         data['${effectivePrefix}unit_id'],
       ),
+      cashRegisterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cash_register_id'],
+      ),
+      paymentMethodId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}payment_method_id'],
+      )!,
       quantity: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}quantity'],
@@ -3109,6 +3217,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
   final int id;
   final int productId;
   final int? unitId;
+  final int? cashRegisterId;
+  final int paymentMethodId;
   final double quantity;
   final double totalCost;
   final DateTime purchaseDate;
@@ -3121,6 +3231,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     required this.id,
     required this.productId,
     this.unitId,
+    this.cashRegisterId,
+    required this.paymentMethodId,
     required this.quantity,
     required this.totalCost,
     required this.purchaseDate,
@@ -3138,6 +3250,10 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     if (!nullToAbsent || unitId != null) {
       map['unit_id'] = Variable<int>(unitId);
     }
+    if (!nullToAbsent || cashRegisterId != null) {
+      map['cash_register_id'] = Variable<int>(cashRegisterId);
+    }
+    map['payment_method_id'] = Variable<int>(paymentMethodId);
     map['quantity'] = Variable<double>(quantity);
     map['total_cost'] = Variable<double>(totalCost);
     map['purchase_date'] = Variable<DateTime>(purchaseDate);
@@ -3164,6 +3280,10 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       unitId: unitId == null && nullToAbsent
           ? const Value.absent()
           : Value(unitId),
+      cashRegisterId: cashRegisterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cashRegisterId),
+      paymentMethodId: Value(paymentMethodId),
       quantity: Value(quantity),
       totalCost: Value(totalCost),
       purchaseDate: Value(purchaseDate),
@@ -3188,6 +3308,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       id: serializer.fromJson<int>(json['id']),
       productId: serializer.fromJson<int>(json['productId']),
       unitId: serializer.fromJson<int?>(json['unitId']),
+      cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
+      paymentMethodId: serializer.fromJson<int>(json['paymentMethodId']),
       quantity: serializer.fromJson<double>(json['quantity']),
       totalCost: serializer.fromJson<double>(json['totalCost']),
       purchaseDate: serializer.fromJson<DateTime>(json['purchaseDate']),
@@ -3207,6 +3329,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       'id': serializer.toJson<int>(id),
       'productId': serializer.toJson<int>(productId),
       'unitId': serializer.toJson<int?>(unitId),
+      'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
+      'paymentMethodId': serializer.toJson<int>(paymentMethodId),
       'quantity': serializer.toJson<double>(quantity),
       'totalCost': serializer.toJson<double>(totalCost),
       'purchaseDate': serializer.toJson<DateTime>(purchaseDate),
@@ -3224,6 +3348,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     int? id,
     int? productId,
     Value<int?> unitId = const Value.absent(),
+    Value<int?> cashRegisterId = const Value.absent(),
+    int? paymentMethodId,
     double? quantity,
     double? totalCost,
     DateTime? purchaseDate,
@@ -3236,6 +3362,10 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     id: id ?? this.id,
     productId: productId ?? this.productId,
     unitId: unitId.present ? unitId.value : this.unitId,
+    cashRegisterId: cashRegisterId.present
+        ? cashRegisterId.value
+        : this.cashRegisterId,
+    paymentMethodId: paymentMethodId ?? this.paymentMethodId,
     quantity: quantity ?? this.quantity,
     totalCost: totalCost ?? this.totalCost,
     purchaseDate: purchaseDate ?? this.purchaseDate,
@@ -3250,6 +3380,12 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       id: data.id.present ? data.id.value : this.id,
       productId: data.productId.present ? data.productId.value : this.productId,
       unitId: data.unitId.present ? data.unitId.value : this.unitId,
+      cashRegisterId: data.cashRegisterId.present
+          ? data.cashRegisterId.value
+          : this.cashRegisterId,
+      paymentMethodId: data.paymentMethodId.present
+          ? data.paymentMethodId.value
+          : this.paymentMethodId,
       quantity: data.quantity.present ? data.quantity.value : this.quantity,
       totalCost: data.totalCost.present ? data.totalCost.value : this.totalCost,
       purchaseDate: data.purchaseDate.present
@@ -3269,6 +3405,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('unitId: $unitId, ')
+          ..write('cashRegisterId: $cashRegisterId, ')
+          ..write('paymentMethodId: $paymentMethodId, ')
           ..write('quantity: $quantity, ')
           ..write('totalCost: $totalCost, ')
           ..write('purchaseDate: $purchaseDate, ')
@@ -3286,6 +3424,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     id,
     productId,
     unitId,
+    cashRegisterId,
+    paymentMethodId,
     quantity,
     totalCost,
     purchaseDate,
@@ -3302,6 +3442,8 @@ class Purchase extends DataClass implements Insertable<Purchase> {
           other.id == this.id &&
           other.productId == this.productId &&
           other.unitId == this.unitId &&
+          other.cashRegisterId == this.cashRegisterId &&
+          other.paymentMethodId == this.paymentMethodId &&
           other.quantity == this.quantity &&
           other.totalCost == this.totalCost &&
           other.purchaseDate == this.purchaseDate &&
@@ -3316,6 +3458,8 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
   final Value<int> id;
   final Value<int> productId;
   final Value<int?> unitId;
+  final Value<int?> cashRegisterId;
+  final Value<int> paymentMethodId;
   final Value<double> quantity;
   final Value<double> totalCost;
   final Value<DateTime> purchaseDate;
@@ -3328,6 +3472,8 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     this.id = const Value.absent(),
     this.productId = const Value.absent(),
     this.unitId = const Value.absent(),
+    this.cashRegisterId = const Value.absent(),
+    this.paymentMethodId = const Value.absent(),
     this.quantity = const Value.absent(),
     this.totalCost = const Value.absent(),
     this.purchaseDate = const Value.absent(),
@@ -3341,6 +3487,8 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     this.id = const Value.absent(),
     required int productId,
     this.unitId = const Value.absent(),
+    this.cashRegisterId = const Value.absent(),
+    required int paymentMethodId,
     this.quantity = const Value.absent(),
     this.totalCost = const Value.absent(),
     this.purchaseDate = const Value.absent(),
@@ -3349,11 +3497,14 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  }) : productId = Value(productId);
+  }) : productId = Value(productId),
+       paymentMethodId = Value(paymentMethodId);
   static Insertable<Purchase> custom({
     Expression<int>? id,
     Expression<int>? productId,
     Expression<int>? unitId,
+    Expression<int>? cashRegisterId,
+    Expression<int>? paymentMethodId,
     Expression<double>? quantity,
     Expression<double>? totalCost,
     Expression<DateTime>? purchaseDate,
@@ -3367,6 +3518,8 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
       if (id != null) 'id': id,
       if (productId != null) 'product_id': productId,
       if (unitId != null) 'unit_id': unitId,
+      if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
+      if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
       if (quantity != null) 'quantity': quantity,
       if (totalCost != null) 'total_cost': totalCost,
       if (purchaseDate != null) 'purchase_date': purchaseDate,
@@ -3382,6 +3535,8 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     Value<int>? id,
     Value<int>? productId,
     Value<int?>? unitId,
+    Value<int?>? cashRegisterId,
+    Value<int>? paymentMethodId,
     Value<double>? quantity,
     Value<double>? totalCost,
     Value<DateTime>? purchaseDate,
@@ -3395,6 +3550,8 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
       id: id ?? this.id,
       productId: productId ?? this.productId,
       unitId: unitId ?? this.unitId,
+      cashRegisterId: cashRegisterId ?? this.cashRegisterId,
+      paymentMethodId: paymentMethodId ?? this.paymentMethodId,
       quantity: quantity ?? this.quantity,
       totalCost: totalCost ?? this.totalCost,
       purchaseDate: purchaseDate ?? this.purchaseDate,
@@ -3417,6 +3574,12 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     }
     if (unitId.present) {
       map['unit_id'] = Variable<int>(unitId.value);
+    }
+    if (cashRegisterId.present) {
+      map['cash_register_id'] = Variable<int>(cashRegisterId.value);
+    }
+    if (paymentMethodId.present) {
+      map['payment_method_id'] = Variable<int>(paymentMethodId.value);
     }
     if (quantity.present) {
       map['quantity'] = Variable<double>(quantity.value);
@@ -3453,6 +3616,8 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('unitId: $unitId, ')
+          ..write('cashRegisterId: $cashRegisterId, ')
+          ..write('paymentMethodId: $paymentMethodId, ')
           ..write('quantity: $quantity, ')
           ..write('totalCost: $totalCost, ')
           ..write('purchaseDate: $purchaseDate, ')
@@ -4704,6 +4869,20 @@ class $PaymentMethodsTable extends PaymentMethods
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<PaymentMethodStatus, String>
+  status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 50,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  ).withConverter<PaymentMethodStatus>($PaymentMethodsTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -4733,6 +4912,7 @@ class $PaymentMethodsTable extends PaymentMethods
     name,
     description,
     displayOrder,
+    status,
     createdAt,
     updatedAt,
   ];
@@ -4814,6 +4994,12 @@ class $PaymentMethodsTable extends PaymentMethods
         DriftSqlType.int,
         data['${effectivePrefix}display_order'],
       )!,
+      status: $PaymentMethodsTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -4829,6 +5015,9 @@ class $PaymentMethodsTable extends PaymentMethods
   $PaymentMethodsTable createAlias(String alias) {
     return $PaymentMethodsTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<PaymentMethodStatus, String, String>
+  $converterstatus = const EnumNameConverter(PaymentMethodStatus.values);
 }
 
 class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
@@ -4836,6 +5025,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
   final String name;
   final String? description;
   final int displayOrder;
+  final PaymentMethodStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const PaymentMethod({
@@ -4843,6 +5033,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
     required this.name,
     this.description,
     required this.displayOrder,
+    required this.status,
     required this.createdAt,
     this.updatedAt,
   });
@@ -4855,6 +5046,11 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
       map['description'] = Variable<String>(description);
     }
     map['display_order'] = Variable<int>(displayOrder);
+    {
+      map['status'] = Variable<String>(
+        $PaymentMethodsTable.$converterstatus.toSql(status),
+      );
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -4870,6 +5066,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
           ? const Value.absent()
           : Value(description),
       displayOrder: Value(displayOrder),
+      status: Value(status),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -4887,6 +5084,9 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
       displayOrder: serializer.fromJson<int>(json['displayOrder']),
+      status: $PaymentMethodsTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
@@ -4899,6 +5099,9 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
       'displayOrder': serializer.toJson<int>(displayOrder),
+      'status': serializer.toJson<String>(
+        $PaymentMethodsTable.$converterstatus.toJson(status),
+      ),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
@@ -4909,6 +5112,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
     String? name,
     Value<String?> description = const Value.absent(),
     int? displayOrder,
+    PaymentMethodStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => PaymentMethod(
@@ -4916,6 +5120,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
     name: name ?? this.name,
     description: description.present ? description.value : this.description,
     displayOrder: displayOrder ?? this.displayOrder,
+    status: status ?? this.status,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
@@ -4929,6 +5134,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
       displayOrder: data.displayOrder.present
           ? data.displayOrder.value
           : this.displayOrder,
+      status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -4941,6 +5147,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('displayOrder: $displayOrder, ')
+          ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -4948,8 +5155,15 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, description, displayOrder, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    description,
+    displayOrder,
+    status,
+    createdAt,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -4958,6 +5172,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
           other.name == this.name &&
           other.description == this.description &&
           other.displayOrder == this.displayOrder &&
+          other.status == this.status &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -4967,6 +5182,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
   final Value<String> name;
   final Value<String?> description;
   final Value<int> displayOrder;
+  final Value<PaymentMethodStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const PaymentMethodsCompanion({
@@ -4974,6 +5190,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     this.displayOrder = const Value.absent(),
+    this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -4982,6 +5199,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
     required String name,
     this.description = const Value.absent(),
     this.displayOrder = const Value.absent(),
+    this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : name = Value(name);
@@ -4990,6 +5208,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
     Expression<String>? name,
     Expression<String>? description,
     Expression<int>? displayOrder,
+    Expression<String>? status,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -4998,6 +5217,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
       if (name != null) 'name': name,
       if (description != null) 'description': description,
       if (displayOrder != null) 'display_order': displayOrder,
+      if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -5008,6 +5228,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
     Value<String>? name,
     Value<String?>? description,
     Value<int>? displayOrder,
+    Value<PaymentMethodStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -5016,6 +5237,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
       name: name ?? this.name,
       description: description ?? this.description,
       displayOrder: displayOrder ?? this.displayOrder,
+      status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -5036,6 +5258,11 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
     if (displayOrder.present) {
       map['display_order'] = Variable<int>(displayOrder.value);
     }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $PaymentMethodsTable.$converterstatus.toSql(status.value),
+      );
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -5052,6 +5279,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('displayOrder: $displayOrder, ')
+          ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -6313,6 +6541,7 @@ typedef $$ExpensesTableCreateCompanionBuilder =
     ExpensesCompanion Function({
       Value<int> id,
       Value<int?> cashRegisterId,
+      required int paymentMethodId,
       required String description,
       Value<double> amount,
       Value<String?> notes,
@@ -6325,6 +6554,7 @@ typedef $$ExpensesTableUpdateCompanionBuilder =
     ExpensesCompanion Function({
       Value<int> id,
       Value<int?> cashRegisterId,
+      Value<int> paymentMethodId,
       Value<String> description,
       Value<double> amount,
       Value<String?> notes,
@@ -6350,6 +6580,11 @@ class $$ExpensesTableFilterComposer
 
   ColumnFilters<int> get cashRegisterId => $composableBuilder(
     column: $table.cashRegisterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paymentMethodId => $composableBuilder(
+    column: $table.paymentMethodId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6409,6 +6644,11 @@ class $$ExpensesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get paymentMethodId => $composableBuilder(
+    column: $table.paymentMethodId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get description => $composableBuilder(
     column: $table.description,
     builder: (column) => ColumnOrderings(column),
@@ -6459,6 +6699,11 @@ class $$ExpensesTableAnnotationComposer
 
   GeneratedColumn<int> get cashRegisterId => $composableBuilder(
     column: $table.cashRegisterId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get paymentMethodId => $composableBuilder(
+    column: $table.paymentMethodId,
     builder: (column) => column,
   );
 
@@ -6518,6 +6763,7 @@ class $$ExpensesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
+                Value<int> paymentMethodId = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<double> amount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -6528,6 +6774,7 @@ class $$ExpensesTableTableManager
               }) => ExpensesCompanion(
                 id: id,
                 cashRegisterId: cashRegisterId,
+                paymentMethodId: paymentMethodId,
                 description: description,
                 amount: amount,
                 notes: notes,
@@ -6540,6 +6787,7 @@ class $$ExpensesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
+                required int paymentMethodId,
                 required String description,
                 Value<double> amount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -6550,6 +6798,7 @@ class $$ExpensesTableTableManager
               }) => ExpensesCompanion.insert(
                 id: id,
                 cashRegisterId: cashRegisterId,
+                paymentMethodId: paymentMethodId,
                 description: description,
                 amount: amount,
                 notes: notes,
@@ -6858,6 +7107,8 @@ typedef $$PurchasesTableCreateCompanionBuilder =
       Value<int> id,
       required int productId,
       Value<int?> unitId,
+      Value<int?> cashRegisterId,
+      required int paymentMethodId,
       Value<double> quantity,
       Value<double> totalCost,
       Value<DateTime> purchaseDate,
@@ -6872,6 +7123,8 @@ typedef $$PurchasesTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> productId,
       Value<int?> unitId,
+      Value<int?> cashRegisterId,
+      Value<int> paymentMethodId,
       Value<double> quantity,
       Value<double> totalCost,
       Value<DateTime> purchaseDate,
@@ -6903,6 +7156,16 @@ class $$PurchasesTableFilterComposer
 
   ColumnFilters<int> get unitId => $composableBuilder(
     column: $table.unitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cashRegisterId => $composableBuilder(
+    column: $table.cashRegisterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get paymentMethodId => $composableBuilder(
+    column: $table.paymentMethodId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6972,6 +7235,16 @@ class $$PurchasesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get cashRegisterId => $composableBuilder(
+    column: $table.cashRegisterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get paymentMethodId => $composableBuilder(
+    column: $table.paymentMethodId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get quantity => $composableBuilder(
     column: $table.quantity,
     builder: (column) => ColumnOrderings(column),
@@ -7031,6 +7304,16 @@ class $$PurchasesTableAnnotationComposer
   GeneratedColumn<int> get unitId =>
       $composableBuilder(column: $table.unitId, builder: (column) => column);
 
+  GeneratedColumn<int> get cashRegisterId => $composableBuilder(
+    column: $table.cashRegisterId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get paymentMethodId => $composableBuilder(
+    column: $table.paymentMethodId,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get quantity =>
       $composableBuilder(column: $table.quantity, builder: (column) => column);
 
@@ -7089,6 +7372,8 @@ class $$PurchasesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> productId = const Value.absent(),
                 Value<int?> unitId = const Value.absent(),
+                Value<int?> cashRegisterId = const Value.absent(),
+                Value<int> paymentMethodId = const Value.absent(),
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalCost = const Value.absent(),
                 Value<DateTime> purchaseDate = const Value.absent(),
@@ -7101,6 +7386,8 @@ class $$PurchasesTableTableManager
                 id: id,
                 productId: productId,
                 unitId: unitId,
+                cashRegisterId: cashRegisterId,
+                paymentMethodId: paymentMethodId,
                 quantity: quantity,
                 totalCost: totalCost,
                 purchaseDate: purchaseDate,
@@ -7115,6 +7402,8 @@ class $$PurchasesTableTableManager
                 Value<int> id = const Value.absent(),
                 required int productId,
                 Value<int?> unitId = const Value.absent(),
+                Value<int?> cashRegisterId = const Value.absent(),
+                required int paymentMethodId,
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalCost = const Value.absent(),
                 Value<DateTime> purchaseDate = const Value.absent(),
@@ -7127,6 +7416,8 @@ class $$PurchasesTableTableManager
                 id: id,
                 productId: productId,
                 unitId: unitId,
+                cashRegisterId: cashRegisterId,
+                paymentMethodId: paymentMethodId,
                 quantity: quantity,
                 totalCost: totalCost,
                 purchaseDate: purchaseDate,
@@ -7719,6 +8010,7 @@ typedef $$PaymentMethodsTableCreateCompanionBuilder =
       required String name,
       Value<String?> description,
       Value<int> displayOrder,
+      Value<PaymentMethodStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -7728,6 +8020,7 @@ typedef $$PaymentMethodsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String?> description,
       Value<int> displayOrder,
+      Value<PaymentMethodStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -7759,6 +8052,16 @@ class $$PaymentMethodsTableFilterComposer
   ColumnFilters<int> get displayOrder => $composableBuilder(
     column: $table.displayOrder,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    PaymentMethodStatus,
+    PaymentMethodStatus,
+    String
+  >
+  get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
@@ -7801,6 +8104,11 @@ class $$PaymentMethodsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -7836,6 +8144,9 @@ class $$PaymentMethodsTableAnnotationComposer
     column: $table.displayOrder,
     builder: (column) => column,
   );
+
+  GeneratedColumnWithTypeConverter<PaymentMethodStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -7881,6 +8192,7 @@ class $$PaymentMethodsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
+                Value<PaymentMethodStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => PaymentMethodsCompanion(
@@ -7888,6 +8200,7 @@ class $$PaymentMethodsTableTableManager
                 name: name,
                 description: description,
                 displayOrder: displayOrder,
+                status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -7897,6 +8210,7 @@ class $$PaymentMethodsTableTableManager
                 required String name,
                 Value<String?> description = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
+                Value<PaymentMethodStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => PaymentMethodsCompanion.insert(
@@ -7904,6 +8218,7 @@ class $$PaymentMethodsTableTableManager
                 name: name,
                 description: description,
                 displayOrder: displayOrder,
+                status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
