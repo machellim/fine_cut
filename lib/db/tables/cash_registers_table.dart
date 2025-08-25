@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
-
-enum CashRegisterStatus { open, closed }
+import 'package:fine_cut/db/enums.dart' show CashRegisterStatus;
 
 class CashRegisters extends Table {
   // Primary key auto-increment
@@ -30,7 +29,7 @@ class CashRegisters extends Table {
       .named('status')
       .withLength(min: 1, max: 50)
       .map(const EnumNameConverter(CashRegisterStatus.values))
-      .withDefault(const Constant('open'))();
+      .withDefault(Constant(CashRegisterStatus.open.name))();
 
   // Optional notes or description about the cash register
   TextColumn get notes =>

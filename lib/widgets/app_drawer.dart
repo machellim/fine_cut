@@ -7,6 +7,9 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final textStyle = Theme.of(context).textTheme.bodyMedium!;
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -19,44 +22,38 @@ class AppDrawer extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).primaryColor,
-                    Theme.of(
-                      context,
-                    ).primaryColor.withAlpha((0.8 * 255).toInt()),
+                    colorScheme.primary,
+                    colorScheme.primary.withValues(alpha: 0.8),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
               ),
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 8.0),
+              padding: const EdgeInsets.all(8),
               child: Stack(
                 children: [
-                  // Contenido centrado
                   Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color.fromRGBO(255, 255, 255, 0.2),
+                            color: colorScheme.onPrimary.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.point_of_sale,
-                            size: 40.0,
-                            color: Colors.white,
+                            size: 40,
+                            color: colorScheme.onPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Cajamiga',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
+                          style: textTheme.headlineSmall!.copyWith(
+                            color: colorScheme.onPrimary,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -66,9 +63,10 @@ class AppDrawer extends StatelessWidget {
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color.fromRGBO(255, 255, 255, 0.8),
-                              fontSize: 12,
+                            style: textTheme.bodySmall!.copyWith(
+                              color: colorScheme.onPrimary.withValues(
+                                alpha: 0.8,
+                              ),
                               height: 1,
                             ),
                           ),
@@ -76,15 +74,15 @@ class AppDrawer extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Botón para cerrar el Drawer en esquina superior izquierda
                   Positioned(
                     top: 0,
                     right: 0,
                     child: IconButton(
-                      icon: const Icon(Icons.close_sharp, color: Colors.white),
-                      onPressed: () {
-                        Navigator.of(context).pop(); // cierra el drawer
-                      },
+                      icon: Icon(
+                        Icons.close_sharp,
+                        color: colorScheme.onPrimary,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
                 ],
@@ -95,109 +93,51 @@ class AppDrawer extends StatelessWidget {
           // --- Sección: Ventas & Compras ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Compras & Ventas',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            child: Row(
+              children: [
+                Icon(Icons.settings, size: 20, color: Colors.grey[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Administración',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
             ),
           ),
           ListTile(
-            leading: Icon(Icons.shopping_bag),
-            title: Text('Compras'),
+            leading: Icon(
+              Icons.payment,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Formas de Pago', style: textStyle),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, 'purchases-list');
+              Navigator.pushNamed(context, 'payment-method-list');
             },
           ),
           ListTile(
-            leading: Icon(Icons.point_of_sale),
-            title: Text('Ventas'),
+            leading: Icon(
+              Icons.straighten_outlined,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Unidades de Medida', style: textStyle),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, 'sales-list');
             },
           ),
-          Divider(),
-
-          // --- Sección: Gestión de Productos ---
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Gestión de Productos',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ListTile(
+            leading: Icon(
+              Icons.link,
+              color: Theme.of(context).colorScheme.primary,
             ),
-          ),
-          ListTile(
-            leading: Icon(Icons.category),
-            title: Text('Categorías'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'categories-list');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.inventory),
-            title: Text('Catálogo de Productos'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'products-list');
-            },
-          ),
-          Divider(),
-
-          // --- Sección: Finanzas ---
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Finanzas',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            title: Text(
+              'Asignar Unidades de Medida a Productos',
+              style: textStyle,
             ),
-          ),
-          ListTile(
-            leading: Icon(Icons.monetization_on),
-            title: Text('Estado de Caja'),
-            onTap: () {
-              final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
-              Navigator.pop(context); // Cierra el Drawer siempre
-
-              if (currentRoute != 'check-totals' && currentRoute != '/') {
-                Navigator.pushNamed(
-                  context,
-                  'check-totals',
-                ); // Solo navega si no estamos en check-totals
-              }
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.lock),
-            title: Text('Cierre de Caja'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, 'cash-review-list');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.money_off),
-            title: Text('Otros Gastos'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'other-expenses-list');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.list_alt), // Icono para Tipos de Gastos
-            title: Text('Tipos de Gastos'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'expense-types-list');
-            },
-          ),
-
-          ListTile(
-            leading: Icon(Icons.add_chart), // Icono para Tipos de Gastos
-            title: Text('Inversiones'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'investment-list');
+              Navigator.pushNamed(context, 'sales-list');
             },
           ),
           Divider(),
@@ -212,7 +152,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.import_export),
-            title: Text('Importar Base de Datos'),
+            title: Text('Cargar Información', style: textStyle),
             onTap: () async {},
           ),
           /*ListTile(
@@ -223,7 +163,7 @@ class AppDrawer extends StatelessWidget {
           // backup
           ListTile(
             leading: Icon(Icons.backup),
-            title: Text('Backup Base de Datos'),
+            title: Text('Respaldar información', style: textStyle),
           ),
           Divider(),
           // --- Sección: Cuenta ---
@@ -236,7 +176,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.logout),
-            title: Text('Cerrar sesión'),
+            title: Text('Cerrar sesión', style: textStyle),
             onTap: () async {
               Navigator.pushNamedAndRemoveUntil(
                 context,

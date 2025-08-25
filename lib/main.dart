@@ -1,11 +1,13 @@
 import 'package:drift/drift.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_bloc.dart';
+import 'package:fine_cut/bloc/payment_method/payment_method_bloc.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fine_cut/screens/financial_dashboard.dart';
+import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 
 void main() {
   runApp(AppInitializer());
@@ -45,11 +47,23 @@ class AppInitializer extends StatelessWidget {
           });*/
 
           // daos
+          final paymentMethodDao = database.paymentMethodDao;
           return MultiRepositoryProvider(
             providers: [
               RepositoryProvider<AppDatabase>(create: (_) => database),
             ],
-            child: FineCutApp(database: database),
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider<CashRegisterBloc>(
+                  create: (_) => CashRegisterBloc(),
+                ),
+                BlocProvider<PaymentMethodBloc>(
+                  create: (_) =>
+                      PaymentMethodBloc(paymentMethodDao: paymentMethodDao),
+                ),
+              ],
+              child: FineCutApp(database: database),
+            ),
           );
         } else {
           return const MaterialApp(
@@ -77,7 +91,7 @@ class FineCutApp extends StatelessWidget {
       theme:
           ThemeData.from(
             colorScheme: ColorScheme.light(
-              primary: Colors.indigo,
+              primary: Colors.deepPurple,
               onPrimary: Colors.white,
               secondary: Colors.deepPurpleAccent,
               onSecondary: Colors.white,
@@ -121,7 +135,7 @@ class FineCutApp extends StatelessWidget {
 
       // o .dark, .light
       debugShowCheckedModeBanner: false,
-      home: FinancialDashboardScreen(),
+      home: MainCashRegisterScreen(),
       routes: appRoutes,
       //onGenerateRoute: generateRoute,
     );

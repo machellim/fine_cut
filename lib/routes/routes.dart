@@ -1,9 +1,17 @@
-import 'package:fine_cut/screens/financial_dashboard.dart';
+import 'package:fine_cut/screens/admin/payment_method_list.dart';
+import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
+import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
 import 'package:flutter/material.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
-  'financial-dashboard': (BuildContext context) {
-    return FinancialDashboardScreen();
+  'main-cash-register': (BuildContext context) {
+    return MainCashRegisterScreen();
+  },
+  'new-cash-register': (BuildContext context) {
+    return NewCashRegisterScreen();
+  },
+  'payment-method-list': (BuildContext context) {
+    return PaymentMethodListScreen();
   },
 };
 

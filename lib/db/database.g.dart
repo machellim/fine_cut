@@ -100,7 +100,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     defaultValue: const Constant(true),
   );
   @override
-  late final GeneratedColumnWithTypeConverter<ProductStatus, String> status =
+  late final GeneratedColumnWithTypeConverter<AppActiveStatus, String> status =
       GeneratedColumn<String>(
         'status',
         aliasedName,
@@ -111,8 +111,8 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         ),
         type: DriftSqlType.string,
         requiredDuringInsert: false,
-        defaultValue: const Constant('active'),
-      ).withConverter<ProductStatus>($ProductsTable.$converterstatus);
+        defaultValue: Constant(AppActiveStatus.active.name),
+      ).withConverter<AppActiveStatus>($ProductsTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -281,8 +281,8 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     return $ProductsTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<ProductStatus, String, String> $converterstatus =
-      const EnumNameConverter(ProductStatus.values);
+  static JsonTypeConverter2<AppActiveStatus, String, String> $converterstatus =
+      const EnumNameConverter(AppActiveStatus.values);
 }
 
 class Product extends DataClass implements Insertable<Product> {
@@ -293,7 +293,7 @@ class Product extends DataClass implements Insertable<Product> {
   final double sellingPrice;
   final int stock;
   final bool trackStock;
-  final ProductStatus status;
+  final AppActiveStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const Product({
@@ -398,7 +398,7 @@ class Product extends DataClass implements Insertable<Product> {
     double? sellingPrice,
     int? stock,
     bool? trackStock,
-    ProductStatus? status,
+    AppActiveStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => Product(
@@ -490,7 +490,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<double> sellingPrice;
   final Value<int> stock;
   final Value<bool> trackStock;
-  final Value<ProductStatus> status;
+  final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const ProductsCompanion({
@@ -552,7 +552,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<double>? sellingPrice,
     Value<int>? stock,
     Value<bool>? trackStock,
-    Value<ProductStatus>? status,
+    Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -716,7 +716,7 @@ class $CashRegistersTable extends CashRegisters
     ),
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultValue: const Constant('open'),
+    defaultValue: Constant(CashRegisterStatus.open.name),
   ).withConverter<CashRegisterStatus>($CashRegistersTable.$converterstatus);
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
@@ -1302,7 +1302,7 @@ class $CategoriesTable extends Categories
     requiredDuringInsert: false,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<CategoryStatus, String> status =
+  late final GeneratedColumnWithTypeConverter<AppActiveStatus, String> status =
       GeneratedColumn<String>(
         'status',
         aliasedName,
@@ -1313,8 +1313,8 @@ class $CategoriesTable extends Categories
         ),
         type: DriftSqlType.string,
         requiredDuringInsert: false,
-        defaultValue: const Constant('active'),
-      ).withConverter<CategoryStatus>($CategoriesTable.$converterstatus);
+        defaultValue: Constant(AppActiveStatus.active.name),
+      ).withConverter<AppActiveStatus>($CategoriesTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1434,15 +1434,15 @@ class $CategoriesTable extends Categories
     return $CategoriesTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<CategoryStatus, String, String> $converterstatus =
-      const EnumNameConverter(CategoryStatus.values);
+  static JsonTypeConverter2<AppActiveStatus, String, String> $converterstatus =
+      const EnumNameConverter(AppActiveStatus.values);
 }
 
 class Category extends DataClass implements Insertable<Category> {
   final int id;
   final String name;
   final String? description;
-  final CategoryStatus status;
+  final AppActiveStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const Category({
@@ -1523,7 +1523,7 @@ class Category extends DataClass implements Insertable<Category> {
     int? id,
     String? name,
     Value<String?> description = const Value.absent(),
-    CategoryStatus? status,
+    AppActiveStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => Category(
@@ -1579,7 +1579,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> description;
-  final Value<CategoryStatus> status;
+  final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const CategoriesCompanion({
@@ -1620,7 +1620,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     Value<int>? id,
     Value<String>? name,
     Value<String?>? description,
-    Value<CategoryStatus>? status,
+    Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -1755,7 +1755,7 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     requiredDuringInsert: false,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<ExpenseStatus, String> status =
+  late final GeneratedColumnWithTypeConverter<RecordStatus, String> status =
       GeneratedColumn<String>(
         'status',
         aliasedName,
@@ -1766,8 +1766,8 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         ),
         type: DriftSqlType.string,
         requiredDuringInsert: false,
-        defaultValue: const Constant('active'),
-      ).withConverter<ExpenseStatus>($ExpensesTable.$converterstatus);
+        defaultValue: Constant(RecordStatus.active.name),
+      ).withConverter<RecordStatus>($ExpensesTable.$converterstatus);
   static const VerificationMeta _expenseDateMeta = const VerificationMeta(
     'expenseDate',
   );
@@ -1954,8 +1954,8 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     return $ExpensesTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<ExpenseStatus, String, String> $converterstatus =
-      const EnumNameConverter(ExpenseStatus.values);
+  static JsonTypeConverter2<RecordStatus, String, String> $converterstatus =
+      const EnumNameConverter(RecordStatus.values);
 }
 
 class Expense extends DataClass implements Insertable<Expense> {
@@ -1965,7 +1965,7 @@ class Expense extends DataClass implements Insertable<Expense> {
   final String description;
   final double amount;
   final String? notes;
-  final ExpenseStatus status;
+  final RecordStatus status;
   final DateTime expenseDate;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -2074,7 +2074,7 @@ class Expense extends DataClass implements Insertable<Expense> {
     String? description,
     double? amount,
     Value<String?> notes = const Value.absent(),
-    ExpenseStatus? status,
+    RecordStatus? status,
     DateTime? expenseDate,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
@@ -2168,7 +2168,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   final Value<String> description;
   final Value<double> amount;
   final Value<String?> notes;
-  final Value<ExpenseStatus> status;
+  final Value<RecordStatus> status;
   final Value<DateTime> expenseDate;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
@@ -2230,7 +2230,7 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Value<String>? description,
     Value<double>? amount,
     Value<String?>? notes,
-    Value<ExpenseStatus>? status,
+    Value<RecordStatus>? status,
     Value<DateTime>? expenseDate,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
@@ -2379,19 +2379,19 @@ class $ProductUnitsTable extends ProductUnits
     defaultValue: const Constant(0),
   );
   @override
-  late final GeneratedColumnWithTypeConverter<ProductUnitStatus, String>
-  status = GeneratedColumn<String>(
-    'status',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 50,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant('active'),
-  ).withConverter<ProductUnitStatus>($ProductUnitsTable.$converterstatus);
+  late final GeneratedColumnWithTypeConverter<AppActiveStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 50,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(AppActiveStatus.active.name),
+      ).withConverter<AppActiveStatus>($ProductUnitsTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2550,8 +2550,8 @@ class $ProductUnitsTable extends ProductUnits
     return $ProductUnitsTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<ProductUnitStatus, String, String>
-  $converterstatus = const EnumNameConverter(ProductUnitStatus.values);
+  static JsonTypeConverter2<AppActiveStatus, String, String> $converterstatus =
+      const EnumNameConverter(AppActiveStatus.values);
 }
 
 class ProductUnit extends DataClass implements Insertable<ProductUnit> {
@@ -2561,7 +2561,7 @@ class ProductUnit extends DataClass implements Insertable<ProductUnit> {
   final double price;
   final double stock;
   final int displayOrder;
-  final ProductUnitStatus status;
+  final AppActiveStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const ProductUnit({
@@ -2656,7 +2656,7 @@ class ProductUnit extends DataClass implements Insertable<ProductUnit> {
     double? price,
     double? stock,
     int? displayOrder,
-    ProductUnitStatus? status,
+    AppActiveStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => ProductUnit(
@@ -2736,7 +2736,7 @@ class ProductUnitsCompanion extends UpdateCompanion<ProductUnit> {
   final Value<double> price;
   final Value<double> stock;
   final Value<int> displayOrder;
-  final Value<ProductUnitStatus> status;
+  final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const ProductUnitsCompanion({
@@ -2793,7 +2793,7 @@ class ProductUnitsCompanion extends UpdateCompanion<ProductUnit> {
     Value<double>? price,
     Value<double>? stock,
     Value<int>? displayOrder,
-    Value<ProductUnitStatus>? status,
+    Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -2992,7 +2992,7 @@ class $PurchasesTable extends Purchases
     defaultValue: const Constant(false),
   );
   @override
-  late final GeneratedColumnWithTypeConverter<PurchaseStatus, String> status =
+  late final GeneratedColumnWithTypeConverter<RecordStatus, String> status =
       GeneratedColumn<String>(
         'status',
         aliasedName,
@@ -3003,8 +3003,8 @@ class $PurchasesTable extends Purchases
         ),
         type: DriftSqlType.string,
         requiredDuringInsert: false,
-        defaultValue: const Constant('active'),
-      ).withConverter<PurchaseStatus>($PurchasesTable.$converterstatus);
+        defaultValue: Constant(RecordStatus.active.name),
+      ).withConverter<RecordStatus>($PurchasesTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -3209,8 +3209,8 @@ class $PurchasesTable extends Purchases
     return $PurchasesTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<PurchaseStatus, String, String> $converterstatus =
-      const EnumNameConverter(PurchaseStatus.values);
+  static JsonTypeConverter2<RecordStatus, String, String> $converterstatus =
+      const EnumNameConverter(RecordStatus.values);
 }
 
 class Purchase extends DataClass implements Insertable<Purchase> {
@@ -3224,7 +3224,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
   final DateTime purchaseDate;
   final String? notes;
   final bool isSoldOut;
-  final PurchaseStatus status;
+  final RecordStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const Purchase({
@@ -3355,7 +3355,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     DateTime? purchaseDate,
     Value<String?> notes = const Value.absent(),
     bool? isSoldOut,
-    PurchaseStatus? status,
+    RecordStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => Purchase(
@@ -3465,7 +3465,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
   final Value<DateTime> purchaseDate;
   final Value<String?> notes;
   final Value<bool> isSoldOut;
-  final Value<PurchaseStatus> status;
+  final Value<RecordStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const PurchasesCompanion({
@@ -3542,7 +3542,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     Value<DateTime>? purchaseDate,
     Value<String?>? notes,
     Value<bool>? isSoldOut,
-    Value<PurchaseStatus>? status,
+    Value<RecordStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -3745,7 +3745,7 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
     requiredDuringInsert: false,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<SaleStatus, String> status =
+  late final GeneratedColumnWithTypeConverter<RecordStatus, String> status =
       GeneratedColumn<String>(
         'status',
         aliasedName,
@@ -3756,8 +3756,8 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
         ),
         type: DriftSqlType.string,
         requiredDuringInsert: false,
-        defaultValue: const Constant('active'),
-      ).withConverter<SaleStatus>($SalesTable.$converterstatus);
+        defaultValue: Constant(RecordStatus.active.name),
+      ).withConverter<RecordStatus>($SalesTable.$converterstatus);
   static const VerificationMeta _saleDateMeta = const VerificationMeta(
     'saleDate',
   );
@@ -3974,8 +3974,8 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
     return $SalesTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<SaleStatus, String, String> $converterstatus =
-      const EnumNameConverter(SaleStatus.values);
+  static JsonTypeConverter2<RecordStatus, String, String> $converterstatus =
+      const EnumNameConverter(RecordStatus.values);
 }
 
 class Sale extends DataClass implements Insertable<Sale> {
@@ -3988,7 +3988,7 @@ class Sale extends DataClass implements Insertable<Sale> {
   final double quantity;
   final double totalAmount;
   final String? notes;
-  final SaleStatus status;
+  final RecordStatus status;
   final DateTime saleDate;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -4123,7 +4123,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     double? quantity,
     double? totalAmount,
     Value<String?> notes = const Value.absent(),
-    SaleStatus? status,
+    RecordStatus? status,
     DateTime? saleDate,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
@@ -4235,7 +4235,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
   final Value<double> quantity;
   final Value<double> totalAmount;
   final Value<String?> notes;
-  final Value<SaleStatus> status;
+  final Value<RecordStatus> status;
   final Value<DateTime> saleDate;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
@@ -4312,7 +4312,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     Value<double>? quantity,
     Value<double>? totalAmount,
     Value<String?>? notes,
-    Value<SaleStatus>? status,
+    Value<RecordStatus>? status,
     Value<DateTime>? saleDate,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
@@ -4448,7 +4448,7 @@ class $UnitsTable extends Units with TableInfo<$UnitsTable, Unit> {
     requiredDuringInsert: true,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<UnitStatus, String> status =
+  late final GeneratedColumnWithTypeConverter<AppActiveStatus, String> status =
       GeneratedColumn<String>(
         'status',
         aliasedName,
@@ -4459,8 +4459,8 @@ class $UnitsTable extends Units with TableInfo<$UnitsTable, Unit> {
         ),
         type: DriftSqlType.string,
         requiredDuringInsert: false,
-        defaultValue: const Constant('active'),
-      ).withConverter<UnitStatus>($UnitsTable.$converterstatus);
+        defaultValue: Constant(AppActiveStatus.active.name),
+      ).withConverter<AppActiveStatus>($UnitsTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -4579,15 +4579,15 @@ class $UnitsTable extends Units with TableInfo<$UnitsTable, Unit> {
     return $UnitsTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<UnitStatus, String, String> $converterstatus =
-      const EnumNameConverter(UnitStatus.values);
+  static JsonTypeConverter2<AppActiveStatus, String, String> $converterstatus =
+      const EnumNameConverter(AppActiveStatus.values);
 }
 
 class Unit extends DataClass implements Insertable<Unit> {
   final int id;
   final String name;
   final String symbol;
-  final UnitStatus status;
+  final AppActiveStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const Unit({
@@ -4664,7 +4664,7 @@ class Unit extends DataClass implements Insertable<Unit> {
     int? id,
     String? name,
     String? symbol,
-    UnitStatus? status,
+    AppActiveStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => Unit(
@@ -4718,7 +4718,7 @@ class UnitsCompanion extends UpdateCompanion<Unit> {
   final Value<int> id;
   final Value<String> name;
   final Value<String> symbol;
-  final Value<UnitStatus> status;
+  final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const UnitsCompanion({
@@ -4760,7 +4760,7 @@ class UnitsCompanion extends UpdateCompanion<Unit> {
     Value<int>? id,
     Value<String>? name,
     Value<String>? symbol,
-    Value<UnitStatus>? status,
+    Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -4870,19 +4870,19 @@ class $PaymentMethodsTable extends PaymentMethods
     defaultValue: const Constant(0),
   );
   @override
-  late final GeneratedColumnWithTypeConverter<PaymentMethodStatus, String>
-  status = GeneratedColumn<String>(
-    'status',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 50,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant('active'),
-  ).withConverter<PaymentMethodStatus>($PaymentMethodsTable.$converterstatus);
+  late final GeneratedColumnWithTypeConverter<AppActiveStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 50,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(AppActiveStatus.active.name),
+      ).withConverter<AppActiveStatus>($PaymentMethodsTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -5016,8 +5016,8 @@ class $PaymentMethodsTable extends PaymentMethods
     return $PaymentMethodsTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<PaymentMethodStatus, String, String>
-  $converterstatus = const EnumNameConverter(PaymentMethodStatus.values);
+  static JsonTypeConverter2<AppActiveStatus, String, String> $converterstatus =
+      const EnumNameConverter(AppActiveStatus.values);
 }
 
 class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
@@ -5025,7 +5025,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
   final String name;
   final String? description;
   final int displayOrder;
-  final PaymentMethodStatus status;
+  final AppActiveStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const PaymentMethod({
@@ -5112,7 +5112,7 @@ class PaymentMethod extends DataClass implements Insertable<PaymentMethod> {
     String? name,
     Value<String?> description = const Value.absent(),
     int? displayOrder,
-    PaymentMethodStatus? status,
+    AppActiveStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => PaymentMethod(
@@ -5182,7 +5182,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
   final Value<String> name;
   final Value<String?> description;
   final Value<int> displayOrder;
-  final Value<PaymentMethodStatus> status;
+  final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const PaymentMethodsCompanion({
@@ -5228,7 +5228,7 @@ class PaymentMethodsCompanion extends UpdateCompanion<PaymentMethod> {
     Value<String>? name,
     Value<String?>? description,
     Value<int>? displayOrder,
-    Value<PaymentMethodStatus>? status,
+    Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -5717,6 +5717,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UnitsTable units = $UnitsTable(this);
   late final $PaymentMethodsTable paymentMethods = $PaymentMethodsTable(this);
   late final $IncomesTable incomes = $IncomesTable(this);
+  late final PaymentMethodDao paymentMethodDao = PaymentMethodDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5744,7 +5747,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<double> sellingPrice,
       Value<int> stock,
       Value<bool> trackStock,
-      Value<ProductStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -5757,7 +5760,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<double> sellingPrice,
       Value<int> stock,
       Value<bool> trackStock,
-      Value<ProductStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -5806,7 +5809,7 @@ class $$ProductsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<ProductStatus, ProductStatus, String>
+  ColumnWithTypeConverterFilters<AppActiveStatus, AppActiveStatus, String>
   get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -5921,7 +5924,7 @@ class $$ProductsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumnWithTypeConverter<ProductStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<AppActiveStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -5966,7 +5969,7 @@ class $$ProductsTableTableManager
                 Value<double> sellingPrice = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
-                Value<ProductStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => ProductsCompanion(
@@ -5990,7 +5993,7 @@ class $$ProductsTableTableManager
                 Value<double> sellingPrice = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
-                Value<ProductStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => ProductsCompanion.insert(
@@ -6332,7 +6335,7 @@ typedef $$CategoriesTableCreateCompanionBuilder =
       Value<int> id,
       required String name,
       Value<String?> description,
-      Value<CategoryStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -6341,7 +6344,7 @@ typedef $$CategoriesTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> name,
       Value<String?> description,
-      Value<CategoryStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -6370,7 +6373,7 @@ class $$CategoriesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<CategoryStatus, CategoryStatus, String>
+  ColumnWithTypeConverterFilters<AppActiveStatus, AppActiveStatus, String>
   get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -6447,7 +6450,7 @@ class $$CategoriesTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumnWithTypeConverter<CategoryStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<AppActiveStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -6488,7 +6491,7 @@ class $$CategoriesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
-                Value<CategoryStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => CategoriesCompanion(
@@ -6504,7 +6507,7 @@ class $$CategoriesTableTableManager
                 Value<int> id = const Value.absent(),
                 required String name,
                 Value<String?> description = const Value.absent(),
-                Value<CategoryStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => CategoriesCompanion.insert(
@@ -6545,7 +6548,7 @@ typedef $$ExpensesTableCreateCompanionBuilder =
       required String description,
       Value<double> amount,
       Value<String?> notes,
-      Value<ExpenseStatus> status,
+      Value<RecordStatus> status,
       Value<DateTime> expenseDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -6558,7 +6561,7 @@ typedef $$ExpensesTableUpdateCompanionBuilder =
       Value<String> description,
       Value<double> amount,
       Value<String?> notes,
-      Value<ExpenseStatus> status,
+      Value<RecordStatus> status,
       Value<DateTime> expenseDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -6603,7 +6606,7 @@ class $$ExpensesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<ExpenseStatus, ExpenseStatus, String>
+  ColumnWithTypeConverterFilters<RecordStatus, RecordStatus, String>
   get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -6718,7 +6721,7 @@ class $$ExpensesTableAnnotationComposer
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<ExpenseStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get expenseDate => $composableBuilder(
@@ -6767,7 +6770,7 @@ class $$ExpensesTableTableManager
                 Value<String> description = const Value.absent(),
                 Value<double> amount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
-                Value<ExpenseStatus> status = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> expenseDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -6791,7 +6794,7 @@ class $$ExpensesTableTableManager
                 required String description,
                 Value<double> amount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
-                Value<ExpenseStatus> status = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> expenseDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -6837,7 +6840,7 @@ typedef $$ProductUnitsTableCreateCompanionBuilder =
       Value<double> price,
       Value<double> stock,
       Value<int> displayOrder,
-      Value<ProductUnitStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -6849,7 +6852,7 @@ typedef $$ProductUnitsTableUpdateCompanionBuilder =
       Value<double> price,
       Value<double> stock,
       Value<int> displayOrder,
-      Value<ProductUnitStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -6893,7 +6896,7 @@ class $$ProductUnitsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<ProductUnitStatus, ProductUnitStatus, String>
+  ColumnWithTypeConverterFilters<AppActiveStatus, AppActiveStatus, String>
   get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -6994,7 +6997,7 @@ class $$ProductUnitsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumnWithTypeConverter<ProductUnitStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<AppActiveStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -7041,7 +7044,7 @@ class $$ProductUnitsTableTableManager
                 Value<double> price = const Value.absent(),
                 Value<double> stock = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
-                Value<ProductUnitStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => ProductUnitsCompanion(
@@ -7063,7 +7066,7 @@ class $$ProductUnitsTableTableManager
                 Value<double> price = const Value.absent(),
                 Value<double> stock = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
-                Value<ProductUnitStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => ProductUnitsCompanion.insert(
@@ -7114,7 +7117,7 @@ typedef $$PurchasesTableCreateCompanionBuilder =
       Value<DateTime> purchaseDate,
       Value<String?> notes,
       Value<bool> isSoldOut,
-      Value<PurchaseStatus> status,
+      Value<RecordStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -7130,7 +7133,7 @@ typedef $$PurchasesTableUpdateCompanionBuilder =
       Value<DateTime> purchaseDate,
       Value<String?> notes,
       Value<bool> isSoldOut,
-      Value<PurchaseStatus> status,
+      Value<RecordStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -7194,7 +7197,7 @@ class $$PurchasesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<PurchaseStatus, PurchaseStatus, String>
+  ColumnWithTypeConverterFilters<RecordStatus, RecordStatus, String>
   get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -7331,7 +7334,7 @@ class $$PurchasesTableAnnotationComposer
   GeneratedColumn<bool> get isSoldOut =>
       $composableBuilder(column: $table.isSoldOut, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<PurchaseStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -7379,7 +7382,7 @@ class $$PurchasesTableTableManager
                 Value<DateTime> purchaseDate = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<bool> isSoldOut = const Value.absent(),
-                Value<PurchaseStatus> status = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => PurchasesCompanion(
@@ -7409,7 +7412,7 @@ class $$PurchasesTableTableManager
                 Value<DateTime> purchaseDate = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<bool> isSoldOut = const Value.absent(),
-                Value<PurchaseStatus> status = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => PurchasesCompanion.insert(
@@ -7460,7 +7463,7 @@ typedef $$SalesTableCreateCompanionBuilder =
       Value<double> quantity,
       Value<double> totalAmount,
       Value<String?> notes,
-      Value<SaleStatus> status,
+      Value<RecordStatus> status,
       Value<DateTime> saleDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -7476,7 +7479,7 @@ typedef $$SalesTableUpdateCompanionBuilder =
       Value<double> quantity,
       Value<double> totalAmount,
       Value<String?> notes,
-      Value<SaleStatus> status,
+      Value<RecordStatus> status,
       Value<DateTime> saleDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -7535,11 +7538,11 @@ class $$SalesTableFilterComposer extends Composer<_$AppDatabase, $SalesTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<SaleStatus, SaleStatus, String> get status =>
-      $composableBuilder(
-        column: $table.status,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<RecordStatus, RecordStatus, String>
+  get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<DateTime> get saleDate => $composableBuilder(
     column: $table.saleDate,
@@ -7676,7 +7679,7 @@ class $$SalesTableAnnotationComposer
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<SaleStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get saleDate =>
@@ -7726,7 +7729,7 @@ class $$SalesTableTableManager
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalAmount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
-                Value<SaleStatus> status = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> saleDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -7756,7 +7759,7 @@ class $$SalesTableTableManager
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalAmount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
-                Value<SaleStatus> status = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> saleDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -7802,7 +7805,7 @@ typedef $$UnitsTableCreateCompanionBuilder =
       Value<int> id,
       required String name,
       required String symbol,
-      Value<UnitStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -7811,7 +7814,7 @@ typedef $$UnitsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> name,
       Value<String> symbol,
-      Value<UnitStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -7839,11 +7842,11 @@ class $$UnitsTableFilterComposer extends Composer<_$AppDatabase, $UnitsTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<UnitStatus, UnitStatus, String> get status =>
-      $composableBuilder(
-        column: $table.status,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<AppActiveStatus, AppActiveStatus, String>
+  get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
@@ -7914,7 +7917,7 @@ class $$UnitsTableAnnotationComposer
   GeneratedColumn<String> get symbol =>
       $composableBuilder(column: $table.symbol, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<UnitStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<AppActiveStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -7955,7 +7958,7 @@ class $$UnitsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> symbol = const Value.absent(),
-                Value<UnitStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => UnitsCompanion(
@@ -7971,7 +7974,7 @@ class $$UnitsTableTableManager
                 Value<int> id = const Value.absent(),
                 required String name,
                 required String symbol,
-                Value<UnitStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => UnitsCompanion.insert(
@@ -8010,7 +8013,7 @@ typedef $$PaymentMethodsTableCreateCompanionBuilder =
       required String name,
       Value<String?> description,
       Value<int> displayOrder,
-      Value<PaymentMethodStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -8020,7 +8023,7 @@ typedef $$PaymentMethodsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String?> description,
       Value<int> displayOrder,
-      Value<PaymentMethodStatus> status,
+      Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -8054,11 +8057,7 @@ class $$PaymentMethodsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<
-    PaymentMethodStatus,
-    PaymentMethodStatus,
-    String
-  >
+  ColumnWithTypeConverterFilters<AppActiveStatus, AppActiveStatus, String>
   get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnWithTypeConverterFilters(column),
@@ -8145,7 +8144,7 @@ class $$PaymentMethodsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumnWithTypeConverter<PaymentMethodStatus, String> get status =>
+  GeneratedColumnWithTypeConverter<AppActiveStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
@@ -8192,7 +8191,7 @@ class $$PaymentMethodsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
-                Value<PaymentMethodStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => PaymentMethodsCompanion(
@@ -8210,7 +8209,7 @@ class $$PaymentMethodsTableTableManager
                 required String name,
                 Value<String?> description = const Value.absent(),
                 Value<int> displayOrder = const Value.absent(),
-                Value<PaymentMethodStatus> status = const Value.absent(),
+                Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => PaymentMethodsCompanion.insert(

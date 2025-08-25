@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
-
-enum PaymentMethodStatus { active, inactive }
+import 'package:fine_cut/db/enums.dart' show AppActiveStatus;
 
 class PaymentMethods extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -17,8 +16,8 @@ class PaymentMethods extends Table {
   TextColumn get status => text()
       .named('status')
       .withLength(min: 1, max: 50)
-      .map(const EnumNameConverter(PaymentMethodStatus.values))
-      .withDefault(const Constant('active'))();
+      .map(const EnumNameConverter(AppActiveStatus.values))
+      .withDefault(Constant(AppActiveStatus.active.name))();
 
   // Creation date, defaults to current date and time
   DateTimeColumn get createdAt =>

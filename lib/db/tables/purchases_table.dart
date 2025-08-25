@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
-
-enum PurchaseStatus { active, deleted }
+import 'package:fine_cut/db/enums.dart' show RecordStatus;
 
 class Purchases extends Table {
   // Primary key auto-increment
@@ -53,8 +52,8 @@ class Purchases extends Table {
   TextColumn get status => text()
       .named('status')
       .withLength(min: 1, max: 50)
-      .map(const EnumNameConverter(PurchaseStatus.values))
-      .withDefault(const Constant('active'))();
+      .map(const EnumNameConverter(RecordStatus.values))
+      .withDefault(Constant(RecordStatus.active.name))();
 
   // Creation date
   DateTimeColumn get createdAt =>

@@ -1,9 +1,10 @@
 class AppMessages {
-  static const Map<String, String> loginMessages = {
-    'titleHomeScreen': 'Resumen Financiero',
+  static const _paymentMethodMessages = {
+    'messageLoadingPaymentMethods': 'Cargando Formas de pago',
+    'messageLoadFailurePaymentMethods': 'Error al cargar Formas de Pago',
   };
 
-  static String getMessage(Map<String, String> messageCategory, String key) {
-    return messageCategory[key] ?? 'mensaje no parametrizado';
+  static String getPaymentMethodMessage(String key) {
+    return _paymentMethodMessages[key] ?? 'mensaje no parametrizado';
   }
 }
