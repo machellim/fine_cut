@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:fine_cut/bloc/cash_register/cash_register_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_bloc.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
@@ -41,13 +42,14 @@ class AppInitializer extends StatelessWidget {
           final database = snapshot.data!;
 
           // to create db if not exists in the directory
-          /*database.allTables.forEach((TableInfo table) async {
+          database.allTables.forEach((TableInfo table) async {
             final count = await database.select(table).get();
             print('${table.actualTableName}');
-          });*/
+          });
 
           // daos
           final paymentMethodDao = database.paymentMethodDao;
+          final cashRegisterDao = database.cashRegisterDao;
           return MultiRepositoryProvider(
             providers: [
               RepositoryProvider<AppDatabase>(create: (_) => database),
@@ -55,11 +57,16 @@ class AppInitializer extends StatelessWidget {
             child: MultiBlocProvider(
               providers: [
                 BlocProvider<CashRegisterBloc>(
-                  create: (_) => CashRegisterBloc(),
+                  create: (_) =>
+                      CashRegisterBloc(cashRegisterDao: cashRegisterDao),
                 ),
                 BlocProvider<PaymentMethodBloc>(
                   create: (_) =>
                       PaymentMethodBloc(paymentMethodDao: paymentMethodDao),
+                ),
+                BlocProvider<CashRegisterCrudBloc>(
+                  create: (_) =>
+                      CashRegisterCrudBloc(cashRegisterDao: cashRegisterDao),
                 ),
               ],
               child: FineCutApp(database: database),
@@ -95,12 +102,18 @@ class FineCutApp extends StatelessWidget {
               onPrimary: Colors.white,
               secondary: Colors.deepPurpleAccent,
               onSecondary: Colors.white,
-              surface: Colors.white, // en lugar de background
+              surface: Colors.white,
               onSurface: Colors.black,
               brightness: Brightness.light,
             ),
             textTheme: ThemeData.light().textTheme,
           ).copyWith(
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple, // botón claro
+                foregroundColor: Colors.white, // texto blanco
+              ),
+            ),
             inputDecorationTheme: const InputDecorationTheme(
               contentPadding: EdgeInsets.symmetric(
                 vertical: 10,
@@ -108,21 +121,26 @@ class FineCutApp extends StatelessWidget {
               ),
             ),
           ),
-
       darkTheme:
           ThemeData.from(
             colorScheme: ColorScheme.dark(
-              primary: Colors.indigo.shade200,
+              primary: Colors.indigoAccent,
               onPrimary: Colors.black,
-              secondary: Colors.deepPurple.shade200,
+              secondary: Colors.deepPurpleAccent,
               onSecondary: Colors.black,
-              surface: Colors.black, // en lugar de background
+              surface: Colors.black,
               onSurface: Colors.white,
               brightness: Brightness.dark,
             ),
             textTheme: ThemeData.dark().textTheme,
           ).copyWith(
             scaffoldBackgroundColor: Colors.black,
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigoAccent, // botón oscuro
+                foregroundColor: Colors.black, // texto oscuro
+              ),
+            ),
             inputDecorationTheme: const InputDecorationTheme(
               contentPadding: EdgeInsets.symmetric(
                 vertical: 10,
@@ -130,7 +148,6 @@ class FineCutApp extends StatelessWidget {
               ),
             ),
           ),
-
       themeMode: ThemeMode.system,
 
       // o .dark, .light

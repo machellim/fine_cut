@@ -6,8 +6,10 @@ class CashRegisters extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   // Date of the register (e.g., 2025-08-24)
-  DateTimeColumn get registerDate =>
-      dateTime().named('register_date').withDefault(currentDateAndTime)();
+  DateTimeColumn get registerDate => dateTime()
+      .named('register_date')
+      .customConstraint('UNIQUE')
+      .withDefault(currentDateAndTime)();
 
   // Opening amount for the day
   RealColumn get openingAmount =>

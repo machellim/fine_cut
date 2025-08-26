@@ -90,6 +90,30 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
 
+          // --- Sección: Visualizacion de cajas ---
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.view_comfy, size: 20, color: Colors.grey[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Visualización de Cajas',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.history_outlined,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Historial de Cajas', style: textStyle),
+            onTap: () async {},
+          ),
+          Divider(),
+
           // --- Sección: Ventas & Compras ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -142,16 +166,25 @@ class AppDrawer extends StatelessWidget {
           ),
           Divider(),
 
-          // --- Sección: Cuenta ---
+          // --- Sección: Gestión de Información ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Gestión de Datos',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            child: Row(
+              children: [
+                Icon(Icons.backup_table, size: 20, color: Colors.grey[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Gestión de Información',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
             ),
           ),
           ListTile(
-            leading: Icon(Icons.import_export),
+            leading: Icon(
+              Icons.import_export,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             title: Text('Cargar Información', style: textStyle),
             onTap: () async {},
           ),
@@ -162,28 +195,11 @@ class AppDrawer extends StatelessWidget {
           ),*/
           // backup
           ListTile(
-            leading: Icon(Icons.backup),
-            title: Text('Respaldar información', style: textStyle),
-          ),
-          Divider(),
-          // --- Sección: Cuenta ---
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Cuenta',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            leading: Icon(
+              Icons.backup,
+              color: Theme.of(context).colorScheme.primary,
             ),
-          ),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Cerrar sesión', style: textStyle),
-            onTap: () async {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                'login',
-                (route) => false,
-              );
-            },
+            title: Text('Respaldar información', style: textStyle),
           ),
         ],
       ),

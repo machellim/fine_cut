@@ -655,6 +655,7 @@ class $CashRegistersTable extends CashRegisters
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
+    $customConstraints: 'UNIQUE',
     defaultValue: currentDateAndTime,
   );
   static const VerificationMeta _openingAmountMeta = const VerificationMeta(
@@ -5718,6 +5719,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PaymentMethodsTable paymentMethods = $PaymentMethodsTable(this);
   late final $IncomesTable incomes = $IncomesTable(this);
   late final PaymentMethodDao paymentMethodDao = PaymentMethodDao(
+    this as AppDatabase,
+  );
+  late final CashRegisterDao cashRegisterDao = CashRegisterDao(
     this as AppDatabase,
   );
   @override

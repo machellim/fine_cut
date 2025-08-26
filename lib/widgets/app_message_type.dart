@@ -14,15 +14,18 @@ class AppMessageType extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     IconData icon;
     Color color;
     String? label;
 
-    // Determinar icono y color según el tipo de mensaje
+    // Determinar icono y color principal según el tipo de mensaje
     switch (messageType) {
       case MessageType.error:
         icon = Icons.error_outline;
-        color = Colors.red;
+        color = theme.colorScheme.error;
         label = 'Error';
         break;
       case MessageType.success:
@@ -35,17 +38,23 @@ class AppMessageType extends StatelessWidget {
         color = Colors.orange;
         label = 'Alert';
         break;
+      case MessageType.info:
       default:
         icon = Icons.info_outline;
-        color = Colors.blue;
+        color = theme.colorScheme.primary;
+        label = 'Info';
+        break;
     }
+
+    // Fondo adaptado (ligero en light mode, más oscuro en dark mode)
+    final backgroundColor = color.withOpacity(isDark ? 0.2 : 0.1);
 
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.red.withValues(alpha: 0.1), // Fondo con opacidad
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -55,7 +64,10 @@ class AppMessageType extends StatelessWidget {
             Flexible(
               child: Text(
                 message,
-                style: TextStyle(color: color, fontSize: 14),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: color,
+                  fontSize: 14,
+                ),
               ),
             ),
           ],

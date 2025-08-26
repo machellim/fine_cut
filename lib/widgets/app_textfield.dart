@@ -18,7 +18,9 @@ class AppTextField extends StatefulWidget {
   final InputBorder? border;
   final bool autofocus;
   final bool enabled;
+  final bool readOnly;
   final String? Function(String?)? validator;
+  final IconData? prefixIcon;
 
   const AppTextField({
     super.key,
@@ -39,7 +41,9 @@ class AppTextField extends StatefulWidget {
     this.border,
     this.autofocus = false,
     this.enabled = true,
+    this.readOnly = false,
     this.validator,
+    this.prefixIcon,
   });
 
   @override
@@ -75,6 +79,7 @@ class _AppTextFieldState extends State<AppTextField> {
       textCapitalization: TextCapitalization.sentences,
       autofocus: widget.autofocus,
       enabled: widget.enabled,
+      readOnly: widget.readOnly,
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: widget.labelStyle,
@@ -102,6 +107,10 @@ class _AppTextFieldState extends State<AppTextField> {
               borderRadius: BorderRadius.circular(8.0),
               borderSide: BorderSide(color: colorScheme.error, width: 2.0),
             ),
+        prefixIcon: widget.prefixIcon != null
+            ? Icon(widget.prefixIcon, color: colorScheme.primary)
+            : null,
+
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
@@ -134,7 +143,7 @@ class _AppTextFieldState extends State<AppTextField> {
           widget.validator ??
           (widget.validate
               ? (value) => (value == null || value.isEmpty)
-                    ? (widget.validationMessage ?? 'Please enter some text')
+                    ? (widget.validationMessage ?? 'Campo requerido')
                     : null
               : null),
       onSaved: widget.onSaved != null

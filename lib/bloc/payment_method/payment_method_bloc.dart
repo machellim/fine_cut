@@ -16,7 +16,7 @@ class PaymentMethodBloc extends Bloc<PaymentMethodEvent, PaymentMethodState> {
 
     on<LoadPaymentMethodsEvent>((event, emit) async {
       emit(PaymentMethodsLoading());
-      await Future.delayed(Duration(seconds: 3));
+      //await Future.delayed(Duration(seconds: 3));
       try {
         final investments = await paymentMethodDao.getAllPaymentMethods();
         emit(PaymentMethodsLoadSuccess(investments));
