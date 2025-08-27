@@ -3,6 +3,7 @@ import 'package:fine_cut/constants/app_messages.dart';
 import 'package:fine_cut/db/enums.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_description_list_item.dart';
+import 'package:fine_cut/widgets/app_floating_action_button.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_title_list_item.dart' hide AppActiveStatus;
@@ -108,13 +109,12 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AppFloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, 'new-category');
         },
-        backgroundColor: Theme.of(context).primaryColor,
-        tooltip: "Agregar Categoría",
-        child: const Icon(Icons.add),
+        tooltip: 'Agregar Categoría',
+        icon: Icons.add,
       ),
     );
   }

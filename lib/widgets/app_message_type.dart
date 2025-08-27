@@ -47,7 +47,9 @@ class AppMessageType extends StatelessWidget {
     }
 
     // Fondo adaptado (ligero en light mode, más oscuro en dark mode)
-    final backgroundColor = color.withOpacity(isDark ? 0.2 : 0.1);
+    final backgroundColor = color.withAlpha(
+      ((isDark ? 0.2 : 0.1) * 255).toInt(),
+    );
 
     return Padding(
       padding: const EdgeInsets.only(top: 20),
@@ -58,6 +60,7 @@ class AppMessageType extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color),
             const SizedBox(width: 10),

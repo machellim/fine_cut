@@ -136,7 +136,7 @@ class AppDrawer extends StatelessWidget {
             title: Text('Categorías', style: textStyle),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, 'payment-method-list');
+              Navigator.pushNamed(context, 'categories-list');
             },
           ),
           ListTile(

@@ -8,7 +8,7 @@ class DatabaseTriggers {
     AFTER UPDATE ON categories
     BEGIN
       UPDATE categories
-      SET updated_at = CURRENT_TIMESTAMP
+      SET updated_at = strftime('%s','now')
       WHERE id = NEW.id;
     END;
   ''';

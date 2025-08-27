@@ -19,7 +19,7 @@ class CashRegisterCrudBloc
       emit(CreateCashRegisterLoading());
       //await Future.delayed(Duration(seconds: 3));
       try {
-        /*final cashRegister = await cashRegisterDao.createCashRegister(
+        final cashRegister = await cashRegisterDao.createCashRegister(
           registerDateString: event.registerDate,
           openingAmount: event.openingAmount,
           notes: event.notes,
@@ -33,8 +33,8 @@ class CashRegisterCrudBloc
           );
         } else {
           emit(CreateCashRegisterSuccess(cashRegister));
-        }*/
-        emit(CreateCashRegisterSuccess(null));
+        }
+        //emit(CreateCashRegisterSuccess(null));
       } catch (e) {
         emit(CreateCashRegisterFailure(message: e.toString()));
       }

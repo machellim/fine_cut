@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
+import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
+import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_bloc.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
@@ -50,6 +52,7 @@ class AppInitializer extends StatelessWidget {
           // daos
           final paymentMethodDao = database.paymentMethodDao;
           final cashRegisterDao = database.cashRegisterDao;
+          final categoryDao = database.categoryDao;
           return MultiRepositoryProvider(
             providers: [
               RepositoryProvider<AppDatabase>(create: (_) => database),
@@ -67,6 +70,12 @@ class AppInitializer extends StatelessWidget {
                 BlocProvider<CashRegisterCrudBloc>(
                   create: (_) =>
                       CashRegisterCrudBloc(cashRegisterDao: cashRegisterDao),
+                ),
+                BlocProvider<CategoryBloc>(
+                  create: (_) => CategoryBloc(categoryDao: categoryDao),
+                ),
+                BlocProvider<CategoriesListBloc>(
+                  create: (_) => CategoriesListBloc(categoryDao: categoryDao),
                 ),
               ],
               child: FineCutApp(database: database),
