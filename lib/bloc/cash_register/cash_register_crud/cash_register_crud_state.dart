@@ -13,7 +13,7 @@ final class CashRegisterCrudInitial extends CashRegisterCrudState {}
 class CreateCashRegisterLoading extends CashRegisterCrudState {}
 
 class CreateCashRegisterSuccess extends CashRegisterCrudState {
-  final CashRegister cashRegister;
+  final CashRegister? cashRegister;
 
   const CreateCashRegisterSuccess(this.cashRegister);
 }

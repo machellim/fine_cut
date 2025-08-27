@@ -130,6 +130,28 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(
+              Icons.category,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Categorías', style: textStyle),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, 'payment-method-list');
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.inventory,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Productos', style: textStyle),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, 'payment-method-list');
+            },
+          ),
+          ListTile(
+            leading: Icon(
               Icons.payment,
               color: Theme.of(context).colorScheme.primary,
             ),

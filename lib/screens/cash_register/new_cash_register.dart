@@ -116,6 +116,7 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                         >(
                           listener: (context, state) {
                             if (state is CreateCashRegisterSuccess) {
+                              final casRegister = state.cashRegister;
                               Navigator.pushNamed(
                                 context,
                                 'view-edit-cash-register',

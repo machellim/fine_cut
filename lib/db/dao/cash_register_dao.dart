@@ -32,7 +32,7 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     return lastRegister?.closingAmount ?? 0.0;
   }
 
-  Future<CashRegister> createCashRegister({
+  Future<CashRegister?> createCashRegister({
     required String registerDateString,
     required double openingAmount,
     String? notes,
@@ -41,15 +41,28 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     final dateFormat = DateFormat("dd-MM-yyyy");
     final parsedDate = dateFormat.parse(registerDateString);
 
+    // Truncar hora para guardar solo la fecha
+    final dateOnly = DateTime(
+      parsedDate.year,
+      parsedDate.month,
+      parsedDate.day,
+    );
+
+    final existing = await (select(
+      cashRegisters,
+    )..where((tbl) => tbl.registerDate.equals(dateOnly))).getSingleOrNull();
+
+    if (existing != null) {
+      return null;
+    }
+
     final companion = CashRegistersCompanion.insert(
-      registerDate: Value(parsedDate),
+      registerDate: Value(dateOnly),
       openingAmount: Value(openingAmount),
       status: Value(CashRegisterStatus.open),
       notes: Value(notes),
-      createdAt: Value(DateTime.now()),
     );
 
-    // Insert and return created object
     return await into(cashRegisters).insertReturning(companion);
   }
 }

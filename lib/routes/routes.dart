@@ -1,4 +1,5 @@
 import 'package:fine_cut/screens/admin/payment_method_list.dart';
+import 'package:fine_cut/screens/cash_register/cash_register_list.dart';
 import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/view_edit_cash_register.dart';
@@ -16,6 +17,9 @@ final Map<String, WidgetBuilder> appRoutes = {
   },
   'view-edit-cash-register': (BuildContext context) {
     return ViewEditCashRegisterScreen();
+  },
+  'cash-register-list': (BuildContext context) {
+    return CashRegisterListScreen();
   },
 };
 

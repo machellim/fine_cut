@@ -19,12 +19,22 @@ class CashRegisterCrudBloc
       emit(CreateCashRegisterLoading());
       //await Future.delayed(Duration(seconds: 3));
       try {
-        final cashRegister = await cashRegisterDao.createCashRegister(
+        /*final cashRegister = await cashRegisterDao.createCashRegister(
           registerDateString: event.registerDate,
           openingAmount: event.openingAmount,
           notes: event.notes,
         );
-        emit(CreateCashRegisterSuccess(cashRegister));
+        if (cashRegister == null) {
+          emit(
+            CreateCashRegisterFailure(
+              message:
+                  'La Caja de la fecha ${event.registerDate} ya fue creada.',
+            ),
+          );
+        } else {
+          emit(CreateCashRegisterSuccess(cashRegister));
+        }*/
+        emit(CreateCashRegisterSuccess(null));
       } catch (e) {
         emit(CreateCashRegisterFailure(message: e.toString()));
       }
