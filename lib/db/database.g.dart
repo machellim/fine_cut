@@ -4846,6 +4846,7 @@ class $PaymentMethodsTable extends PaymentMethods
     ),
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+    $customConstraints: 'UNIQUE',
   );
   static const VerificationMeta _descriptionMeta = const VerificationMeta(
     'description',

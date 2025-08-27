@@ -3,14 +3,15 @@ import 'package:equatable/equatable.dart';
 import 'package:fine_cut/db/dao/payment_method_dao.dart';
 import 'package:fine_cut/db/database.dart';
 
-part 'payment_method_event.dart';
-part 'payment_method_state.dart';
+part 'payment_method_list_event.dart';
+part 'payment_method_list_state.dart';
 
-class PaymentMethodBloc extends Bloc<PaymentMethodEvent, PaymentMethodState> {
+class PaymentMethodListBloc
+    extends Bloc<PaymentMethodListEvent, PaymentMethodListState> {
   final PaymentMethodDao paymentMethodDao;
-  PaymentMethodBloc({required this.paymentMethodDao})
+  PaymentMethodListBloc({required this.paymentMethodDao})
     : super(PaymentMethodInitial()) {
-    on<PaymentMethodEvent>((event, emit) {
+    on<PaymentMethodListEvent>((event, emit) {
       // TODO: implement event handler
     });
 

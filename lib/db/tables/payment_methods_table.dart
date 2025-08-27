@@ -5,7 +5,9 @@ class PaymentMethods extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   // Payment method name (e.g., "Cash", "Credit Card", "Mobile Payment")
-  TextColumn get name => text().withLength(min: 1, max: 50)();
+  TextColumn get name =>
+      text().withLength(min: 1, max: 50).customConstraint('UNIQUE')();
+
   TextColumn get description => text().nullable()();
 
   // Order to display the unit in UI

@@ -3,7 +3,7 @@ import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_cru
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
 import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
-import 'package:fine_cut/bloc/payment_method/payment_method_bloc.dart';
+import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
@@ -63,9 +63,9 @@ class AppInitializer extends StatelessWidget {
                   create: (_) =>
                       CashRegisterBloc(cashRegisterDao: cashRegisterDao),
                 ),
-                BlocProvider<PaymentMethodBloc>(
+                BlocProvider<PaymentMethodListBloc>(
                   create: (_) =>
-                      PaymentMethodBloc(paymentMethodDao: paymentMethodDao),
+                      PaymentMethodListBloc(paymentMethodDao: paymentMethodDao),
                 ),
                 BlocProvider<CashRegisterCrudBloc>(
                   create: (_) =>

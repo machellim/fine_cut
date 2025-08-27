@@ -1,4 +1,4 @@
-import 'package:fine_cut/bloc/payment_method/payment_method_bloc.dart';
+import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/constants/app_messages.dart';
 import 'package:fine_cut/db/enums.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
@@ -6,7 +6,7 @@ import 'package:fine_cut/widgets/app_description_list_item.dart';
 import 'package:fine_cut/widgets/app_floating_action_button.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
-import 'package:fine_cut/widgets/app_title_list_item.dart' hide AppActiveStatus;
+import 'package:fine_cut/widgets/app_title_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,14 +22,14 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<PaymentMethodBloc>().add(LoadPaymentMethodsEvent());
+    context.read<PaymentMethodListBloc>().add(LoadPaymentMethodsEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Lista de Categorías")),
-      body: BlocBuilder<PaymentMethodBloc, PaymentMethodState>(
+      body: BlocBuilder<PaymentMethodListBloc, PaymentMethodListState>(
         builder: (context, state) {
           if (state is PaymentMethodsLoading) {
             return AppLoadingScreen(
