@@ -1,12 +1,11 @@
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
-import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_description_list_item.dart';
 import 'package:fine_cut/widgets/app_floating_action_button.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
-import 'package:fine_cut/widgets/app_snackbar.dart';
+import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:fine_cut/widgets/app_title_list_item.dart';
 import 'package:fine_cut/widgets/app_top_banner.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +47,7 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Lista de Categorías")),
+      appBar: AppBar(title: const Text("Lista de Formas de Pago")),
       body: BlocConsumer<PaymentMethodListBloc, PaymentMethodListState>(
         listener: (context, state) => {
           if (state is PaymentMethodsLoadSuccess)
@@ -67,6 +66,14 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
               ),
             );
           } else if (state is PaymentMethodsLoadSuccess) {
+            if (state.paymentMethods.isEmpty) {
+              return Center(
+                child: AppMessageType(
+                  message: AppMessages.getAppMessage('emptyList'),
+                  messageType: MessageType.info,
+                ),
+              );
+            }
             return Column(
               children: [
                 if (_showBanner)

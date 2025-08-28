@@ -74,7 +74,7 @@ class _CategoriesListScreenState extends State<CategoriesListScreen> {
             if (state.categories.isEmpty) {
               return Center(
                 child: AppMessageType(
-                  message: 'No hay categorías disponibles.',
+                  message: AppMessages.getAppMessage('emptyList'),
                   messageType: MessageType.info,
                 ),
               );

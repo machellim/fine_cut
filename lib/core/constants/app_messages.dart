@@ -14,6 +14,14 @@ class AppMessages {
     'messageLoadingCategories': 'Cargando categorías.',
   };
 
+  static const _productMessages = {
+    'messageNewProductScreen': 'Crear Nuevo Producto.',
+    'messageEditProductScreen': 'Editar Producto.',
+    'messageLoadingProducts': 'Cargando productos.',
+  };
+
+  static const appMessages = {'emptyList': 'No hay información.'};
+
   static String getPaymentMethodMessage(String key) {
     return _paymentMethodMessages[key] ?? 'mensaje no parametrizado';
   }
@@ -24,5 +32,13 @@ class AppMessages {
 
   static String getCategoryMessage(String key) {
     return _categoryMessages[key] ?? 'mensaje no parametrizado';
+  }
+
+  static String getProductMessage(String key) {
+    return _productMessages[key] ?? 'mensaje no parametrizado';
+  }
+
+  static String getAppMessage(String key) {
+    return appMessages[key] ?? 'mensaje no parametrizado';
   }
 }

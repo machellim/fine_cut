@@ -2,42 +2,24 @@ import 'package:drift/drift.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import '../database.dart';
 
-import '../tables/categories_table.dart';
+import '../tables/products_table.dart';
 
-part 'category_dao.g.dart';
+part 'product_dao.g.dart';
 
-@DriftAccessor(tables: [Categories])
-class CategoryDao extends DatabaseAccessor<AppDatabase>
-    with _$CategoryDaoMixin {
+@DriftAccessor(tables: [Products])
+class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   final AppDatabase db;
 
-  CategoryDao(this.db) : super(db);
+  ProductDao(this.db) : super(db);
 
-  Future<List<Category>> getAllCategories() {
-    return (select(
-      categories,
-    )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
-  }
-
-  Future<List<Category>> searchCategories(String query) {
-    final trimmedQuery = query.trim();
-
-    // Return empty list if query is too short
-    if (trimmedQuery.length < 3) {
-      return Future.value([]);
-    }
-
-    // Filter categories in the database
-    return (select(categories)
-          ..where((c) => c.name.lower().like('%${trimmedQuery.toLowerCase()}%'))
-          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
-        .get();
+  Future<List<Product>> getAllProducts() {
+    return (select(products)..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
   }
 
   Future<bool> _isNameTaken(String name, {int? excludeId}) async {
     final normalizedName = name.toLowerCase();
     final conflict =
-        await (select(categories)
+        await (select(products)
               ..where((tbl) => tbl.name.lower().equals(normalizedName)))
             .getSingleOrNull();
 
@@ -46,39 +28,47 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
     return true;
   }
 
-  Future<Category?> createCategory({
+  Future<Product?> createProduct({
+    required int categoryId,
     required String name,
     String? description,
+    bool? trackStock,
   }) async {
     if (await _isNameTaken(name)) return null;
 
-    final companion = CategoriesCompanion.insert(
+    final companion = ProductsCompanion.insert(
+      categoryId: categoryId,
       name: name,
       description: Value(description),
+      trackStock: Value(trackStock ?? true),
     );
-    return await into(categories).insertReturning(companion);
+    return await into(products).insertReturning(companion);
   }
 
-  Future<Category?> updateCategory({
+  Future<Product?> updateProduct({
     required int id,
+    required int categoryId,
     required String name,
     String? description,
     AppActiveStatus status = AppActiveStatus.active,
+    bool? trackStock,
   }) async {
     if (await _isNameTaken(name, excludeId: id)) return null;
 
-    final companion = CategoriesCompanion(
+    final companion = ProductsCompanion(
+      categoryId: Value(categoryId),
       name: Value(name),
       description: Value(description),
       status: Value(status),
+      trackStock: Value(trackStock ?? true),
     );
 
     await (update(
-      categories,
+      products,
     )..where((tbl) => tbl.id.equals(id))).write(companion);
 
     return await (select(
-      categories,
+      products,
     )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 }

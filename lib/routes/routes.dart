@@ -2,6 +2,8 @@ import 'package:fine_cut/screens/admin/categories/categories_list.dart';
 import 'package:fine_cut/screens/admin/categories/new_category.dart';
 import 'package:fine_cut/screens/admin/payment_methods/new_payment_method.dart';
 import 'package:fine_cut/screens/admin/payment_methods/payment_method_list.dart';
+import 'package:fine_cut/screens/admin/products/new_product.dart';
+import 'package:fine_cut/screens/admin/products/products_list.dart';
 import 'package:fine_cut/screens/cash_register/cash_register_list.dart';
 import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
@@ -32,6 +34,12 @@ final Map<String, WidgetBuilder> appRoutes = {
   },
   'new-payment-method': (BuildContext context) {
     return NewPaymentMethodScreen();
+  },
+  'product-list': (BuildContext context) {
+    return ProductsListScreen();
+  },
+  'new-product': (BuildContext context) {
+    return NewProductScreen();
   },
 };
 

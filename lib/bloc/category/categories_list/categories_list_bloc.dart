@@ -25,9 +25,7 @@ class CategoriesListBloc
 
         final categories = await categoryDao.getAllCategories();
         emit(CategoriesListLoadSuccess(categories, event.eventSource));
-        print('ok');
       } catch (e) {
-        print(e);
         emit(
           CategoriesListLoadFailure(message: 'Error al cargar las categorías'),
         );

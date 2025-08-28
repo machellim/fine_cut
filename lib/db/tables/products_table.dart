@@ -20,10 +20,6 @@ class Products extends Table {
   TextColumn get description =>
       text().withLength(min: 0, max: 1000).nullable().named('description')();
 
-  // Selling price per unit, including tax
-  RealColumn get sellingPrice =>
-      real().named('selling_price').withDefault(const Constant(0.0))();
-
   // Product stock quantity
   IntColumn get stock =>
       integer().named('stock').withDefault(const Constant(0))();
