@@ -22,7 +22,7 @@ class CategoriesListBloc
       try {
         // Emite un estado de "carga en progreso"
         emit(CategoriesListLoading());
-
+        //await Future.delayed(Duration(seconds: 3));
         final categories = await categoryDao.getAllCategories();
         emit(CategoriesListLoadSuccess(categories, event.eventSource));
       } catch (e) {

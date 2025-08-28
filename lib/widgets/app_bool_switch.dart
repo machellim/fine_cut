@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-class AppSwitch extends StatefulWidget {
-  final bool value;
+class AppBoolSwitch extends StatefulWidget {
   final ValueChanged<bool>? onChanged;
   final String activeText;
   final String inactiveText;
   final EdgeInsets padding;
 
-  const AppSwitch({
+  // Controller obligatorio
+  final TextEditingController controller;
+
+  const AppBoolSwitch({
     super.key,
-    required this.value,
+    required this.controller,
     this.onChanged,
     this.activeText = "Activo",
     this.inactiveText = "Inactivo",
@@ -17,16 +19,17 @@ class AppSwitch extends StatefulWidget {
   });
 
   @override
-  State<AppSwitch> createState() => _AppSwitchState();
+  State<AppBoolSwitch> createState() => _AppBoolSwitchState();
 }
 
-class _AppSwitchState extends State<AppSwitch> {
+class _AppBoolSwitchState extends State<AppBoolSwitch> {
   late bool _value;
 
   @override
   void initState() {
     super.initState();
-    _value = widget.value;
+    // Inicializamos desde el controller (true/false)
+    _value = widget.controller.text.toLowerCase() == 'true';
   }
 
   @override
@@ -51,10 +54,14 @@ class _AppSwitchState extends State<AppSwitch> {
             value: _value,
             activeTrackColor: colorScheme.primary.withValues(alpha: 0.5),
             activeThumbColor: colorScheme.primary,
-            inactiveTrackColor: colorScheme.surfaceContainerHighest,
+            inactiveTrackColor: colorScheme.surface,
             inactiveThumbColor: colorScheme.onSurface,
             onChanged: (val) {
               setState(() => _value = val);
+
+              // Actualizamos el controller
+              widget.controller.text = val.toString();
+
               widget.onChanged?.call(val);
             },
           ),

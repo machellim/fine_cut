@@ -11,7 +11,7 @@ import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_int_field.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
-import 'package:fine_cut/widgets/app_switch.dart';
+import 'package:fine_cut/widgets/app_string_switch.dart';
 import 'package:fine_cut/widgets/app_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -129,14 +129,10 @@ class _NewPaymentMethodScreenState extends State<NewPaymentMethodScreen> {
                   ),
                   if (!isNew) ...[
                     const SizedBox(height: 20),
-                    AppSwitch(
-                      value:
-                          _statusController.text == AppActiveStatus.active.name,
+                    AppStringSwitch(
+                      controller: _statusController,
                       onChanged: (value) {
                         setState(() {
-                          _statusController.text = value
-                              ? AppActiveStatus.active.name
-                              : AppActiveStatus.inactive.name;
                           paymentMethodCompanion = paymentMethodCompanion
                               .copyWith(
                                 status: drift.Value(
