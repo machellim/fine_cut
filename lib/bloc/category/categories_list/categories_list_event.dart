@@ -8,4 +8,11 @@ sealed class CategoriesListEvent extends Equatable {
 }
 
 // Event to load categories
-class LoadCategoriesListEvent extends CategoriesListEvent {}
+class LoadCategoriesListEvent extends CategoriesListEvent {
+  final AppEventSource eventSource;
+
+  const LoadCategoriesListEvent(this.eventSource);
+
+  @override
+  List<Object> get props => [eventSource];
+}

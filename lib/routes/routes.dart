@@ -1,5 +1,6 @@
 import 'package:fine_cut/screens/admin/categories/categories_list.dart';
 import 'package:fine_cut/screens/admin/categories/new_category.dart';
+import 'package:fine_cut/screens/admin/payment_methods/new_payment_method.dart';
 import 'package:fine_cut/screens/admin/payment_methods/payment_method_list.dart';
 import 'package:fine_cut/screens/cash_register/cash_register_list.dart';
 import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
@@ -28,6 +29,9 @@ final Map<String, WidgetBuilder> appRoutes = {
   },
   'new-category': (BuildContext context) {
     return NewCategoryScreen();
+  },
+  'new-payment-method': (BuildContext context) {
+    return NewPaymentMethodScreen();
   },
 };
 

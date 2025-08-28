@@ -14,8 +14,9 @@ class CategoriesListLoading extends CategoriesListState {}
 
 class CategoriesListLoadSuccess extends CategoriesListState {
   final List<Category> categories;
+  final AppEventSource eventSource;
 
-  const CategoriesListLoadSuccess(this.categories);
+  const CategoriesListLoadSuccess(this.categories, this.eventSource);
 }
 
 class CategoriesListLoadFailure extends CategoriesListState {

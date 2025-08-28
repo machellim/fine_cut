@@ -11,6 +11,7 @@ abstract class CategoryEvent extends Equatable {
 // event to reset state
 class ResetCategoryEvent extends CategoryEvent {}
 
+// create or update category
 class CreateCategoryEvent extends CategoryEvent {
   final String action;
   final CategoriesCompanion category;

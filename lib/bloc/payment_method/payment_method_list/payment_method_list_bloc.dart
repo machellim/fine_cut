@@ -20,7 +20,7 @@ class PaymentMethodListBloc
       //await Future.delayed(Duration(seconds: 3));
       try {
         final investments = await paymentMethodDao.getAllPaymentMethods();
-        emit(PaymentMethodsLoadSuccess(investments));
+        emit(PaymentMethodsLoadSuccess(investments, event.executeFrom));
       } catch (e) {
         emit(PaymentMethodsLoadFailure(message: e.toString()));
       }

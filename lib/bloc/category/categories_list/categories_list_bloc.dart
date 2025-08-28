@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/dao/category_dao.dart';
 import 'package:fine_cut/db/database.dart';
 
@@ -23,7 +24,7 @@ class CategoriesListBloc
         emit(CategoriesListLoading());
 
         final categories = await categoryDao.getAllCategories();
-        emit(CategoriesListLoadSuccess(categories));
+        emit(CategoriesListLoadSuccess(categories, event.eventSource));
         print('ok');
       } catch (e) {
         print(e);

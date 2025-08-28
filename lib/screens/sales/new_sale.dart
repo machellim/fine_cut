@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
-import 'package:fine_cut/constants/app_messages.dart';
+import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';

@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:fine_cut/db/enums.dart' show AppActiveStatus;
+import 'package:fine_cut/core/enums/enums.dart' show AppActiveStatus;
 
 class Products extends Table {
   // Primary key auto-increment

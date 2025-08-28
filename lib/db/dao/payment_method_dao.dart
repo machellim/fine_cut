@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:fine_cut/db/enums.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 import '../database.dart';
 
 import '../tables/payment_methods_table.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fine_cut/db/enums.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 
 class AppTitleListItem extends StatelessWidget {
   final String text;
