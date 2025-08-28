@@ -14,9 +14,9 @@ class PaymentMethodsLoading extends PaymentMethodListState {}
 
 class PaymentMethodsLoadSuccess extends PaymentMethodListState {
   final List<PaymentMethod> paymentMethods;
-  final String executeFrom;
+  final AppEventSource eventSource;
 
-  const PaymentMethodsLoadSuccess(this.paymentMethods, this.executeFrom);
+  const PaymentMethodsLoadSuccess(this.paymentMethods, this.eventSource);
 }
 
 class PaymentMethodsLoadFailure extends PaymentMethodListState {

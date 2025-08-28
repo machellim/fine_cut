@@ -71,11 +71,11 @@ class _NewPaymentMethodScreenState extends State<NewPaymentMethodScreen> {
     });
   }
 
-  void goBack(String executeFrom) {
+  void goBack(AppEventSource eventSource) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pop(context, true);
       context.read<PaymentMethodListBloc>().add(
-        LoadPaymentMethodsEvent(executeFrom),
+        LoadPaymentMethodsEvent(eventSource),
       );
     });
   }
@@ -154,10 +154,10 @@ class _NewPaymentMethodScreenState extends State<NewPaymentMethodScreen> {
                   BlocConsumer<PaymentMethodCrudBloc, PaymentMethodCrudState>(
                     listener: (context, state) {
                       if (state is PaymentMethodCreationSuccess) {
-                        goBack('create');
+                        goBack(AppEventSource.create);
                       }
                       if (state is PaymentMethodUpdateSuccess) {
-                        goBack('update');
+                        goBack(AppEventSource.update);
                       }
                     },
                     builder: (context, state) {

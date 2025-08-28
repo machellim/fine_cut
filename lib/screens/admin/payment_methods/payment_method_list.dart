@@ -27,7 +27,9 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<PaymentMethodListBloc>().add(LoadPaymentMethodsEvent('list'));
+    context.read<PaymentMethodListBloc>().add(
+      LoadPaymentMethodsEvent(AppEventSource.list),
+    );
   }
 
   void _showTopBanner(String message) {
@@ -51,9 +53,9 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
         listener: (context, state) => {
           if (state is PaymentMethodsLoadSuccess)
             {
-              if (state.executeFrom == 'create')
+              if (state.eventSource == AppEventSource.create)
                 {_showTopBanner('Forma de Pago creada con éxito')}
-              else if (state.executeFrom == 'update')
+              else if (state.eventSource == AppEventSource.update)
                 {_showTopBanner('Forma de Pago actualizada con éxito')},
             },
         },

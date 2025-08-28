@@ -9,10 +9,10 @@ sealed class PaymentMethodListEvent extends Equatable {
 
 // === Event to load payment methods ===
 class LoadPaymentMethodsEvent extends PaymentMethodListEvent {
-  final String executeFrom; // list, create, update
+  final AppEventSource eventSource;
 
-  const LoadPaymentMethodsEvent(this.executeFrom);
+  const LoadPaymentMethodsEvent(this.eventSource);
 
   @override
-  List<Object> get props => [executeFrom];
+  List<Object> get props => [eventSource];
 }

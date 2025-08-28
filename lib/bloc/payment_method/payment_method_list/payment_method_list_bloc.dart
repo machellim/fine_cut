@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/dao/payment_method_dao.dart';
 import 'package:fine_cut/db/database.dart';
 
@@ -20,7 +21,7 @@ class PaymentMethodListBloc
       //await Future.delayed(Duration(seconds: 3));
       try {
         final investments = await paymentMethodDao.getAllPaymentMethods();
-        emit(PaymentMethodsLoadSuccess(investments, event.executeFrom));
+        emit(PaymentMethodsLoadSuccess(investments, event.eventSource));
       } catch (e) {
         emit(PaymentMethodsLoadFailure(message: e.toString()));
       }
