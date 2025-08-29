@@ -28,7 +28,9 @@ class _NewProductScreenState extends State<NewProductScreen> {
   //controllers
   final TextEditingController _categoryIdController = TextEditingController();
   final TextEditingController _productNameController = TextEditingController();
-  final TextEditingController _trackStockController = TextEditingController();
+  final TextEditingController _needsCuttingController = TextEditingController(
+    text: "false",
+  );
   final TextEditingController _statusController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
@@ -41,7 +43,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
   void dispose() {
     _categoryIdController.dispose();
     _productNameController.dispose();
-    _trackStockController.dispose();
+    _needsCuttingController.dispose();
     _statusController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -66,6 +68,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
         );
         _categoryIdController.text = args.categoryId.toString();
         _productNameController.text = args.name;
+        _needsCuttingController.text = args.trackStock.toString();
         _statusController.text = args.status.name;
         _descriptionController.text = args.description ?? '';
         setState(() {
@@ -201,19 +204,20 @@ class _NewProductScreenState extends State<NewProductScreen> {
                   const SizedBox(height: 20),
 
                   AppBoolSwitch(
-                    controller: _statusController,
+                    controller:
+                        _needsCuttingController, // controller con "true" o "false"
+                    activeText: 'Se despieza',
+                    inactiveText: 'No se despieza',
                     onChanged: (value) {
                       setState(() {
+                        // Guarda directamente como bool en tu companion
                         productCompanion = productCompanion.copyWith(
-                          status: drift.Value(
-                            value
-                                ? AppActiveStatus.active
-                                : AppActiveStatus.inactive,
-                          ),
+                          trackStock: drift.Value(value),
                         );
                       });
                     },
                   ),
+
                   const SizedBox(height: 20),
                   AppTextField(
                     label: 'Descripción',
@@ -226,7 +230,23 @@ class _NewProductScreenState extends State<NewProductScreen> {
                       );
                     },
                   ),
-
+                  if (!isNew) ...[
+                    const SizedBox(height: 20),
+                    AppStringSwitch(
+                      controller: _statusController,
+                      onChanged: (value) {
+                        setState(() {
+                          productCompanion = productCompanion.copyWith(
+                            status: drift.Value(
+                              value
+                                  ? AppActiveStatus.active
+                                  : AppActiveStatus.inactive,
+                            ),
+                          );
+                        });
+                      },
+                    ),
+                  ],
                   BlocBuilder<ProductCrudBloc, ProductCrudState>(
                     builder: (context, state) {
                       bool isLoading = state is ProductCrudCreationInProgress;

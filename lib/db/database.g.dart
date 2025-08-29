@@ -62,18 +62,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _sellingPriceMeta = const VerificationMeta(
-    'sellingPrice',
-  );
-  @override
-  late final GeneratedColumn<double> sellingPrice = GeneratedColumn<double>(
-    'selling_price',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0.0),
-  );
   static const VerificationMeta _stockMeta = const VerificationMeta('stock');
   @override
   late final GeneratedColumn<int> stock = GeneratedColumn<int>(
@@ -98,6 +86,33 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       'CHECK ("track_stock" IN (0, 1))',
     ),
     defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _needsCuttingMeta = const VerificationMeta(
+    'needsCutting',
+  );
+  @override
+  late final GeneratedColumn<bool> needsCutting = GeneratedColumn<bool>(
+    'needs_cutting',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("needs_cutting" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _parentProductIdMeta = const VerificationMeta(
+    'parentProductId',
+  );
+  @override
+  late final GeneratedColumn<int> parentProductId = GeneratedColumn<int>(
+    'parent_product_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES products(id) ON DELETE SET NULL',
   );
   @override
   late final GeneratedColumnWithTypeConverter<AppActiveStatus, String> status =
@@ -142,9 +157,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     categoryId,
     name,
     description,
-    sellingPrice,
     stock,
     trackStock,
+    needsCutting,
+    parentProductId,
     status,
     createdAt,
     updatedAt,
@@ -189,15 +205,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         ),
       );
     }
-    if (data.containsKey('selling_price')) {
-      context.handle(
-        _sellingPriceMeta,
-        sellingPrice.isAcceptableOrUnknown(
-          data['selling_price']!,
-          _sellingPriceMeta,
-        ),
-      );
-    }
     if (data.containsKey('stock')) {
       context.handle(
         _stockMeta,
@@ -208,6 +215,24 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       context.handle(
         _trackStockMeta,
         trackStock.isAcceptableOrUnknown(data['track_stock']!, _trackStockMeta),
+      );
+    }
+    if (data.containsKey('needs_cutting')) {
+      context.handle(
+        _needsCuttingMeta,
+        needsCutting.isAcceptableOrUnknown(
+          data['needs_cutting']!,
+          _needsCuttingMeta,
+        ),
+      );
+    }
+    if (data.containsKey('parent_product_id')) {
+      context.handle(
+        _parentProductIdMeta,
+        parentProductId.isAcceptableOrUnknown(
+          data['parent_product_id']!,
+          _parentProductIdMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -247,10 +272,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
-      sellingPrice: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}selling_price'],
-      )!,
       stock: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}stock'],
@@ -259,6 +280,14 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.bool,
         data['${effectivePrefix}track_stock'],
       )!,
+      needsCutting: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}needs_cutting'],
+      )!,
+      parentProductId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}parent_product_id'],
+      ),
       status: $ProductsTable.$converterstatus.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -290,9 +319,10 @@ class Product extends DataClass implements Insertable<Product> {
   final int categoryId;
   final String name;
   final String? description;
-  final double sellingPrice;
   final int stock;
   final bool trackStock;
+  final bool needsCutting;
+  final int? parentProductId;
   final AppActiveStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -301,9 +331,10 @@ class Product extends DataClass implements Insertable<Product> {
     required this.categoryId,
     required this.name,
     this.description,
-    required this.sellingPrice,
     required this.stock,
     required this.trackStock,
+    required this.needsCutting,
+    this.parentProductId,
     required this.status,
     required this.createdAt,
     this.updatedAt,
@@ -317,9 +348,12 @@ class Product extends DataClass implements Insertable<Product> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
-    map['selling_price'] = Variable<double>(sellingPrice);
     map['stock'] = Variable<int>(stock);
     map['track_stock'] = Variable<bool>(trackStock);
+    map['needs_cutting'] = Variable<bool>(needsCutting);
+    if (!nullToAbsent || parentProductId != null) {
+      map['parent_product_id'] = Variable<int>(parentProductId);
+    }
     {
       map['status'] = Variable<String>(
         $ProductsTable.$converterstatus.toSql(status),
@@ -340,9 +374,12 @@ class Product extends DataClass implements Insertable<Product> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
-      sellingPrice: Value(sellingPrice),
       stock: Value(stock),
       trackStock: Value(trackStock),
+      needsCutting: Value(needsCutting),
+      parentProductId: parentProductId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentProductId),
       status: Value(status),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
@@ -361,9 +398,10 @@ class Product extends DataClass implements Insertable<Product> {
       categoryId: serializer.fromJson<int>(json['categoryId']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
-      sellingPrice: serializer.fromJson<double>(json['sellingPrice']),
       stock: serializer.fromJson<int>(json['stock']),
       trackStock: serializer.fromJson<bool>(json['trackStock']),
+      needsCutting: serializer.fromJson<bool>(json['needsCutting']),
+      parentProductId: serializer.fromJson<int?>(json['parentProductId']),
       status: $ProductsTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
       ),
@@ -379,9 +417,10 @@ class Product extends DataClass implements Insertable<Product> {
       'categoryId': serializer.toJson<int>(categoryId),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
-      'sellingPrice': serializer.toJson<double>(sellingPrice),
       'stock': serializer.toJson<int>(stock),
       'trackStock': serializer.toJson<bool>(trackStock),
+      'needsCutting': serializer.toJson<bool>(needsCutting),
+      'parentProductId': serializer.toJson<int?>(parentProductId),
       'status': serializer.toJson<String>(
         $ProductsTable.$converterstatus.toJson(status),
       ),
@@ -395,9 +434,10 @@ class Product extends DataClass implements Insertable<Product> {
     int? categoryId,
     String? name,
     Value<String?> description = const Value.absent(),
-    double? sellingPrice,
     int? stock,
     bool? trackStock,
+    bool? needsCutting,
+    Value<int?> parentProductId = const Value.absent(),
     AppActiveStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
@@ -406,9 +446,12 @@ class Product extends DataClass implements Insertable<Product> {
     categoryId: categoryId ?? this.categoryId,
     name: name ?? this.name,
     description: description.present ? description.value : this.description,
-    sellingPrice: sellingPrice ?? this.sellingPrice,
     stock: stock ?? this.stock,
     trackStock: trackStock ?? this.trackStock,
+    needsCutting: needsCutting ?? this.needsCutting,
+    parentProductId: parentProductId.present
+        ? parentProductId.value
+        : this.parentProductId,
     status: status ?? this.status,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
@@ -423,13 +466,16 @@ class Product extends DataClass implements Insertable<Product> {
       description: data.description.present
           ? data.description.value
           : this.description,
-      sellingPrice: data.sellingPrice.present
-          ? data.sellingPrice.value
-          : this.sellingPrice,
       stock: data.stock.present ? data.stock.value : this.stock,
       trackStock: data.trackStock.present
           ? data.trackStock.value
           : this.trackStock,
+      needsCutting: data.needsCutting.present
+          ? data.needsCutting.value
+          : this.needsCutting,
+      parentProductId: data.parentProductId.present
+          ? data.parentProductId.value
+          : this.parentProductId,
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -443,9 +489,10 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
-          ..write('sellingPrice: $sellingPrice, ')
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
+          ..write('needsCutting: $needsCutting, ')
+          ..write('parentProductId: $parentProductId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -459,9 +506,10 @@ class Product extends DataClass implements Insertable<Product> {
     categoryId,
     name,
     description,
-    sellingPrice,
     stock,
     trackStock,
+    needsCutting,
+    parentProductId,
     status,
     createdAt,
     updatedAt,
@@ -474,9 +522,10 @@ class Product extends DataClass implements Insertable<Product> {
           other.categoryId == this.categoryId &&
           other.name == this.name &&
           other.description == this.description &&
-          other.sellingPrice == this.sellingPrice &&
           other.stock == this.stock &&
           other.trackStock == this.trackStock &&
+          other.needsCutting == this.needsCutting &&
+          other.parentProductId == this.parentProductId &&
           other.status == this.status &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -487,9 +536,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int> categoryId;
   final Value<String> name;
   final Value<String?> description;
-  final Value<double> sellingPrice;
   final Value<int> stock;
   final Value<bool> trackStock;
+  final Value<bool> needsCutting;
+  final Value<int?> parentProductId;
   final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
@@ -498,9 +548,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.categoryId = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
-    this.sellingPrice = const Value.absent(),
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
+    this.needsCutting = const Value.absent(),
+    this.parentProductId = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -510,9 +561,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     required int categoryId,
     required String name,
     this.description = const Value.absent(),
-    this.sellingPrice = const Value.absent(),
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
+    this.needsCutting = const Value.absent(),
+    this.parentProductId = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -523,9 +575,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<int>? categoryId,
     Expression<String>? name,
     Expression<String>? description,
-    Expression<double>? sellingPrice,
     Expression<int>? stock,
     Expression<bool>? trackStock,
+    Expression<bool>? needsCutting,
+    Expression<int>? parentProductId,
     Expression<String>? status,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -535,9 +588,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (categoryId != null) 'category_id': categoryId,
       if (name != null) 'name': name,
       if (description != null) 'description': description,
-      if (sellingPrice != null) 'selling_price': sellingPrice,
       if (stock != null) 'stock': stock,
       if (trackStock != null) 'track_stock': trackStock,
+      if (needsCutting != null) 'needs_cutting': needsCutting,
+      if (parentProductId != null) 'parent_product_id': parentProductId,
       if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -549,9 +603,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<int>? categoryId,
     Value<String>? name,
     Value<String?>? description,
-    Value<double>? sellingPrice,
     Value<int>? stock,
     Value<bool>? trackStock,
+    Value<bool>? needsCutting,
+    Value<int?>? parentProductId,
     Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
@@ -561,9 +616,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       categoryId: categoryId ?? this.categoryId,
       name: name ?? this.name,
       description: description ?? this.description,
-      sellingPrice: sellingPrice ?? this.sellingPrice,
       stock: stock ?? this.stock,
       trackStock: trackStock ?? this.trackStock,
+      needsCutting: needsCutting ?? this.needsCutting,
+      parentProductId: parentProductId ?? this.parentProductId,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -585,14 +641,17 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
-    if (sellingPrice.present) {
-      map['selling_price'] = Variable<double>(sellingPrice.value);
-    }
     if (stock.present) {
       map['stock'] = Variable<int>(stock.value);
     }
     if (trackStock.present) {
       map['track_stock'] = Variable<bool>(trackStock.value);
+    }
+    if (needsCutting.present) {
+      map['needs_cutting'] = Variable<bool>(needsCutting.value);
+    }
+    if (parentProductId.present) {
+      map['parent_product_id'] = Variable<int>(parentProductId.value);
     }
     if (status.present) {
       map['status'] = Variable<String>(
@@ -615,9 +674,10 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
-          ..write('sellingPrice: $sellingPrice, ')
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
+          ..write('needsCutting: $needsCutting, ')
+          ..write('parentProductId: $parentProductId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -5751,9 +5811,10 @@ typedef $$ProductsTableCreateCompanionBuilder =
       required int categoryId,
       required String name,
       Value<String?> description,
-      Value<double> sellingPrice,
       Value<int> stock,
       Value<bool> trackStock,
+      Value<bool> needsCutting,
+      Value<int?> parentProductId,
       Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -5764,9 +5825,10 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<int> categoryId,
       Value<String> name,
       Value<String?> description,
-      Value<double> sellingPrice,
       Value<int> stock,
       Value<bool> trackStock,
+      Value<bool> needsCutting,
+      Value<int?> parentProductId,
       Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -5801,11 +5863,6 @@ class $$ProductsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get sellingPrice => $composableBuilder(
-    column: $table.sellingPrice,
-    builder: (column) => ColumnFilters(column),
-  );
-
   ColumnFilters<int> get stock => $composableBuilder(
     column: $table.stock,
     builder: (column) => ColumnFilters(column),
@@ -5813,6 +5870,16 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<bool> get trackStock => $composableBuilder(
     column: $table.trackStock,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get needsCutting => $composableBuilder(
+    column: $table.needsCutting,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get parentProductId => $composableBuilder(
+    column: $table.parentProductId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5862,11 +5929,6 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get sellingPrice => $composableBuilder(
-    column: $table.sellingPrice,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<int> get stock => $composableBuilder(
     column: $table.stock,
     builder: (column) => ColumnOrderings(column),
@@ -5874,6 +5936,16 @@ class $$ProductsTableOrderingComposer
 
   ColumnOrderings<bool> get trackStock => $composableBuilder(
     column: $table.trackStock,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get needsCutting => $composableBuilder(
+    column: $table.needsCutting,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get parentProductId => $composableBuilder(
+    column: $table.parentProductId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5918,16 +5990,21 @@ class $$ProductsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<double> get sellingPrice => $composableBuilder(
-    column: $table.sellingPrice,
-    builder: (column) => column,
-  );
-
   GeneratedColumn<int> get stock =>
       $composableBuilder(column: $table.stock, builder: (column) => column);
 
   GeneratedColumn<bool> get trackStock => $composableBuilder(
     column: $table.trackStock,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get needsCutting => $composableBuilder(
+    column: $table.needsCutting,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get parentProductId => $composableBuilder(
+    column: $table.parentProductId,
     builder: (column) => column,
   );
 
@@ -5973,9 +6050,10 @@ class $$ProductsTableTableManager
                 Value<int> categoryId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
-                Value<double> sellingPrice = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
+                Value<bool> needsCutting = const Value.absent(),
+                Value<int?> parentProductId = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -5984,9 +6062,10 @@ class $$ProductsTableTableManager
                 categoryId: categoryId,
                 name: name,
                 description: description,
-                sellingPrice: sellingPrice,
                 stock: stock,
                 trackStock: trackStock,
+                needsCutting: needsCutting,
+                parentProductId: parentProductId,
                 status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -5997,9 +6076,10 @@ class $$ProductsTableTableManager
                 required int categoryId,
                 required String name,
                 Value<String?> description = const Value.absent(),
-                Value<double> sellingPrice = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
+                Value<bool> needsCutting = const Value.absent(),
+                Value<int?> parentProductId = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -6008,9 +6088,10 @@ class $$ProductsTableTableManager
                 categoryId: categoryId,
                 name: name,
                 description: description,
-                sellingPrice: sellingPrice,
                 stock: stock,
                 trackStock: trackStock,
+                needsCutting: needsCutting,
+                parentProductId: parentProductId,
                 status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
