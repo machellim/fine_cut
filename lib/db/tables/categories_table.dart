@@ -7,7 +7,7 @@ class Categories extends Table {
 
   // Category name (e.g., "Meat", "Condiments")
   TextColumn get name => text()
-      .withLength(min: 1, max: 100)
+      .withLength(min: 3, max: 100)
       .named('name')
       .customConstraint('UNIQUE')();
 

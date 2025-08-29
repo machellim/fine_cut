@@ -27,6 +27,12 @@ class Purchases extends Table {
       .named('payment_method_id')
       .customConstraint('REFERENCES payment_methods(id) ON DELETE SET NULL')();
 
+  //alias from product name
+  TextColumn get aliasProductName => text()
+      .withLength(min: 5, max: 300)
+      .named('alias_product_name')
+      .customConstraint('UNIQUE')();
+
   // Quantity purchased
   RealColumn get quantity =>
       real().named('quantity').withDefault(const Constant(0.0))();

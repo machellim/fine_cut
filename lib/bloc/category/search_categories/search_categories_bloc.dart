@@ -18,12 +18,13 @@ class SearchCategoriesBloc
     on<FilterCategoriesEvent>((event, emit) async {
       try {
         emit(FilterCategoriesLoading());
-        final query = event.query;
+        final query = event.filter;
         if (query.trim().length < 3) {
           emit(FilterCategoriesSuccess([]));
         } else {
-          final results = await categoryDao.searchCategories(event.query);
-          emit(FilterCategoriesSuccess(results));
+          final categories = await categoryDao.searchCategories(event.filter);
+          print('Categories found: ${categories.length}');
+          emit(FilterCategoriesSuccess(categories));
         }
       } catch (e) {
         emit(

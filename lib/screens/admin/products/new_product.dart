@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' as drift;
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
+import 'package:fine_cut/bloc/category/search_categories/search_categories_bloc.dart';
 import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
@@ -28,7 +31,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
   //controllers
   final TextEditingController _categoryIdController = TextEditingController();
   final TextEditingController _productNameController = TextEditingController();
-  final TextEditingController _needsCuttingController = TextEditingController(
+  final TextEditingController _hasSubProductsController = TextEditingController(
     text: "false",
   );
   final TextEditingController _statusController = TextEditingController();
@@ -43,7 +46,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
   void dispose() {
     _categoryIdController.dispose();
     _productNameController.dispose();
-    _needsCuttingController.dispose();
+    _hasSubProductsController.dispose();
     _statusController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -68,7 +71,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
         );
         _categoryIdController.text = args.categoryId.toString();
         _productNameController.text = args.name;
-        _needsCuttingController.text = args.trackStock.toString();
+        _hasSubProductsController.text = args.trackStock.toString();
         _statusController.text = args.status.name;
         _descriptionController.text = args.description ?? '';
         setState(() {
@@ -82,6 +85,17 @@ class _NewProductScreenState extends State<NewProductScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pop(context, true);
     });
+  }
+
+  FutureOr<List<Category>> fetchCategories(
+    String filter,
+    LoadProps? loadProps,
+  ) {
+    // Aquí haces la consulta, por ejemplo llamar al Bloc o filtrar localmente
+    final filteredCategories = AppDatabase().categoryDao.searchCategories(
+      filter,
+    );
+    return filteredCategories;
   }
 
   @override
@@ -114,82 +128,54 @@ class _NewProductScreenState extends State<NewProductScreen> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  BlocBuilder<CategoriesListBloc, CategoriesListState>(
-                    builder: (context, state) {
-                      if (state is CategoriesListLoading) {
-                        return AppCircularProgressText(
-                          messageLoading: AppMessages.getCategoryMessage(
-                            'messageLoadingCategories',
-                          ),
-                        );
-                      }
-                      if (state is CategoriesListLoadFailure) {
-                        return AppMessageType(
-                          message: state.message,
-                          messageType: MessageType.error,
-                        );
-                      }
-                      if (state is CategoriesListLoadSuccess) {
-                        return DropdownSearch<Category>(
-                          key: dropDownKey,
-                          selectedItem: isNew
-                              ? null
-                              : state.categories.firstWhere(
-                                  (element) =>
-                                      element.id ==
-                                      productCompanion.categoryId.value,
-                                ),
-                          items: (filter, infiniteScrollProps) {
-                            // Si el filtro está vacío, retornamos todas las categorías
-                            if (filter.isEmpty) {
-                              return state.categories;
-                            } else {
-                              // Filtramos las categorías basándonos en el nombre
-                              return state.categories
-                                  .where(
-                                    (category) => category.name
-                                        .toLowerCase()
-                                        .contains(filter.toLowerCase()),
-                                  )
-                                  .toList();
-                            }
-                          },
-                          popupProps: PopupProps.menu(
-                            showSearchBox: true,
-                            fit: FlexFit.loose,
-                            constraints: BoxConstraints(),
-                          ),
-                          validator: (value) =>
-                              (value == null || value.name == '')
-                              ? 'Seleccione una categoría.'
-                              : null,
-                          onSaved: (value) {
-                            productCompanion = productCompanion.copyWith(
-                              categoryId: drift.Value(value?.id ?? 0),
-                            );
-                          },
-                          itemAsString: (item) => item.name,
-                          compareFn: (item1, item2) => item1.id == item2.id,
-                          onChanged: (selectedCategory) {
-                            if (selectedCategory != null) {
-                              productCompanion = productCompanion.copyWith(
-                                categoryId: drift.Value(selectedCategory.id),
-                              ); // Asigna el id si no es null
-                            }
-                          },
-
-                          decoratorProps: DropDownDecoratorProps(
-                            decoration: InputDecoration(
-                              labelText: 'Seleccione una categoría',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                      return Container();
+                  DropdownSearch<Category>(
+                    key: dropDownKey,
+                    selectedItem: null,
+                    items: (filter, loadProps) async {
+                      final repo = context.read<SearchCategoriesBloc>();
+                      return await repo.categoryDao.searchCategories(filter);
                     },
+                    itemAsString: (item) => item.name,
+                    compareFn: (item1, item2) => item1.id == item2.id,
+                    onChanged: (selectedCategory) {
+                      if (selectedCategory != null) {
+                        productCompanion = productCompanion.copyWith(
+                          categoryId: drift.Value(selectedCategory.id),
+                        );
+                      }
+                    },
+                    validator: (value) => (value == null || value.name.isEmpty)
+                        ? 'Seleccione una categoría.'
+                        : null,
+                    decoratorProps: DropDownDecoratorProps(
+                      decoration: InputDecoration(
+                        labelText: 'Seleccione una categoría',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ),
+                    popupProps: PopupProps.menu(
+                      showSearchBox: true,
+                      fit: FlexFit.loose,
+                      constraints: BoxConstraints(maxHeight: 200),
+                      errorBuilder: (context, searchEntry, exception) {
+                        return Center(
+                          child: Text(
+                            exception.toString(),
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        );
+                      },
+                      emptyBuilder: (context, searchEntry) {
+                        return const Center(
+                          child: Text(
+                            "No se encontraron categorías",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 30),
                   AppTextField(
@@ -205,14 +191,14 @@ class _NewProductScreenState extends State<NewProductScreen> {
 
                   AppBoolSwitch(
                     controller:
-                        _needsCuttingController, // controller con "true" o "false"
-                    activeText: 'Se despieza',
-                    inactiveText: 'No se despieza',
+                        _hasSubProductsController, // controller con "true" o "false"
+                    activeText: 'Tiene Sub-productos',
+                    inactiveText: 'No tiene Sub-productos',
                     onChanged: (value) {
                       setState(() {
                         // Guarda directamente como bool en tu companion
                         productCompanion = productCompanion.copyWith(
-                          trackStock: drift.Value(value),
+                          hasSubProducts: drift.Value(value),
                         );
                       });
                     },

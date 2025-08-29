@@ -27,11 +27,10 @@ class Products extends Table {
   // Whether to track stock for this product
   BoolColumn get trackStock => boolean().withDefault(const Constant(true))();
 
-  // Whether the product needs cutting/preparation. eg. "Beef" needs cutting, "Salt" does not
-  BoolColumn get needsCutting =>
-      boolean().named('needs_cutting').withDefault(const Constant(false))();
+  // Whether the product has sub-products (e.g., beef cuts)
+  BoolColumn get hasSubProducts => boolean().withDefault(Constant(false))();
 
-  // parent_product_id
+  // if this product is a sub-product, reference to parent product
   IntColumn get parentProductId => integer()
       .named('parent_product_id')
       .nullable()

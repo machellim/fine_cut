@@ -87,20 +87,20 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     ),
     defaultValue: const Constant(true),
   );
-  static const VerificationMeta _needsCuttingMeta = const VerificationMeta(
-    'needsCutting',
+  static const VerificationMeta _hasSubProductsMeta = const VerificationMeta(
+    'hasSubProducts',
   );
   @override
-  late final GeneratedColumn<bool> needsCutting = GeneratedColumn<bool>(
-    'needs_cutting',
+  late final GeneratedColumn<bool> hasSubProducts = GeneratedColumn<bool>(
+    'has_sub_products',
     aliasedName,
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("needs_cutting" IN (0, 1))',
+      'CHECK ("has_sub_products" IN (0, 1))',
     ),
-    defaultValue: const Constant(false),
+    defaultValue: Constant(false),
   );
   static const VerificationMeta _parentProductIdMeta = const VerificationMeta(
     'parentProductId',
@@ -159,7 +159,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     description,
     stock,
     trackStock,
-    needsCutting,
+    hasSubProducts,
     parentProductId,
     status,
     createdAt,
@@ -217,12 +217,12 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         trackStock.isAcceptableOrUnknown(data['track_stock']!, _trackStockMeta),
       );
     }
-    if (data.containsKey('needs_cutting')) {
+    if (data.containsKey('has_sub_products')) {
       context.handle(
-        _needsCuttingMeta,
-        needsCutting.isAcceptableOrUnknown(
-          data['needs_cutting']!,
-          _needsCuttingMeta,
+        _hasSubProductsMeta,
+        hasSubProducts.isAcceptableOrUnknown(
+          data['has_sub_products']!,
+          _hasSubProductsMeta,
         ),
       );
     }
@@ -280,9 +280,9 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.bool,
         data['${effectivePrefix}track_stock'],
       )!,
-      needsCutting: attachedDatabase.typeMapping.read(
+      hasSubProducts: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}needs_cutting'],
+        data['${effectivePrefix}has_sub_products'],
       )!,
       parentProductId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -321,7 +321,7 @@ class Product extends DataClass implements Insertable<Product> {
   final String? description;
   final int stock;
   final bool trackStock;
-  final bool needsCutting;
+  final bool hasSubProducts;
   final int? parentProductId;
   final AppActiveStatus status;
   final DateTime createdAt;
@@ -333,7 +333,7 @@ class Product extends DataClass implements Insertable<Product> {
     this.description,
     required this.stock,
     required this.trackStock,
-    required this.needsCutting,
+    required this.hasSubProducts,
     this.parentProductId,
     required this.status,
     required this.createdAt,
@@ -350,7 +350,7 @@ class Product extends DataClass implements Insertable<Product> {
     }
     map['stock'] = Variable<int>(stock);
     map['track_stock'] = Variable<bool>(trackStock);
-    map['needs_cutting'] = Variable<bool>(needsCutting);
+    map['has_sub_products'] = Variable<bool>(hasSubProducts);
     if (!nullToAbsent || parentProductId != null) {
       map['parent_product_id'] = Variable<int>(parentProductId);
     }
@@ -376,7 +376,7 @@ class Product extends DataClass implements Insertable<Product> {
           : Value(description),
       stock: Value(stock),
       trackStock: Value(trackStock),
-      needsCutting: Value(needsCutting),
+      hasSubProducts: Value(hasSubProducts),
       parentProductId: parentProductId == null && nullToAbsent
           ? const Value.absent()
           : Value(parentProductId),
@@ -400,7 +400,7 @@ class Product extends DataClass implements Insertable<Product> {
       description: serializer.fromJson<String?>(json['description']),
       stock: serializer.fromJson<int>(json['stock']),
       trackStock: serializer.fromJson<bool>(json['trackStock']),
-      needsCutting: serializer.fromJson<bool>(json['needsCutting']),
+      hasSubProducts: serializer.fromJson<bool>(json['hasSubProducts']),
       parentProductId: serializer.fromJson<int?>(json['parentProductId']),
       status: $ProductsTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
@@ -419,7 +419,7 @@ class Product extends DataClass implements Insertable<Product> {
       'description': serializer.toJson<String?>(description),
       'stock': serializer.toJson<int>(stock),
       'trackStock': serializer.toJson<bool>(trackStock),
-      'needsCutting': serializer.toJson<bool>(needsCutting),
+      'hasSubProducts': serializer.toJson<bool>(hasSubProducts),
       'parentProductId': serializer.toJson<int?>(parentProductId),
       'status': serializer.toJson<String>(
         $ProductsTable.$converterstatus.toJson(status),
@@ -436,7 +436,7 @@ class Product extends DataClass implements Insertable<Product> {
     Value<String?> description = const Value.absent(),
     int? stock,
     bool? trackStock,
-    bool? needsCutting,
+    bool? hasSubProducts,
     Value<int?> parentProductId = const Value.absent(),
     AppActiveStatus? status,
     DateTime? createdAt,
@@ -448,7 +448,7 @@ class Product extends DataClass implements Insertable<Product> {
     description: description.present ? description.value : this.description,
     stock: stock ?? this.stock,
     trackStock: trackStock ?? this.trackStock,
-    needsCutting: needsCutting ?? this.needsCutting,
+    hasSubProducts: hasSubProducts ?? this.hasSubProducts,
     parentProductId: parentProductId.present
         ? parentProductId.value
         : this.parentProductId,
@@ -470,9 +470,9 @@ class Product extends DataClass implements Insertable<Product> {
       trackStock: data.trackStock.present
           ? data.trackStock.value
           : this.trackStock,
-      needsCutting: data.needsCutting.present
-          ? data.needsCutting.value
-          : this.needsCutting,
+      hasSubProducts: data.hasSubProducts.present
+          ? data.hasSubProducts.value
+          : this.hasSubProducts,
       parentProductId: data.parentProductId.present
           ? data.parentProductId.value
           : this.parentProductId,
@@ -491,7 +491,7 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('description: $description, ')
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
-          ..write('needsCutting: $needsCutting, ')
+          ..write('hasSubProducts: $hasSubProducts, ')
           ..write('parentProductId: $parentProductId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
@@ -508,7 +508,7 @@ class Product extends DataClass implements Insertable<Product> {
     description,
     stock,
     trackStock,
-    needsCutting,
+    hasSubProducts,
     parentProductId,
     status,
     createdAt,
@@ -524,7 +524,7 @@ class Product extends DataClass implements Insertable<Product> {
           other.description == this.description &&
           other.stock == this.stock &&
           other.trackStock == this.trackStock &&
-          other.needsCutting == this.needsCutting &&
+          other.hasSubProducts == this.hasSubProducts &&
           other.parentProductId == this.parentProductId &&
           other.status == this.status &&
           other.createdAt == this.createdAt &&
@@ -538,7 +538,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<String?> description;
   final Value<int> stock;
   final Value<bool> trackStock;
-  final Value<bool> needsCutting;
+  final Value<bool> hasSubProducts;
   final Value<int?> parentProductId;
   final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
@@ -550,7 +550,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.description = const Value.absent(),
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
-    this.needsCutting = const Value.absent(),
+    this.hasSubProducts = const Value.absent(),
     this.parentProductId = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -563,7 +563,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.description = const Value.absent(),
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
-    this.needsCutting = const Value.absent(),
+    this.hasSubProducts = const Value.absent(),
     this.parentProductId = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -577,7 +577,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<String>? description,
     Expression<int>? stock,
     Expression<bool>? trackStock,
-    Expression<bool>? needsCutting,
+    Expression<bool>? hasSubProducts,
     Expression<int>? parentProductId,
     Expression<String>? status,
     Expression<DateTime>? createdAt,
@@ -590,7 +590,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (description != null) 'description': description,
       if (stock != null) 'stock': stock,
       if (trackStock != null) 'track_stock': trackStock,
-      if (needsCutting != null) 'needs_cutting': needsCutting,
+      if (hasSubProducts != null) 'has_sub_products': hasSubProducts,
       if (parentProductId != null) 'parent_product_id': parentProductId,
       if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
@@ -605,7 +605,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<String?>? description,
     Value<int>? stock,
     Value<bool>? trackStock,
-    Value<bool>? needsCutting,
+    Value<bool>? hasSubProducts,
     Value<int?>? parentProductId,
     Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
@@ -618,7 +618,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       description: description ?? this.description,
       stock: stock ?? this.stock,
       trackStock: trackStock ?? this.trackStock,
-      needsCutting: needsCutting ?? this.needsCutting,
+      hasSubProducts: hasSubProducts ?? this.hasSubProducts,
       parentProductId: parentProductId ?? this.parentProductId,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
@@ -647,8 +647,8 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (trackStock.present) {
       map['track_stock'] = Variable<bool>(trackStock.value);
     }
-    if (needsCutting.present) {
-      map['needs_cutting'] = Variable<bool>(needsCutting.value);
+    if (hasSubProducts.present) {
+      map['has_sub_products'] = Variable<bool>(hasSubProducts.value);
     }
     if (parentProductId.present) {
       map['parent_product_id'] = Variable<int>(parentProductId.value);
@@ -676,7 +676,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('description: $description, ')
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
-          ..write('needsCutting: $needsCutting, ')
+          ..write('hasSubProducts: $hasSubProducts, ')
           ..write('parentProductId: $parentProductId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
@@ -1340,7 +1340,7 @@ class $CategoriesTable extends Categories
     aliasedName,
     false,
     additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
+      minTextLength: 3,
       maxTextLength: 100,
     ),
     type: DriftSqlType.string,
@@ -2988,6 +2988,22 @@ class $PurchasesTable extends Purchases
     requiredDuringInsert: true,
     $customConstraints: 'REFERENCES payment_methods(id) ON DELETE SET NULL',
   );
+  static const VerificationMeta _aliasProductNameMeta = const VerificationMeta(
+    'aliasProductName',
+  );
+  @override
+  late final GeneratedColumn<String> aliasProductName = GeneratedColumn<String>(
+    'alias_product_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 5,
+      maxTextLength: 300,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'UNIQUE',
+  );
   static const VerificationMeta _quantityMeta = const VerificationMeta(
     'quantity',
   );
@@ -3096,6 +3112,7 @@ class $PurchasesTable extends Purchases
     unitId,
     cashRegisterId,
     paymentMethodId,
+    aliasProductName,
     quantity,
     totalCost,
     purchaseDate,
@@ -3153,6 +3170,17 @@ class $PurchasesTable extends Purchases
       );
     } else if (isInserting) {
       context.missing(_paymentMethodIdMeta);
+    }
+    if (data.containsKey('alias_product_name')) {
+      context.handle(
+        _aliasProductNameMeta,
+        aliasProductName.isAcceptableOrUnknown(
+          data['alias_product_name']!,
+          _aliasProductNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_aliasProductNameMeta);
     }
     if (data.containsKey('quantity')) {
       context.handle(
@@ -3228,6 +3256,10 @@ class $PurchasesTable extends Purchases
         DriftSqlType.int,
         data['${effectivePrefix}payment_method_id'],
       )!,
+      aliasProductName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}alias_product_name'],
+      )!,
       quantity: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}quantity'],
@@ -3280,6 +3312,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
   final int? unitId;
   final int? cashRegisterId;
   final int paymentMethodId;
+  final String aliasProductName;
   final double quantity;
   final double totalCost;
   final DateTime purchaseDate;
@@ -3294,6 +3327,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     this.unitId,
     this.cashRegisterId,
     required this.paymentMethodId,
+    required this.aliasProductName,
     required this.quantity,
     required this.totalCost,
     required this.purchaseDate,
@@ -3315,6 +3349,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       map['cash_register_id'] = Variable<int>(cashRegisterId);
     }
     map['payment_method_id'] = Variable<int>(paymentMethodId);
+    map['alias_product_name'] = Variable<String>(aliasProductName);
     map['quantity'] = Variable<double>(quantity);
     map['total_cost'] = Variable<double>(totalCost);
     map['purchase_date'] = Variable<DateTime>(purchaseDate);
@@ -3345,6 +3380,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
           ? const Value.absent()
           : Value(cashRegisterId),
       paymentMethodId: Value(paymentMethodId),
+      aliasProductName: Value(aliasProductName),
       quantity: Value(quantity),
       totalCost: Value(totalCost),
       purchaseDate: Value(purchaseDate),
@@ -3371,6 +3407,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       unitId: serializer.fromJson<int?>(json['unitId']),
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
       paymentMethodId: serializer.fromJson<int>(json['paymentMethodId']),
+      aliasProductName: serializer.fromJson<String>(json['aliasProductName']),
       quantity: serializer.fromJson<double>(json['quantity']),
       totalCost: serializer.fromJson<double>(json['totalCost']),
       purchaseDate: serializer.fromJson<DateTime>(json['purchaseDate']),
@@ -3392,6 +3429,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       'unitId': serializer.toJson<int?>(unitId),
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
       'paymentMethodId': serializer.toJson<int>(paymentMethodId),
+      'aliasProductName': serializer.toJson<String>(aliasProductName),
       'quantity': serializer.toJson<double>(quantity),
       'totalCost': serializer.toJson<double>(totalCost),
       'purchaseDate': serializer.toJson<DateTime>(purchaseDate),
@@ -3411,6 +3449,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     Value<int?> unitId = const Value.absent(),
     Value<int?> cashRegisterId = const Value.absent(),
     int? paymentMethodId,
+    String? aliasProductName,
     double? quantity,
     double? totalCost,
     DateTime? purchaseDate,
@@ -3427,6 +3466,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
         ? cashRegisterId.value
         : this.cashRegisterId,
     paymentMethodId: paymentMethodId ?? this.paymentMethodId,
+    aliasProductName: aliasProductName ?? this.aliasProductName,
     quantity: quantity ?? this.quantity,
     totalCost: totalCost ?? this.totalCost,
     purchaseDate: purchaseDate ?? this.purchaseDate,
@@ -3447,6 +3487,9 @@ class Purchase extends DataClass implements Insertable<Purchase> {
       paymentMethodId: data.paymentMethodId.present
           ? data.paymentMethodId.value
           : this.paymentMethodId,
+      aliasProductName: data.aliasProductName.present
+          ? data.aliasProductName.value
+          : this.aliasProductName,
       quantity: data.quantity.present ? data.quantity.value : this.quantity,
       totalCost: data.totalCost.present ? data.totalCost.value : this.totalCost,
       purchaseDate: data.purchaseDate.present
@@ -3468,6 +3511,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
           ..write('unitId: $unitId, ')
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
+          ..write('aliasProductName: $aliasProductName, ')
           ..write('quantity: $quantity, ')
           ..write('totalCost: $totalCost, ')
           ..write('purchaseDate: $purchaseDate, ')
@@ -3487,6 +3531,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
     unitId,
     cashRegisterId,
     paymentMethodId,
+    aliasProductName,
     quantity,
     totalCost,
     purchaseDate,
@@ -3505,6 +3550,7 @@ class Purchase extends DataClass implements Insertable<Purchase> {
           other.unitId == this.unitId &&
           other.cashRegisterId == this.cashRegisterId &&
           other.paymentMethodId == this.paymentMethodId &&
+          other.aliasProductName == this.aliasProductName &&
           other.quantity == this.quantity &&
           other.totalCost == this.totalCost &&
           other.purchaseDate == this.purchaseDate &&
@@ -3521,6 +3567,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
   final Value<int?> unitId;
   final Value<int?> cashRegisterId;
   final Value<int> paymentMethodId;
+  final Value<String> aliasProductName;
   final Value<double> quantity;
   final Value<double> totalCost;
   final Value<DateTime> purchaseDate;
@@ -3535,6 +3582,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     this.unitId = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
     this.paymentMethodId = const Value.absent(),
+    this.aliasProductName = const Value.absent(),
     this.quantity = const Value.absent(),
     this.totalCost = const Value.absent(),
     this.purchaseDate = const Value.absent(),
@@ -3550,6 +3598,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     this.unitId = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
     required int paymentMethodId,
+    required String aliasProductName,
     this.quantity = const Value.absent(),
     this.totalCost = const Value.absent(),
     this.purchaseDate = const Value.absent(),
@@ -3559,13 +3608,15 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : productId = Value(productId),
-       paymentMethodId = Value(paymentMethodId);
+       paymentMethodId = Value(paymentMethodId),
+       aliasProductName = Value(aliasProductName);
   static Insertable<Purchase> custom({
     Expression<int>? id,
     Expression<int>? productId,
     Expression<int>? unitId,
     Expression<int>? cashRegisterId,
     Expression<int>? paymentMethodId,
+    Expression<String>? aliasProductName,
     Expression<double>? quantity,
     Expression<double>? totalCost,
     Expression<DateTime>? purchaseDate,
@@ -3581,6 +3632,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
       if (unitId != null) 'unit_id': unitId,
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
       if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
+      if (aliasProductName != null) 'alias_product_name': aliasProductName,
       if (quantity != null) 'quantity': quantity,
       if (totalCost != null) 'total_cost': totalCost,
       if (purchaseDate != null) 'purchase_date': purchaseDate,
@@ -3598,6 +3650,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     Value<int?>? unitId,
     Value<int?>? cashRegisterId,
     Value<int>? paymentMethodId,
+    Value<String>? aliasProductName,
     Value<double>? quantity,
     Value<double>? totalCost,
     Value<DateTime>? purchaseDate,
@@ -3613,6 +3666,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
       unitId: unitId ?? this.unitId,
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
       paymentMethodId: paymentMethodId ?? this.paymentMethodId,
+      aliasProductName: aliasProductName ?? this.aliasProductName,
       quantity: quantity ?? this.quantity,
       totalCost: totalCost ?? this.totalCost,
       purchaseDate: purchaseDate ?? this.purchaseDate,
@@ -3641,6 +3695,9 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
     }
     if (paymentMethodId.present) {
       map['payment_method_id'] = Variable<int>(paymentMethodId.value);
+    }
+    if (aliasProductName.present) {
+      map['alias_product_name'] = Variable<String>(aliasProductName.value);
     }
     if (quantity.present) {
       map['quantity'] = Variable<double>(quantity.value);
@@ -3679,6 +3736,7 @@ class PurchasesCompanion extends UpdateCompanion<Purchase> {
           ..write('unitId: $unitId, ')
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
+          ..write('aliasProductName: $aliasProductName, ')
           ..write('quantity: $quantity, ')
           ..write('totalCost: $totalCost, ')
           ..write('purchaseDate: $purchaseDate, ')
@@ -5813,7 +5871,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<String?> description,
       Value<int> stock,
       Value<bool> trackStock,
-      Value<bool> needsCutting,
+      Value<bool> hasSubProducts,
       Value<int?> parentProductId,
       Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
@@ -5827,7 +5885,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<String?> description,
       Value<int> stock,
       Value<bool> trackStock,
-      Value<bool> needsCutting,
+      Value<bool> hasSubProducts,
       Value<int?> parentProductId,
       Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
@@ -5873,8 +5931,8 @@ class $$ProductsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get needsCutting => $composableBuilder(
-    column: $table.needsCutting,
+  ColumnFilters<bool> get hasSubProducts => $composableBuilder(
+    column: $table.hasSubProducts,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5939,8 +5997,8 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get needsCutting => $composableBuilder(
-    column: $table.needsCutting,
+  ColumnOrderings<bool> get hasSubProducts => $composableBuilder(
+    column: $table.hasSubProducts,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5998,8 +6056,8 @@ class $$ProductsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get needsCutting => $composableBuilder(
-    column: $table.needsCutting,
+  GeneratedColumn<bool> get hasSubProducts => $composableBuilder(
+    column: $table.hasSubProducts,
     builder: (column) => column,
   );
 
@@ -6052,7 +6110,7 @@ class $$ProductsTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
-                Value<bool> needsCutting = const Value.absent(),
+                Value<bool> hasSubProducts = const Value.absent(),
                 Value<int?> parentProductId = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -6064,7 +6122,7 @@ class $$ProductsTableTableManager
                 description: description,
                 stock: stock,
                 trackStock: trackStock,
-                needsCutting: needsCutting,
+                hasSubProducts: hasSubProducts,
                 parentProductId: parentProductId,
                 status: status,
                 createdAt: createdAt,
@@ -6078,7 +6136,7 @@ class $$ProductsTableTableManager
                 Value<String?> description = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
-                Value<bool> needsCutting = const Value.absent(),
+                Value<bool> hasSubProducts = const Value.absent(),
                 Value<int?> parentProductId = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -6090,7 +6148,7 @@ class $$ProductsTableTableManager
                 description: description,
                 stock: stock,
                 trackStock: trackStock,
-                needsCutting: needsCutting,
+                hasSubProducts: hasSubProducts,
                 parentProductId: parentProductId,
                 status: status,
                 createdAt: createdAt,
@@ -7200,6 +7258,7 @@ typedef $$PurchasesTableCreateCompanionBuilder =
       Value<int?> unitId,
       Value<int?> cashRegisterId,
       required int paymentMethodId,
+      required String aliasProductName,
       Value<double> quantity,
       Value<double> totalCost,
       Value<DateTime> purchaseDate,
@@ -7216,6 +7275,7 @@ typedef $$PurchasesTableUpdateCompanionBuilder =
       Value<int?> unitId,
       Value<int?> cashRegisterId,
       Value<int> paymentMethodId,
+      Value<String> aliasProductName,
       Value<double> quantity,
       Value<double> totalCost,
       Value<DateTime> purchaseDate,
@@ -7257,6 +7317,11 @@ class $$PurchasesTableFilterComposer
 
   ColumnFilters<int> get paymentMethodId => $composableBuilder(
     column: $table.paymentMethodId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aliasProductName => $composableBuilder(
+    column: $table.aliasProductName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7336,6 +7401,11 @@ class $$PurchasesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get aliasProductName => $composableBuilder(
+    column: $table.aliasProductName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get quantity => $composableBuilder(
     column: $table.quantity,
     builder: (column) => ColumnOrderings(column),
@@ -7405,6 +7475,11 @@ class $$PurchasesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get aliasProductName => $composableBuilder(
+    column: $table.aliasProductName,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get quantity =>
       $composableBuilder(column: $table.quantity, builder: (column) => column);
 
@@ -7465,6 +7540,7 @@ class $$PurchasesTableTableManager
                 Value<int?> unitId = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
                 Value<int> paymentMethodId = const Value.absent(),
+                Value<String> aliasProductName = const Value.absent(),
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalCost = const Value.absent(),
                 Value<DateTime> purchaseDate = const Value.absent(),
@@ -7479,6 +7555,7 @@ class $$PurchasesTableTableManager
                 unitId: unitId,
                 cashRegisterId: cashRegisterId,
                 paymentMethodId: paymentMethodId,
+                aliasProductName: aliasProductName,
                 quantity: quantity,
                 totalCost: totalCost,
                 purchaseDate: purchaseDate,
@@ -7495,6 +7572,7 @@ class $$PurchasesTableTableManager
                 Value<int?> unitId = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
                 required int paymentMethodId,
+                required String aliasProductName,
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalCost = const Value.absent(),
                 Value<DateTime> purchaseDate = const Value.absent(),
@@ -7509,6 +7587,7 @@ class $$PurchasesTableTableManager
                 unitId: unitId,
                 cashRegisterId: cashRegisterId,
                 paymentMethodId: paymentMethodId,
+                aliasProductName: aliasProductName,
                 quantity: quantity,
                 totalCost: totalCost,
                 purchaseDate: purchaseDate,

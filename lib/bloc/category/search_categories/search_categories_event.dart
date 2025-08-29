@@ -9,10 +9,10 @@ sealed class SearchCategoriesEvent extends Equatable {
 
 // event to filter categories by query
 class FilterCategoriesEvent extends SearchCategoriesEvent {
-  final String query;
+  final String filter;
 
-  const FilterCategoriesEvent(this.query);
+  const FilterCategoriesEvent(this.filter);
 
   @override
-  List<Object> get props => [query];
+  List<Object> get props => [filter];
 }
