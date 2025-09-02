@@ -14,8 +14,13 @@ class ResetProductCrudEvent extends ProductCrudEvent {}
 class CreateProductCrudEvent extends ProductCrudEvent {
   final RecordAction recordAction;
   final ProductsCompanion product;
+  final List<ProductSubproductsCompanion> subproducts;
 
-  const CreateProductCrudEvent(this.recordAction, this.product);
+  const CreateProductCrudEvent(
+    this.recordAction,
+    this.product,
+    this.subproducts,
+  );
 
   @override
   List<Object> get props => [recordAction, product];

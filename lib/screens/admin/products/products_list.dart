@@ -1,9 +1,12 @@
+import 'package:fine_cut/bloc/category/search_categories/search_categories_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
+import 'package:fine_cut/widgets/app_floating_action_button.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
+import 'package:fine_cut/widgets/app_top_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,6 +18,9 @@ class ProductsListScreen extends StatefulWidget {
 }
 
 class _ProductsListScreenState extends State<ProductsListScreen> {
+  bool _showBanner = false;
+  String _bannerMessage = '';
+
   @override
   void initState() {
     super.initState();
@@ -24,11 +30,33 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     );
   }
 
+  void _showTopBanner(String message) {
+    setState(() {
+      _showBanner = true;
+      _bannerMessage = message;
+    });
+  }
+
+  void _closeBanner() {
+    setState(() {
+      _showBanner = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Catálogo de Productos")),
-      body: BlocBuilder<ProductsListBloc, ProductsListState>(
+      body: BlocConsumer<ProductsListBloc, ProductsListState>(
+        listener: (context, state) => {
+          if (state is ProductsListLoadSuccess)
+            {
+              if (state.eventSource == AppEventSource.create)
+                {_showTopBanner('Producto creado con éxito')}
+              else if (state.eventSource == AppEventSource.update)
+                {_showTopBanner('Producto actualizado con éxito')},
+            },
+        },
         builder: (context, state) {
           if (state is ProductsListLoading) {
             return Center(
@@ -47,41 +75,75 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                 ),
               );
             } else {
-              return ListView.builder(
-                itemCount: state.products.length,
-                itemBuilder: (context, index) {
-                  final productName = state.products[index].name;
-                  final productStock = state.products[index].stock;
-                  return Column(
-                    children: [
-                      AppListItem(
-                        title: Text(productName),
-                        description: Text(
-                          "Stock: $productStock",
-                          style: TextStyle(
-                            color: productStock <= 0
-                                ? Colors.red
-                                : Colors
-                                      .green, // Cambia el color dependiendo del valor
-                          ),
-                        ),
-                        onEdit: () {
-                          Navigator.pushNamed(
-                            context,
-                            'new-product',
-                            arguments: state.products[index],
-                          );
-                        },
+              return Column(
+                children: [
+                  if (_showBanner)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: AppTopBanner(
+                        message: _bannerMessage,
+                        type: AppBannerType.success,
+                        onClose: _closeBanner,
                       ),
-                      Divider(
-                        color: Colors.grey, // Color de la línea
-                        thickness: 0.4, // Grosor de la línea
-                        indent: 4, // Espaciado desde la izquierda
-                        endIndent: 4, // Espaciado desde la derecha
-                      ),
-                    ],
-                  );
-                },
+                    ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: state.products.length,
+                      itemBuilder: (context, index) {
+                        final productName = state.products[index].name;
+                        final productStock = state.products[index].stock;
+                        return Column(
+                          children: [
+                            AppListItem(
+                              title: Text(productName),
+                              description: Text(
+                                "Stock: $productStock",
+                                style: TextStyle(
+                                  color: productStock <= 0
+                                      ? Colors.red
+                                      : Colors
+                                            .green, // Cambia el color dependiendo del valor
+                                ),
+                              ),
+                              onEdit: () async {
+                                final product = state.products[index];
+
+                                // Obtener la categoría completa antes de abrir la pantalla
+                                final repoCategory = context
+                                    .read<SearchCategoriesBloc>();
+                                final category = await repoCategory.categoryDao
+                                    .getById(product.categoryId);
+
+                                // suproducts
+                                final repoProduct = context
+                                    .read<ProductsListBloc>();
+                                final subproducts = await repoProduct.productDao
+                                    .getSubproductsByProduct(product);
+
+                                // Pasar el producto y la categoría completa como argumento
+                                Navigator.pushNamed(
+                                  context,
+                                  'new-product',
+                                  arguments: {
+                                    'product': product,
+                                    'category': category,
+                                    'subproducts': subproducts,
+                                  },
+                                );
+                              },
+                            ),
+                            Divider(
+                              color: Colors.grey, // Color de la línea
+                              thickness: 0.4, // Grosor de la línea
+                              indent: 4, // Espaciado desde la izquierda
+                              endIndent: 4, // Espaciado desde la derecha
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             }
           } else if (state is ProductsListLoadFailure) {
@@ -91,13 +153,12 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AppFloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, 'new-product');
         },
-        backgroundColor: Theme.of(context).primaryColor,
-        tooltip: "Agregar producto",
-        child: const Icon(Icons.add),
+        tooltip: 'Agregar Categoría',
+        icon: Icons.add,
       ),
     );
   }

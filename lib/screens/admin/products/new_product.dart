@@ -4,9 +4,11 @@ import 'package:drift/drift.dart' as drift;
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
 import 'package:fine_cut/bloc/category/search_categories/search_categories_bloc.dart';
 import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
+import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/db/tables/product_subproducts_table.dart';
 import 'package:fine_cut/widgets/app_bool_switch.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
@@ -31,16 +33,20 @@ class _NewProductScreenState extends State<NewProductScreen> {
   //controllers
   final TextEditingController _categoryIdController = TextEditingController();
   final TextEditingController _productNameController = TextEditingController();
-  final TextEditingController _hasSubProductsController = TextEditingController(
-    text: "false",
-  );
+  final TextEditingController _hasSubProductsController =
+      TextEditingController();
   final TextEditingController _statusController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   final dropDownKey = GlobalKey<DropdownSearchState>();
 
   ProductsCompanion productCompanion = ProductsCompanion(); // default values
+  List<ProductSubproductsCompanion> productSubproductsCompanions = [];
+
+  List<Product> selectedProducts = [];
+
   bool isNew = true;
+  Category? selectedCategory;
 
   @override
   void dispose() {
@@ -56,24 +62,47 @@ class _NewProductScreenState extends State<NewProductScreen> {
   void initState() {
     super.initState();
 
-    context.read<CategoriesListBloc>().add(
-      LoadCategoriesListEvent(AppEventSource.list),
+    // restart state
+    //context.read<ProductCrudBloc>().add(ResetProductCrudEvent());
+
+    productCompanion = productCompanion.copyWith(
+      hasSubProducts: drift.Value(
+        _hasSubProductsController.text.toLowerCase() == 'true',
+      ),
     );
 
     Future.microtask(() {
-      if (!mounted) return;
-      final args = ModalRoute.of(context)?.settings.arguments as Product?;
+      final args = ModalRoute.of(context)?.settings.arguments as Map?;
       if (args != null) {
+        final product = args['product'] as Product;
+        final category = args['category'] as Category?;
+
         productCompanion = productCompanion.copyWith(
-          id: drift.Value(args.id),
-          categoryId: drift.Value(args.categoryId),
-          name: drift.Value(args.name),
+          id: drift.Value(product.id),
+          categoryId: drift.Value(product.categoryId),
+          name: drift.Value(product.name),
+          hasSubProducts: drift.Value(product.hasSubProducts),
+          status: drift.Value(product.status),
+          description: drift.Value(product.description),
         );
-        _categoryIdController.text = args.categoryId.toString();
-        _productNameController.text = args.name;
-        _hasSubProductsController.text = args.trackStock.toString();
-        _statusController.text = args.status.name;
-        _descriptionController.text = args.description ?? '';
+
+        _categoryIdController.text = product.categoryId.toString();
+        _productNameController.text = product.name;
+        _hasSubProductsController.text = product.hasSubProducts.toString();
+        _statusController.text = product.status.name;
+        _descriptionController.text = product.description ?? '';
+
+        selectedCategory = category;
+        selectedProducts = args['subproducts'];
+
+        // on edit, load existing subproducts
+        productSubproductsCompanions = selectedProducts.map((subproduct) {
+          return ProductSubproductsCompanion.insert(
+            productId: product.id,
+            subproductId: subproduct.id,
+          );
+        }).toList();
+
         setState(() {
           isNew = false;
         });
@@ -81,9 +110,10 @@ class _NewProductScreenState extends State<NewProductScreen> {
     });
   }
 
-  void goBack() {
+  void goBack(AppEventSource eventSource) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pop(context, true);
+      context.read<ProductsListBloc>().add(LoadProductsListEvent(eventSource));
     });
   }
 
@@ -130,7 +160,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                 children: [
                   DropdownSearch<Category>(
                     key: dropDownKey,
-                    selectedItem: null,
+                    selectedItem: selectedCategory,
                     items: (filter, loadProps) async {
                       final repo = context.read<SearchCategoriesBloc>();
                       return await repo.categoryDao.searchCategories(filter);
@@ -204,6 +234,51 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     },
                   ),
 
+                  // Después del AppBoolSwitch
+                  if (productCompanion.hasSubProducts.value) ...[
+                    const SizedBox(height: 20),
+                    DropdownSearch<Product>.multiSelection(
+                      items: (filter, loadProps) async {
+                        // Aquí iría la lógica de búsqueda de productos, por ahora mock
+                        final repo = context.read<ProductsListBloc>();
+                        return await repo.productDao.searchProducts(filter);
+                      },
+                      selectedItems: [...selectedProducts],
+                      itemAsString: (item) => item.name,
+                      compareFn: (item1, item2) => item1.id == item2.id,
+                      onChanged: (selectedProducts) {
+                        setState(() {
+                          productSubproductsCompanions = selectedProducts.map((
+                            subproduct,
+                          ) {
+                            return ProductSubproductsCompanion.insert(
+                              productId: 0,
+                              subproductId: subproduct.id,
+                            );
+                          }).toList();
+                        });
+                      },
+                      /*validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Seleccione al menos un subproducto.';
+                        }
+                        return null;
+                      },*/
+                      popupProps: PopupPropsMultiSelection.menu(
+                        showSearchBox: true,
+                        constraints: const BoxConstraints(maxHeight: 250),
+                        emptyBuilder: (context, searchEntry) {
+                          return const Center(
+                            child: Text(
+                              "No se encontraron productos",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+
                   const SizedBox(height: 20),
                   AppTextField(
                     label: 'Descripción',
@@ -233,14 +308,17 @@ class _NewProductScreenState extends State<NewProductScreen> {
                       },
                     ),
                   ],
-                  BlocBuilder<ProductCrudBloc, ProductCrudState>(
-                    builder: (context, state) {
-                      bool isLoading = state is ProductCrudCreationInProgress;
-                      bool isSuccess = state is ProductCrudCreationSuccess;
-                      bool isUpdate = state is ProductCrudUpdateSuccess;
-                      if (isSuccess || isUpdate) {
-                        goBack();
+                  BlocConsumer<ProductCrudBloc, ProductCrudState>(
+                    listener: (context, state) {
+                      if (state is ProductCrudCreationSuccess) {
+                        goBack(AppEventSource.create);
                       }
+                      if (state is ProductCrudUpdateSuccess) {
+                        goBack(AppEventSource.update);
+                      }
+                    },
+                    builder: (context, state) {
+                      final isLoading = state is ProductCrudCreationInProgress;
                       return Column(
                         children: [
                           if (state is ProductCrudCreationFailure)
@@ -275,6 +353,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                                                 ? RecordAction.create
                                                 : RecordAction.update,
                                             productCompanion,
+                                            productSubproductsCompanions,
                                           ),
                                         );
                                       }

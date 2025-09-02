@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fine_cut/bloc/bloc_observer.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
@@ -17,6 +18,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 
 void main() {
+  // Bloc.observer = AppBlocObserver();
   runApp(AppInitializer());
 }
 

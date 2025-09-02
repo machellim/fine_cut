@@ -30,12 +30,6 @@ class Products extends Table {
   // Whether the product has sub-products (e.g., beef cuts)
   BoolColumn get hasSubProducts => boolean().withDefault(Constant(false))();
 
-  // if this product is a sub-product, reference to parent product
-  IntColumn get parentProductId => integer()
-      .named('parent_product_id')
-      .nullable()
-      .customConstraint('REFERENCES products(id) ON DELETE SET NULL')();
-
   // Active/inactive status
   TextColumn get status => text()
       .named('status')

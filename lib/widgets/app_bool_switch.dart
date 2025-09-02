@@ -25,11 +25,38 @@ class AppBoolSwitch extends StatefulWidget {
 class _AppBoolSwitchState extends State<AppBoolSwitch> {
   late bool _value;
 
+  bool parseBool(String? text) {
+    if (text == null) return false;
+    return text.toLowerCase() == 'true';
+  }
+
   @override
   void initState() {
     super.initState();
-    // Inicializamos desde el controller (true/false)
-    _value = widget.controller.text.toLowerCase() == 'true';
+
+    // Inicializamos desde el controller
+    if (widget.controller.text.isEmpty) {
+      widget.controller.text = 'false';
+    }
+    _value = parseBool(widget.controller.text);
+
+    // Listener para actualizar _value cuando el controller cambie
+    widget.controller.addListener(_controllerListener);
+  }
+
+  void _controllerListener() {
+    final newValue = parseBool(widget.controller.text);
+    if (newValue != _value) {
+      setState(() {
+        _value = newValue;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_controllerListener);
+    super.dispose();
   }
 
   @override

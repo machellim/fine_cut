@@ -92,6 +92,8 @@ class _NewCategoryScreenState extends State<NewCategoryScreen> {
                   AppTextField(
                     controller: _nameController,
                     label: 'Nombre Categoría',
+                    minLength: 3,
+                    maxLength: 100,
                     onSaved: (value) {
                       categoryCompanion = categoryCompanion.copyWith(
                         name: drift.Value(value),

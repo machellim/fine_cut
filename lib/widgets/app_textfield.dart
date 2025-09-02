@@ -21,6 +21,8 @@ class AppTextField extends StatefulWidget {
   final bool readOnly;
   final String? Function(String?)? validator;
   final IconData? prefixIcon;
+  final int? minLength;
+  final int? maxLength;
 
   const AppTextField({
     super.key,
@@ -44,6 +46,8 @@ class AppTextField extends StatefulWidget {
     this.readOnly = false,
     this.validator,
     this.prefixIcon,
+    this.minLength,
+    this.maxLength,
   });
 
   @override
@@ -142,9 +146,20 @@ class _AppTextFieldState extends State<AppTextField> {
       validator:
           widget.validator ??
           (widget.validate
-              ? (value) => (value == null || value.isEmpty)
-                    ? (widget.validationMessage ?? 'Campo requerido')
-                    : null
+              ? (value) {
+                  if (value == null || value.isEmpty) {
+                    return widget.validationMessage ?? 'Campo requerido';
+                  }
+                  if (widget.minLength != null &&
+                      value.length < widget.minLength!) {
+                    return 'Mínimo ${widget.minLength} caracteres';
+                  }
+                  if (widget.maxLength != null &&
+                      value.length > widget.maxLength!) {
+                    return 'Máximo ${widget.maxLength} caracteres';
+                  }
+                  return null;
+                }
               : null),
       onSaved: widget.onSaved != null
           ? (value) {

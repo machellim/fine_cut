@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import '../database.dart';
 
@@ -19,18 +20,24 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
     )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
   }
 
+  Future<Category?> getById(int id) {
+    return (select(
+      categories,
+    )..where((c) => c.id.equals(id))).getSingleOrNull();
+  }
+
   Future<List<Category>> searchCategories(String query) {
     final trimmedQuery = query.trim();
 
-    // Return empty list if query is too short
-    if (trimmedQuery.length < 3) {
-      return Future.value([]);
-    }
-
     // Filter categories in the database
     return (select(categories)
-          ..where((c) => c.name.lower().like('%${trimmedQuery.toLowerCase()}%'))
-          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+          ..where(
+            (c) =>
+                c.name.lower().like('%${trimmedQuery.toLowerCase()}%') &
+                (c.status.equals(AppActiveStatus.active.name)),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.name)])
+          ..limit(AppConstants.searchResultsLimit))
         .get();
   }
 

@@ -102,18 +102,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     ),
     defaultValue: Constant(false),
   );
-  static const VerificationMeta _parentProductIdMeta = const VerificationMeta(
-    'parentProductId',
-  );
-  @override
-  late final GeneratedColumn<int> parentProductId = GeneratedColumn<int>(
-    'parent_product_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    $customConstraints: 'REFERENCES products(id) ON DELETE SET NULL',
-  );
   @override
   late final GeneratedColumnWithTypeConverter<AppActiveStatus, String> status =
       GeneratedColumn<String>(
@@ -160,7 +148,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     stock,
     trackStock,
     hasSubProducts,
-    parentProductId,
     status,
     createdAt,
     updatedAt,
@@ -226,15 +213,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         ),
       );
     }
-    if (data.containsKey('parent_product_id')) {
-      context.handle(
-        _parentProductIdMeta,
-        parentProductId.isAcceptableOrUnknown(
-          data['parent_product_id']!,
-          _parentProductIdMeta,
-        ),
-      );
-    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -284,10 +262,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.bool,
         data['${effectivePrefix}has_sub_products'],
       )!,
-      parentProductId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}parent_product_id'],
-      ),
       status: $ProductsTable.$converterstatus.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -322,7 +296,6 @@ class Product extends DataClass implements Insertable<Product> {
   final int stock;
   final bool trackStock;
   final bool hasSubProducts;
-  final int? parentProductId;
   final AppActiveStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -334,7 +307,6 @@ class Product extends DataClass implements Insertable<Product> {
     required this.stock,
     required this.trackStock,
     required this.hasSubProducts,
-    this.parentProductId,
     required this.status,
     required this.createdAt,
     this.updatedAt,
@@ -351,9 +323,6 @@ class Product extends DataClass implements Insertable<Product> {
     map['stock'] = Variable<int>(stock);
     map['track_stock'] = Variable<bool>(trackStock);
     map['has_sub_products'] = Variable<bool>(hasSubProducts);
-    if (!nullToAbsent || parentProductId != null) {
-      map['parent_product_id'] = Variable<int>(parentProductId);
-    }
     {
       map['status'] = Variable<String>(
         $ProductsTable.$converterstatus.toSql(status),
@@ -377,9 +346,6 @@ class Product extends DataClass implements Insertable<Product> {
       stock: Value(stock),
       trackStock: Value(trackStock),
       hasSubProducts: Value(hasSubProducts),
-      parentProductId: parentProductId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(parentProductId),
       status: Value(status),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
@@ -401,7 +367,6 @@ class Product extends DataClass implements Insertable<Product> {
       stock: serializer.fromJson<int>(json['stock']),
       trackStock: serializer.fromJson<bool>(json['trackStock']),
       hasSubProducts: serializer.fromJson<bool>(json['hasSubProducts']),
-      parentProductId: serializer.fromJson<int?>(json['parentProductId']),
       status: $ProductsTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
       ),
@@ -420,7 +385,6 @@ class Product extends DataClass implements Insertable<Product> {
       'stock': serializer.toJson<int>(stock),
       'trackStock': serializer.toJson<bool>(trackStock),
       'hasSubProducts': serializer.toJson<bool>(hasSubProducts),
-      'parentProductId': serializer.toJson<int?>(parentProductId),
       'status': serializer.toJson<String>(
         $ProductsTable.$converterstatus.toJson(status),
       ),
@@ -437,7 +401,6 @@ class Product extends DataClass implements Insertable<Product> {
     int? stock,
     bool? trackStock,
     bool? hasSubProducts,
-    Value<int?> parentProductId = const Value.absent(),
     AppActiveStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
@@ -449,9 +412,6 @@ class Product extends DataClass implements Insertable<Product> {
     stock: stock ?? this.stock,
     trackStock: trackStock ?? this.trackStock,
     hasSubProducts: hasSubProducts ?? this.hasSubProducts,
-    parentProductId: parentProductId.present
-        ? parentProductId.value
-        : this.parentProductId,
     status: status ?? this.status,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
@@ -473,9 +433,6 @@ class Product extends DataClass implements Insertable<Product> {
       hasSubProducts: data.hasSubProducts.present
           ? data.hasSubProducts.value
           : this.hasSubProducts,
-      parentProductId: data.parentProductId.present
-          ? data.parentProductId.value
-          : this.parentProductId,
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -492,7 +449,6 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
           ..write('hasSubProducts: $hasSubProducts, ')
-          ..write('parentProductId: $parentProductId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -509,7 +465,6 @@ class Product extends DataClass implements Insertable<Product> {
     stock,
     trackStock,
     hasSubProducts,
-    parentProductId,
     status,
     createdAt,
     updatedAt,
@@ -525,7 +480,6 @@ class Product extends DataClass implements Insertable<Product> {
           other.stock == this.stock &&
           other.trackStock == this.trackStock &&
           other.hasSubProducts == this.hasSubProducts &&
-          other.parentProductId == this.parentProductId &&
           other.status == this.status &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -539,7 +493,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int> stock;
   final Value<bool> trackStock;
   final Value<bool> hasSubProducts;
-  final Value<int?> parentProductId;
   final Value<AppActiveStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
@@ -551,7 +504,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
     this.hasSubProducts = const Value.absent(),
-    this.parentProductId = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -564,7 +516,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
     this.hasSubProducts = const Value.absent(),
-    this.parentProductId = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -578,7 +529,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<int>? stock,
     Expression<bool>? trackStock,
     Expression<bool>? hasSubProducts,
-    Expression<int>? parentProductId,
     Expression<String>? status,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -591,7 +541,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (stock != null) 'stock': stock,
       if (trackStock != null) 'track_stock': trackStock,
       if (hasSubProducts != null) 'has_sub_products': hasSubProducts,
-      if (parentProductId != null) 'parent_product_id': parentProductId,
       if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -606,7 +555,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<int>? stock,
     Value<bool>? trackStock,
     Value<bool>? hasSubProducts,
-    Value<int?>? parentProductId,
     Value<AppActiveStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
@@ -619,7 +567,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       stock: stock ?? this.stock,
       trackStock: trackStock ?? this.trackStock,
       hasSubProducts: hasSubProducts ?? this.hasSubProducts,
-      parentProductId: parentProductId ?? this.parentProductId,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -650,9 +597,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (hasSubProducts.present) {
       map['has_sub_products'] = Variable<bool>(hasSubProducts.value);
     }
-    if (parentProductId.present) {
-      map['parent_product_id'] = Variable<int>(parentProductId.value);
-    }
     if (status.present) {
       map['status'] = Variable<String>(
         $ProductsTable.$converterstatus.toSql(status.value),
@@ -677,7 +621,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
           ..write('hasSubProducts: $hasSubProducts, ')
-          ..write('parentProductId: $parentProductId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -5824,6 +5767,235 @@ class IncomesCompanion extends UpdateCompanion<Income> {
   }
 }
 
+class $ProductSubproductsTable extends ProductSubproducts
+    with TableInfo<$ProductSubproductsTable, ProductSubproduct> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProductSubproductsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _productIdMeta = const VerificationMeta(
+    'productId',
+  );
+  @override
+  late final GeneratedColumn<int> productId = GeneratedColumn<int>(
+    'product_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'REFERENCES products(id) ON DELETE CASCADE',
+  );
+  static const VerificationMeta _subproductIdMeta = const VerificationMeta(
+    'subproductId',
+  );
+  @override
+  late final GeneratedColumn<int> subproductId = GeneratedColumn<int>(
+    'subproduct_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'REFERENCES products(id) ON DELETE CASCADE',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [productId, subproductId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'product_subproducts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ProductSubproduct> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('product_id')) {
+      context.handle(
+        _productIdMeta,
+        productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('subproduct_id')) {
+      context.handle(
+        _subproductIdMeta,
+        subproductId.isAcceptableOrUnknown(
+          data['subproduct_id']!,
+          _subproductIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_subproductIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {productId, subproductId};
+  @override
+  ProductSubproduct map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ProductSubproduct(
+      productId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}product_id'],
+      )!,
+      subproductId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}subproduct_id'],
+      )!,
+    );
+  }
+
+  @override
+  $ProductSubproductsTable createAlias(String alias) {
+    return $ProductSubproductsTable(attachedDatabase, alias);
+  }
+}
+
+class ProductSubproduct extends DataClass
+    implements Insertable<ProductSubproduct> {
+  final int productId;
+  final int subproductId;
+  const ProductSubproduct({
+    required this.productId,
+    required this.subproductId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['product_id'] = Variable<int>(productId);
+    map['subproduct_id'] = Variable<int>(subproductId);
+    return map;
+  }
+
+  ProductSubproductsCompanion toCompanion(bool nullToAbsent) {
+    return ProductSubproductsCompanion(
+      productId: Value(productId),
+      subproductId: Value(subproductId),
+    );
+  }
+
+  factory ProductSubproduct.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ProductSubproduct(
+      productId: serializer.fromJson<int>(json['productId']),
+      subproductId: serializer.fromJson<int>(json['subproductId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'productId': serializer.toJson<int>(productId),
+      'subproductId': serializer.toJson<int>(subproductId),
+    };
+  }
+
+  ProductSubproduct copyWith({int? productId, int? subproductId}) =>
+      ProductSubproduct(
+        productId: productId ?? this.productId,
+        subproductId: subproductId ?? this.subproductId,
+      );
+  ProductSubproduct copyWithCompanion(ProductSubproductsCompanion data) {
+    return ProductSubproduct(
+      productId: data.productId.present ? data.productId.value : this.productId,
+      subproductId: data.subproductId.present
+          ? data.subproductId.value
+          : this.subproductId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProductSubproduct(')
+          ..write('productId: $productId, ')
+          ..write('subproductId: $subproductId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(productId, subproductId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ProductSubproduct &&
+          other.productId == this.productId &&
+          other.subproductId == this.subproductId);
+}
+
+class ProductSubproductsCompanion extends UpdateCompanion<ProductSubproduct> {
+  final Value<int> productId;
+  final Value<int> subproductId;
+  final Value<int> rowid;
+  const ProductSubproductsCompanion({
+    this.productId = const Value.absent(),
+    this.subproductId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProductSubproductsCompanion.insert({
+    required int productId,
+    required int subproductId,
+    this.rowid = const Value.absent(),
+  }) : productId = Value(productId),
+       subproductId = Value(subproductId);
+  static Insertable<ProductSubproduct> custom({
+    Expression<int>? productId,
+    Expression<int>? subproductId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (productId != null) 'product_id': productId,
+      if (subproductId != null) 'subproduct_id': subproductId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProductSubproductsCompanion copyWith({
+    Value<int>? productId,
+    Value<int>? subproductId,
+    Value<int>? rowid,
+  }) {
+    return ProductSubproductsCompanion(
+      productId: productId ?? this.productId,
+      subproductId: subproductId ?? this.subproductId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (productId.present) {
+      map['product_id'] = Variable<int>(productId.value);
+    }
+    if (subproductId.present) {
+      map['subproduct_id'] = Variable<int>(subproductId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProductSubproductsCompanion(')
+          ..write('productId: $productId, ')
+          ..write('subproductId: $subproductId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5837,6 +6009,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UnitsTable units = $UnitsTable(this);
   late final $PaymentMethodsTable paymentMethods = $PaymentMethodsTable(this);
   late final $IncomesTable incomes = $IncomesTable(this);
+  late final $ProductSubproductsTable productSubproducts =
+      $ProductSubproductsTable(this);
   late final PaymentMethodDao paymentMethodDao = PaymentMethodDao(
     this as AppDatabase,
   );
@@ -5845,6 +6019,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final CategoryDao categoryDao = CategoryDao(this as AppDatabase);
   late final ProductDao productDao = ProductDao(this as AppDatabase);
+  late final ProductSubproductDao productSubproductDao = ProductSubproductDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5860,6 +6037,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     units,
     paymentMethods,
     incomes,
+    productSubproducts,
   ];
 }
 
@@ -5872,7 +6050,6 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<int> stock,
       Value<bool> trackStock,
       Value<bool> hasSubProducts,
-      Value<int?> parentProductId,
       Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -5886,7 +6063,6 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<int> stock,
       Value<bool> trackStock,
       Value<bool> hasSubProducts,
-      Value<int?> parentProductId,
       Value<AppActiveStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
@@ -5933,11 +6109,6 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<bool> get hasSubProducts => $composableBuilder(
     column: $table.hasSubProducts,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get parentProductId => $composableBuilder(
-    column: $table.parentProductId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6002,11 +6173,6 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get parentProductId => $composableBuilder(
-    column: $table.parentProductId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
@@ -6061,11 +6227,6 @@ class $$ProductsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get parentProductId => $composableBuilder(
-    column: $table.parentProductId,
-    builder: (column) => column,
-  );
-
   GeneratedColumnWithTypeConverter<AppActiveStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
@@ -6111,7 +6272,6 @@ class $$ProductsTableTableManager
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
                 Value<bool> hasSubProducts = const Value.absent(),
-                Value<int?> parentProductId = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -6123,7 +6283,6 @@ class $$ProductsTableTableManager
                 stock: stock,
                 trackStock: trackStock,
                 hasSubProducts: hasSubProducts,
-                parentProductId: parentProductId,
                 status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -6137,7 +6296,6 @@ class $$ProductsTableTableManager
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
                 Value<bool> hasSubProducts = const Value.absent(),
-                Value<int?> parentProductId = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
@@ -6149,7 +6307,6 @@ class $$ProductsTableTableManager
                 stock: stock,
                 trackStock: trackStock,
                 hasSubProducts: hasSubProducts,
-                parentProductId: parentProductId,
                 status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -8624,6 +8781,164 @@ typedef $$IncomesTableProcessedTableManager =
       Income,
       PrefetchHooks Function()
     >;
+typedef $$ProductSubproductsTableCreateCompanionBuilder =
+    ProductSubproductsCompanion Function({
+      required int productId,
+      required int subproductId,
+      Value<int> rowid,
+    });
+typedef $$ProductSubproductsTableUpdateCompanionBuilder =
+    ProductSubproductsCompanion Function({
+      Value<int> productId,
+      Value<int> subproductId,
+      Value<int> rowid,
+    });
+
+class $$ProductSubproductsTableFilterComposer
+    extends Composer<_$AppDatabase, $ProductSubproductsTable> {
+  $$ProductSubproductsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get subproductId => $composableBuilder(
+    column: $table.subproductId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ProductSubproductsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProductSubproductsTable> {
+  $$ProductSubproductsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get subproductId => $composableBuilder(
+    column: $table.subproductId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ProductSubproductsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProductSubproductsTable> {
+  $$ProductSubproductsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<int> get subproductId => $composableBuilder(
+    column: $table.subproductId,
+    builder: (column) => column,
+  );
+}
+
+class $$ProductSubproductsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProductSubproductsTable,
+          ProductSubproduct,
+          $$ProductSubproductsTableFilterComposer,
+          $$ProductSubproductsTableOrderingComposer,
+          $$ProductSubproductsTableAnnotationComposer,
+          $$ProductSubproductsTableCreateCompanionBuilder,
+          $$ProductSubproductsTableUpdateCompanionBuilder,
+          (
+            ProductSubproduct,
+            BaseReferences<
+              _$AppDatabase,
+              $ProductSubproductsTable,
+              ProductSubproduct
+            >,
+          ),
+          ProductSubproduct,
+          PrefetchHooks Function()
+        > {
+  $$ProductSubproductsTableTableManager(
+    _$AppDatabase db,
+    $ProductSubproductsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProductSubproductsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProductSubproductsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProductSubproductsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> productId = const Value.absent(),
+                Value<int> subproductId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProductSubproductsCompanion(
+                productId: productId,
+                subproductId: subproductId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int productId,
+                required int subproductId,
+                Value<int> rowid = const Value.absent(),
+              }) => ProductSubproductsCompanion.insert(
+                productId: productId,
+                subproductId: subproductId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ProductSubproductsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProductSubproductsTable,
+      ProductSubproduct,
+      $$ProductSubproductsTableFilterComposer,
+      $$ProductSubproductsTableOrderingComposer,
+      $$ProductSubproductsTableAnnotationComposer,
+      $$ProductSubproductsTableCreateCompanionBuilder,
+      $$ProductSubproductsTableUpdateCompanionBuilder,
+      (
+        ProductSubproduct,
+        BaseReferences<
+          _$AppDatabase,
+          $ProductSubproductsTable,
+          ProductSubproduct
+        >,
+      ),
+      ProductSubproduct,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8648,4 +8963,6 @@ class $AppDatabaseManager {
       $$PaymentMethodsTableTableManager(_db, _db.paymentMethods);
   $$IncomesTableTableManager get incomes =>
       $$IncomesTableTableManager(_db, _db.incomes);
+  $$ProductSubproductsTableTableManager get productSubproducts =>
+      $$ProductSubproductsTableTableManager(_db, _db.productSubproducts);
 }

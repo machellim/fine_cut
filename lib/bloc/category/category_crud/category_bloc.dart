@@ -55,6 +55,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
           }
         }
       } catch (e) {
+        print(e);
         emit(CategoryCreationFailure(message: 'Error al crear la categoría'));
       }
     });
