@@ -155,7 +155,26 @@ class _ViewEditCashRegisterScreenState
                 ExpansionPanelRadio(
                   value: 2,
                   headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: Text('Otros Gastos')),
+                      const ListTile(title: Text('Gastos')),
+                  body: const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('Contenido de compras'),
+                  ),
+                ),
+                ExpansionPanelRadio(
+                  value: 3,
+                  headerBuilder: (context, isExpanded) =>
+                      const ListTile(title: Text('Ingresos Varios')),
+                  body: const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('Contenido de otros gastos'),
+                  ),
+                ),
+                ExpansionPanelRadio(
+                  value: 4,
+                  headerBuilder: (context, isExpanded) => const ListTile(
+                    title: Text('Productos dañados, robados, perdidos, etc.'),
+                  ),
                   body: const Padding(
                     padding: EdgeInsets.all(16),
                     child: Text('Contenido de otros gastos'),

@@ -65,4 +65,16 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
 
     return await into(cashRegisters).insertReturning(companion);
   }
+
+  Future<CashRegister?> getLastOpenCashRegister() {
+    final query = (select(cashRegisters)
+      ..where((tbl) => tbl.status.equals(CashRegisterStatus.open.name))
+      ..orderBy([
+        (tbl) =>
+            OrderingTerm(expression: tbl.registerDate, mode: OrderingMode.desc),
+      ])
+      ..limit(1));
+
+    return query.getSingleOrNull();
+  }
 }
