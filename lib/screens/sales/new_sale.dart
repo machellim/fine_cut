@@ -1,98 +1,125 @@
 import 'package:drift/drift.dart' as drift;
-import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
-import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
-import 'package:fine_cut/core/constants/app_messages.dart';
-import 'package:fine_cut/widgets/app_bar_custom.dart';
+import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/widgets/app_button.dart';
-import 'package:fine_cut/widgets/app_loading_screen.dart';
-import 'package:fine_cut/widgets/app_message_type.dart';
-import 'package:intl/intl.dart';
-
+import 'package:fine_cut/widgets/app_number_field.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
-import 'package:fine_cut/widgets/app_textfield.dart';
 import 'package:flutter/material.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ViewEditCashRegisterScreen extends StatefulWidget {
-  const ViewEditCashRegisterScreen({super.key});
-
+class NewSaleScreen extends StatefulWidget {
+  const NewSaleScreen({super.key});
   @override
-  State<ViewEditCashRegisterScreen> createState() =>
-      _ViewEditCashRegisterScreenState();
+  NewSaleScreenState createState() => NewSaleScreenState();
 }
 
-class _ViewEditCashRegisterScreenState
-    extends State<ViewEditCashRegisterScreen> {
+class NewSaleScreenState extends State<NewSaleScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  late TextEditingController _registerDateController;
-  final _notesController = TextEditingController();
-  final _openingAmountController = TextEditingController();
+  // controllers
+  final TextEditingController _saleQuantityController = TextEditingController();
+  final TextEditingController _saleTotalPriceController =
+      TextEditingController();
 
-  bool isNew = true;
+  final dropDownKey = GlobalKey<DropdownSearchState>();
+
+  SalesCompanion sale = SalesCompanion();
+  bool isNewSale = true;
 
   @override
   void dispose() {
-    _registerDateController.dispose();
-    _openingAmountController.dispose();
-    _notesController.dispose();
+    _saleQuantityController.dispose();
+    _saleTotalPriceController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    final String today = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    _registerDateController = TextEditingController(text: today);
 
-    context.read<CashRegisterBloc>().add(LoadDataCashRegisterEvent());
+    Future.microtask(() {
+      if (!mounted) return;
+      final args = ModalRoute.of(context)?.settings.arguments as Sale?;
+
+      if (args != null) {
+        sale = sale.copyWith(
+          id: drift.Value(args.id),
+          productId: drift.Value(args.productId),
+          quantity: drift.Value(args.quantity),
+          totalPrice: drift.Value(args.totalPrice),
+        );
+        _saleQuantityController.text = args.quantity.toString();
+        _saleTotalPriceController.text = args.totalPrice.toString();
+        setState(() {
+          isNewSale = false;
+        });
+      }
+    });
   }
 
-  void goBack() {}
+  void goBack() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.pop(context, true);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      appBar: AppBarCustom(title: isNew ? 'Crear Nueva Caja' : 'Editar Caja'),
+      appBar: AppBar(title: Text('oo')),
       body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
           children: [
-            Form(
-              key: _formKey,
+            SizedBox(
               child: Column(
                 children: [
-                  AppTextField(
-                    label: 'Fecha',
-                    controller: _registerDateController,
-                    readOnly: true,
-                    prefixIcon: Icons.calendar_today,
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Por favor ingrese la fecha.'
-                        : null,
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width * 0.1,
+                      right: MediaQuery.of(context).size.width * 0.1,
+                      top: 80.0,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 30.0),
+                          AppNumberField(
+                            controller: _saleQuantityController,
+                            label: 'Ingrese la cantidad',
+                            onSaved: (value) {
+                              sale = sale.copyWith(
+                                quantity: drift.Value(double.parse(value)),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 30.0),
+                          AppNumberField(
+                            controller: _saleTotalPriceController,
+                            label: 'Ingrese el precio de venta',
+                            onSaved: (value) {
+                              sale = sale.copyWith(
+                                totalPrice: drift.Value(double.parse(value)),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 30),
+                          AppButton(
+                            title: isNewSale
+                                ? 'Crear Venta'
+                                : 'Actualizar Venta',
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20),
-                  AppTextField(
-                    label: 'Saldo Inicial',
-                    controller: _openingAmountController,
-                    prefixIcon: Icons.monetization_on_outlined,
-                    readOnly: true,
-                    //enabled: false,
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Please enter your username'
-                        : null,
-                  ),
-                  const SizedBox(height: 20),
-                  AppTextField(
-                    label: 'Notas',
-                    autofocus: true,
-                    controller: _notesController,
-                    isMultiline: true,
-                    validate: false,
-                  ),
-                  const SizedBox(height: 20),
-                  AppButton(title: '', onPressed: () {}),
                 ],
               ),
             ),

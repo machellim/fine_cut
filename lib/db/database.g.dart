@@ -3781,12 +3781,12 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0.0),
   );
-  static const VerificationMeta _totalAmountMeta = const VerificationMeta(
-    'totalAmount',
+  static const VerificationMeta _totalPriceMeta = const VerificationMeta(
+    'totalPrice',
   );
   @override
-  late final GeneratedColumn<double> totalAmount = GeneratedColumn<double>(
-    'total_amount',
+  late final GeneratedColumn<double> totalPrice = GeneratedColumn<double>(
+    'total_price',
     aliasedName,
     false,
     type: DriftSqlType.double,
@@ -3864,7 +3864,7 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
     cashRegisterId,
     paymentMethodId,
     quantity,
-    totalAmount,
+    totalPrice,
     notes,
     status,
     saleDate,
@@ -3932,13 +3932,10 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
         quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
       );
     }
-    if (data.containsKey('total_amount')) {
+    if (data.containsKey('total_price')) {
       context.handle(
-        _totalAmountMeta,
-        totalAmount.isAcceptableOrUnknown(
-          data['total_amount']!,
-          _totalAmountMeta,
-        ),
+        _totalPriceMeta,
+        totalPrice.isAcceptableOrUnknown(data['total_price']!, _totalPriceMeta),
       );
     }
     if (data.containsKey('notes')) {
@@ -4002,9 +3999,9 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
         DriftSqlType.double,
         data['${effectivePrefix}quantity'],
       )!,
-      totalAmount: attachedDatabase.typeMapping.read(
+      totalPrice: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
-        data['${effectivePrefix}total_amount'],
+        data['${effectivePrefix}total_price'],
       )!,
       notes: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -4048,7 +4045,7 @@ class Sale extends DataClass implements Insertable<Sale> {
   final int? cashRegisterId;
   final int paymentMethodId;
   final double quantity;
-  final double totalAmount;
+  final double totalPrice;
   final String? notes;
   final RecordStatus status;
   final DateTime saleDate;
@@ -4062,7 +4059,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     this.cashRegisterId,
     required this.paymentMethodId,
     required this.quantity,
-    required this.totalAmount,
+    required this.totalPrice,
     this.notes,
     required this.status,
     required this.saleDate,
@@ -4085,7 +4082,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     }
     map['payment_method_id'] = Variable<int>(paymentMethodId);
     map['quantity'] = Variable<double>(quantity);
-    map['total_amount'] = Variable<double>(totalAmount);
+    map['total_price'] = Variable<double>(totalPrice);
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
@@ -4117,7 +4114,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           : Value(cashRegisterId),
       paymentMethodId: Value(paymentMethodId),
       quantity: Value(quantity),
-      totalAmount: Value(totalAmount),
+      totalPrice: Value(totalPrice),
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
@@ -4143,7 +4140,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
       paymentMethodId: serializer.fromJson<int>(json['paymentMethodId']),
       quantity: serializer.fromJson<double>(json['quantity']),
-      totalAmount: serializer.fromJson<double>(json['totalAmount']),
+      totalPrice: serializer.fromJson<double>(json['totalPrice']),
       notes: serializer.fromJson<String?>(json['notes']),
       status: $SalesTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
@@ -4164,7 +4161,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
       'paymentMethodId': serializer.toJson<int>(paymentMethodId),
       'quantity': serializer.toJson<double>(quantity),
-      'totalAmount': serializer.toJson<double>(totalAmount),
+      'totalPrice': serializer.toJson<double>(totalPrice),
       'notes': serializer.toJson<String?>(notes),
       'status': serializer.toJson<String>(
         $SalesTable.$converterstatus.toJson(status),
@@ -4183,7 +4180,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     Value<int?> cashRegisterId = const Value.absent(),
     int? paymentMethodId,
     double? quantity,
-    double? totalAmount,
+    double? totalPrice,
     Value<String?> notes = const Value.absent(),
     RecordStatus? status,
     DateTime? saleDate,
@@ -4199,7 +4196,7 @@ class Sale extends DataClass implements Insertable<Sale> {
         : this.cashRegisterId,
     paymentMethodId: paymentMethodId ?? this.paymentMethodId,
     quantity: quantity ?? this.quantity,
-    totalAmount: totalAmount ?? this.totalAmount,
+    totalPrice: totalPrice ?? this.totalPrice,
     notes: notes.present ? notes.value : this.notes,
     status: status ?? this.status,
     saleDate: saleDate ?? this.saleDate,
@@ -4221,9 +4218,9 @@ class Sale extends DataClass implements Insertable<Sale> {
           ? data.paymentMethodId.value
           : this.paymentMethodId,
       quantity: data.quantity.present ? data.quantity.value : this.quantity,
-      totalAmount: data.totalAmount.present
-          ? data.totalAmount.value
-          : this.totalAmount,
+      totalPrice: data.totalPrice.present
+          ? data.totalPrice.value
+          : this.totalPrice,
       notes: data.notes.present ? data.notes.value : this.notes,
       status: data.status.present ? data.status.value : this.status,
       saleDate: data.saleDate.present ? data.saleDate.value : this.saleDate,
@@ -4242,7 +4239,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
           ..write('quantity: $quantity, ')
-          ..write('totalAmount: $totalAmount, ')
+          ..write('totalPrice: $totalPrice, ')
           ..write('notes: $notes, ')
           ..write('status: $status, ')
           ..write('saleDate: $saleDate, ')
@@ -4261,7 +4258,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     cashRegisterId,
     paymentMethodId,
     quantity,
-    totalAmount,
+    totalPrice,
     notes,
     status,
     saleDate,
@@ -4279,7 +4276,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           other.cashRegisterId == this.cashRegisterId &&
           other.paymentMethodId == this.paymentMethodId &&
           other.quantity == this.quantity &&
-          other.totalAmount == this.totalAmount &&
+          other.totalPrice == this.totalPrice &&
           other.notes == this.notes &&
           other.status == this.status &&
           other.saleDate == this.saleDate &&
@@ -4295,7 +4292,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
   final Value<int?> cashRegisterId;
   final Value<int> paymentMethodId;
   final Value<double> quantity;
-  final Value<double> totalAmount;
+  final Value<double> totalPrice;
   final Value<String?> notes;
   final Value<RecordStatus> status;
   final Value<DateTime> saleDate;
@@ -4309,7 +4306,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     this.cashRegisterId = const Value.absent(),
     this.paymentMethodId = const Value.absent(),
     this.quantity = const Value.absent(),
-    this.totalAmount = const Value.absent(),
+    this.totalPrice = const Value.absent(),
     this.notes = const Value.absent(),
     this.status = const Value.absent(),
     this.saleDate = const Value.absent(),
@@ -4324,7 +4321,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     this.cashRegisterId = const Value.absent(),
     required int paymentMethodId,
     this.quantity = const Value.absent(),
-    this.totalAmount = const Value.absent(),
+    this.totalPrice = const Value.absent(),
     this.notes = const Value.absent(),
     this.status = const Value.absent(),
     this.saleDate = const Value.absent(),
@@ -4340,7 +4337,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     Expression<int>? cashRegisterId,
     Expression<int>? paymentMethodId,
     Expression<double>? quantity,
-    Expression<double>? totalAmount,
+    Expression<double>? totalPrice,
     Expression<String>? notes,
     Expression<String>? status,
     Expression<DateTime>? saleDate,
@@ -4355,7 +4352,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
       if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
       if (quantity != null) 'quantity': quantity,
-      if (totalAmount != null) 'total_amount': totalAmount,
+      if (totalPrice != null) 'total_price': totalPrice,
       if (notes != null) 'notes': notes,
       if (status != null) 'status': status,
       if (saleDate != null) 'sale_date': saleDate,
@@ -4372,7 +4369,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     Value<int?>? cashRegisterId,
     Value<int>? paymentMethodId,
     Value<double>? quantity,
-    Value<double>? totalAmount,
+    Value<double>? totalPrice,
     Value<String?>? notes,
     Value<RecordStatus>? status,
     Value<DateTime>? saleDate,
@@ -4387,7 +4384,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
       paymentMethodId: paymentMethodId ?? this.paymentMethodId,
       quantity: quantity ?? this.quantity,
-      totalAmount: totalAmount ?? this.totalAmount,
+      totalPrice: totalPrice ?? this.totalPrice,
       notes: notes ?? this.notes,
       status: status ?? this.status,
       saleDate: saleDate ?? this.saleDate,
@@ -4420,8 +4417,8 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     if (quantity.present) {
       map['quantity'] = Variable<double>(quantity.value);
     }
-    if (totalAmount.present) {
-      map['total_amount'] = Variable<double>(totalAmount.value);
+    if (totalPrice.present) {
+      map['total_price'] = Variable<double>(totalPrice.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -4453,7 +4450,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
           ..write('quantity: $quantity, ')
-          ..write('totalAmount: $totalAmount, ')
+          ..write('totalPrice: $totalPrice, ')
           ..write('notes: $notes, ')
           ..write('status: $status, ')
           ..write('saleDate: $saleDate, ')
@@ -8784,7 +8781,7 @@ typedef $$SalesTableCreateCompanionBuilder =
       Value<int?> cashRegisterId,
       required int paymentMethodId,
       Value<double> quantity,
-      Value<double> totalAmount,
+      Value<double> totalPrice,
       Value<String?> notes,
       Value<RecordStatus> status,
       Value<DateTime> saleDate,
@@ -8800,7 +8797,7 @@ typedef $$SalesTableUpdateCompanionBuilder =
       Value<int?> cashRegisterId,
       Value<int> paymentMethodId,
       Value<double> quantity,
-      Value<double> totalAmount,
+      Value<double> totalPrice,
       Value<String?> notes,
       Value<RecordStatus> status,
       Value<DateTime> saleDate,
@@ -8851,8 +8848,8 @@ class $$SalesTableFilterComposer extends Composer<_$AppDatabase, $SalesTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get totalAmount => $composableBuilder(
-    column: $table.totalAmount,
+  ColumnFilters<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8927,8 +8924,8 @@ class $$SalesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get totalAmount => $composableBuilder(
-    column: $table.totalAmount,
+  ColumnOrderings<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -8994,8 +8991,8 @@ class $$SalesTableAnnotationComposer
   GeneratedColumn<double> get quantity =>
       $composableBuilder(column: $table.quantity, builder: (column) => column);
 
-  GeneratedColumn<double> get totalAmount => $composableBuilder(
-    column: $table.totalAmount,
+  GeneratedColumn<double> get totalPrice => $composableBuilder(
+    column: $table.totalPrice,
     builder: (column) => column,
   );
 
@@ -9050,7 +9047,7 @@ class $$SalesTableTableManager
                 Value<int?> cashRegisterId = const Value.absent(),
                 Value<int> paymentMethodId = const Value.absent(),
                 Value<double> quantity = const Value.absent(),
-                Value<double> totalAmount = const Value.absent(),
+                Value<double> totalPrice = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> saleDate = const Value.absent(),
@@ -9064,7 +9061,7 @@ class $$SalesTableTableManager
                 cashRegisterId: cashRegisterId,
                 paymentMethodId: paymentMethodId,
                 quantity: quantity,
-                totalAmount: totalAmount,
+                totalPrice: totalPrice,
                 notes: notes,
                 status: status,
                 saleDate: saleDate,
@@ -9080,7 +9077,7 @@ class $$SalesTableTableManager
                 Value<int?> cashRegisterId = const Value.absent(),
                 required int paymentMethodId,
                 Value<double> quantity = const Value.absent(),
-                Value<double> totalAmount = const Value.absent(),
+                Value<double> totalPrice = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> saleDate = const Value.absent(),
@@ -9094,7 +9091,7 @@ class $$SalesTableTableManager
                 cashRegisterId: cashRegisterId,
                 paymentMethodId: paymentMethodId,
                 quantity: quantity,
-                totalAmount: totalAmount,
+                totalPrice: totalPrice,
                 notes: notes,
                 status: status,
                 saleDate: saleDate,

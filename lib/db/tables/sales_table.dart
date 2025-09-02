@@ -38,9 +38,9 @@ class Sales extends Table {
   RealColumn get quantity =>
       real().named('quantity').withDefault(const Constant(0.0))();
 
-  // Total amount of the sale
-  RealColumn get totalAmount =>
-      real().named('total_amount').withDefault(const Constant(0.0))();
+  // Total price of the sale
+  RealColumn get totalPrice =>
+      real().named('total_price').withDefault(const Constant(0.0))();
 
   // Optional notes about the sale
   TextColumn get notes =>

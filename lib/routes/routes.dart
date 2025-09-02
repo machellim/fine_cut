@@ -8,6 +8,7 @@ import 'package:fine_cut/screens/cash_register/cash_register_list.dart';
 import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/view_edit_cash_register.dart';
+import 'package:fine_cut/screens/sales/new_sale.dart';
 import 'package:flutter/material.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
@@ -40,6 +41,9 @@ final Map<String, WidgetBuilder> appRoutes = {
   },
   'new-product': (BuildContext context) {
     return NewProductScreen();
+  },
+  'new-sale': (BuildContext context) {
+    return NewSaleScreen();
   },
 };
 

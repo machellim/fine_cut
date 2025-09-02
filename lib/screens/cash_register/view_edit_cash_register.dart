@@ -1,4 +1,5 @@
 import 'package:fine_cut/widgets/app_button.dart';
+import 'package:fine_cut/widgets/app_drawer.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_title.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class _ViewEditCashRegisterScreenState
           ),
         ],
       ),
+      drawer: AppDrawer(appContext: context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 5),
         child: Column(
@@ -110,7 +112,12 @@ class _ViewEditCashRegisterScreenState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        AppButton(title: 'Agregar Venta', onPressed: () {}),
+                        AppButton(
+                          title: 'Agregar Venta',
+                          onPressed: () {
+                            Navigator.pushNamed(context, 'new-sale');
+                          },
+                        ),
                         const SizedBox(height: 16),
                         ListView.builder(
                           shrinkWrap:
