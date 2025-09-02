@@ -26,3 +26,11 @@ enum RecordAction {
   /// Represents updating an existing record
   update,
 }
+
+enum LossType {
+  damaged, // Product damaged physically
+  expired, // Product expired or perished
+  stolen, // Product lost due to theft
+  lost, // Product lost (not found in stock)
+  other, // Other type of loss
+}

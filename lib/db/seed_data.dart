@@ -82,4 +82,21 @@ Future<void> insertInitialData(AppDatabase db) async {
           ),
         );
   }
+
+  // ================= Insert Loss Types =================
+  final lossTypes = [
+    'Dañado', // Product damaged physically
+    'Vencido', // Product expired or perished
+    'Robado', // Product lost due to theft
+    'Perdido', // Product lost (not found in stock)
+    'Otro', // Other type of loss
+  ];
+  for (var type in lossTypes) {
+    final exists = await (db.select(
+      db.lossTypes,
+    )..where((lt) => lt.name.equals(type))).getSingleOrNull();
+    if (exists == null) {
+      await db.into(db.lossTypes).insert(LossTypesCompanion.insert(name: type));
+    }
+  }
 }

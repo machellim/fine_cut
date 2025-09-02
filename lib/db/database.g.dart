@@ -5996,6 +5996,999 @@ class ProductSubproductsCompanion extends UpdateCompanion<ProductSubproduct> {
   }
 }
 
+class $InventoryLossesTable extends InventoryLosses
+    with TableInfo<$InventoryLossesTable, InventoryLossesData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InventoryLossesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _productIdMeta = const VerificationMeta(
+    'productId',
+  );
+  @override
+  late final GeneratedColumn<int> productId = GeneratedColumn<int>(
+    'product_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'REFERENCES products(id) ON DELETE CASCADE',
+  );
+  static const VerificationMeta _cashRegisterIdMeta = const VerificationMeta(
+    'cashRegisterId',
+  );
+  @override
+  late final GeneratedColumn<int> cashRegisterId = GeneratedColumn<int>(
+    'cash_register_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'REFERENCES cash_registers(id) ON DELETE SET NULL',
+  );
+  static const VerificationMeta _lossTypeIdMeta = const VerificationMeta(
+    'lossTypeId',
+  );
+  @override
+  late final GeneratedColumn<int> lossTypeId = GeneratedColumn<int>(
+    'loss_type_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'REFERENCES loss_types(id) ON DELETE SET NULL',
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<double> quantity = GeneratedColumn<double>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 0,
+      maxTextLength: 1000,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<RecordStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 50,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(RecordStatus.active.name),
+      ).withConverter<RecordStatus>($InventoryLossesTable.$converterstatus);
+  static const VerificationMeta _lossDateMeta = const VerificationMeta(
+    'lossDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lossDate = GeneratedColumn<DateTime>(
+    'loss_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    productId,
+    cashRegisterId,
+    lossTypeId,
+    quantity,
+    description,
+    status,
+    lossDate,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'inventory_losses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InventoryLossesData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(
+        _productIdMeta,
+        productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('cash_register_id')) {
+      context.handle(
+        _cashRegisterIdMeta,
+        cashRegisterId.isAcceptableOrUnknown(
+          data['cash_register_id']!,
+          _cashRegisterIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('loss_type_id')) {
+      context.handle(
+        _lossTypeIdMeta,
+        lossTypeId.isAcceptableOrUnknown(
+          data['loss_type_id']!,
+          _lossTypeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lossTypeIdMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('loss_date')) {
+      context.handle(
+        _lossDateMeta,
+        lossDate.isAcceptableOrUnknown(data['loss_date']!, _lossDateMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InventoryLossesData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InventoryLossesData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      productId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}product_id'],
+      )!,
+      cashRegisterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}cash_register_id'],
+      ),
+      lossTypeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}loss_type_id'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}quantity'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      status: $InventoryLossesTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
+      lossDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}loss_date'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $InventoryLossesTable createAlias(String alias) {
+    return $InventoryLossesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<RecordStatus, String, String> $converterstatus =
+      const EnumNameConverter(RecordStatus.values);
+}
+
+class InventoryLossesData extends DataClass
+    implements Insertable<InventoryLossesData> {
+  final int id;
+  final int productId;
+  final int? cashRegisterId;
+  final int lossTypeId;
+  final double quantity;
+  final String? description;
+  final RecordStatus status;
+  final DateTime lossDate;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  const InventoryLossesData({
+    required this.id,
+    required this.productId,
+    this.cashRegisterId,
+    required this.lossTypeId,
+    required this.quantity,
+    this.description,
+    required this.status,
+    required this.lossDate,
+    required this.createdAt,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['product_id'] = Variable<int>(productId);
+    if (!nullToAbsent || cashRegisterId != null) {
+      map['cash_register_id'] = Variable<int>(cashRegisterId);
+    }
+    map['loss_type_id'] = Variable<int>(lossTypeId);
+    map['quantity'] = Variable<double>(quantity);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    {
+      map['status'] = Variable<String>(
+        $InventoryLossesTable.$converterstatus.toSql(status),
+      );
+    }
+    map['loss_date'] = Variable<DateTime>(lossDate);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  InventoryLossesCompanion toCompanion(bool nullToAbsent) {
+    return InventoryLossesCompanion(
+      id: Value(id),
+      productId: Value(productId),
+      cashRegisterId: cashRegisterId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cashRegisterId),
+      lossTypeId: Value(lossTypeId),
+      quantity: Value(quantity),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      status: Value(status),
+      lossDate: Value(lossDate),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory InventoryLossesData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InventoryLossesData(
+      id: serializer.fromJson<int>(json['id']),
+      productId: serializer.fromJson<int>(json['productId']),
+      cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
+      lossTypeId: serializer.fromJson<int>(json['lossTypeId']),
+      quantity: serializer.fromJson<double>(json['quantity']),
+      description: serializer.fromJson<String?>(json['description']),
+      status: $InventoryLossesTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
+      lossDate: serializer.fromJson<DateTime>(json['lossDate']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'productId': serializer.toJson<int>(productId),
+      'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
+      'lossTypeId': serializer.toJson<int>(lossTypeId),
+      'quantity': serializer.toJson<double>(quantity),
+      'description': serializer.toJson<String?>(description),
+      'status': serializer.toJson<String>(
+        $InventoryLossesTable.$converterstatus.toJson(status),
+      ),
+      'lossDate': serializer.toJson<DateTime>(lossDate),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  InventoryLossesData copyWith({
+    int? id,
+    int? productId,
+    Value<int?> cashRegisterId = const Value.absent(),
+    int? lossTypeId,
+    double? quantity,
+    Value<String?> description = const Value.absent(),
+    RecordStatus? status,
+    DateTime? lossDate,
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => InventoryLossesData(
+    id: id ?? this.id,
+    productId: productId ?? this.productId,
+    cashRegisterId: cashRegisterId.present
+        ? cashRegisterId.value
+        : this.cashRegisterId,
+    lossTypeId: lossTypeId ?? this.lossTypeId,
+    quantity: quantity ?? this.quantity,
+    description: description.present ? description.value : this.description,
+    status: status ?? this.status,
+    lossDate: lossDate ?? this.lossDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  InventoryLossesData copyWithCompanion(InventoryLossesCompanion data) {
+    return InventoryLossesData(
+      id: data.id.present ? data.id.value : this.id,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      cashRegisterId: data.cashRegisterId.present
+          ? data.cashRegisterId.value
+          : this.cashRegisterId,
+      lossTypeId: data.lossTypeId.present
+          ? data.lossTypeId.value
+          : this.lossTypeId,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      status: data.status.present ? data.status.value : this.status,
+      lossDate: data.lossDate.present ? data.lossDate.value : this.lossDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InventoryLossesData(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('cashRegisterId: $cashRegisterId, ')
+          ..write('lossTypeId: $lossTypeId, ')
+          ..write('quantity: $quantity, ')
+          ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('lossDate: $lossDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    productId,
+    cashRegisterId,
+    lossTypeId,
+    quantity,
+    description,
+    status,
+    lossDate,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InventoryLossesData &&
+          other.id == this.id &&
+          other.productId == this.productId &&
+          other.cashRegisterId == this.cashRegisterId &&
+          other.lossTypeId == this.lossTypeId &&
+          other.quantity == this.quantity &&
+          other.description == this.description &&
+          other.status == this.status &&
+          other.lossDate == this.lossDate &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
+  final Value<int> id;
+  final Value<int> productId;
+  final Value<int?> cashRegisterId;
+  final Value<int> lossTypeId;
+  final Value<double> quantity;
+  final Value<String?> description;
+  final Value<RecordStatus> status;
+  final Value<DateTime> lossDate;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  const InventoryLossesCompanion({
+    this.id = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.cashRegisterId = const Value.absent(),
+    this.lossTypeId = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.description = const Value.absent(),
+    this.status = const Value.absent(),
+    this.lossDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  InventoryLossesCompanion.insert({
+    this.id = const Value.absent(),
+    required int productId,
+    this.cashRegisterId = const Value.absent(),
+    required int lossTypeId,
+    this.quantity = const Value.absent(),
+    this.description = const Value.absent(),
+    this.status = const Value.absent(),
+    this.lossDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : productId = Value(productId),
+       lossTypeId = Value(lossTypeId);
+  static Insertable<InventoryLossesData> custom({
+    Expression<int>? id,
+    Expression<int>? productId,
+    Expression<int>? cashRegisterId,
+    Expression<int>? lossTypeId,
+    Expression<double>? quantity,
+    Expression<String>? description,
+    Expression<String>? status,
+    Expression<DateTime>? lossDate,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (productId != null) 'product_id': productId,
+      if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
+      if (lossTypeId != null) 'loss_type_id': lossTypeId,
+      if (quantity != null) 'quantity': quantity,
+      if (description != null) 'description': description,
+      if (status != null) 'status': status,
+      if (lossDate != null) 'loss_date': lossDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  InventoryLossesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? productId,
+    Value<int?>? cashRegisterId,
+    Value<int>? lossTypeId,
+    Value<double>? quantity,
+    Value<String?>? description,
+    Value<RecordStatus>? status,
+    Value<DateTime>? lossDate,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+  }) {
+    return InventoryLossesCompanion(
+      id: id ?? this.id,
+      productId: productId ?? this.productId,
+      cashRegisterId: cashRegisterId ?? this.cashRegisterId,
+      lossTypeId: lossTypeId ?? this.lossTypeId,
+      quantity: quantity ?? this.quantity,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      lossDate: lossDate ?? this.lossDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<int>(productId.value);
+    }
+    if (cashRegisterId.present) {
+      map['cash_register_id'] = Variable<int>(cashRegisterId.value);
+    }
+    if (lossTypeId.present) {
+      map['loss_type_id'] = Variable<int>(lossTypeId.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<double>(quantity.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $InventoryLossesTable.$converterstatus.toSql(status.value),
+      );
+    }
+    if (lossDate.present) {
+      map['loss_date'] = Variable<DateTime>(lossDate.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InventoryLossesCompanion(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('cashRegisterId: $cashRegisterId, ')
+          ..write('lossTypeId: $lossTypeId, ')
+          ..write('quantity: $quantity, ')
+          ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('lossDate: $lossDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LossTypesTable extends LossTypes
+    with TableInfo<$LossTypesTable, LossType> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LossTypesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 50,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'UNIQUE',
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 0,
+      maxTextLength: 255,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    description,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'loss_types';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LossType> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LossType map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LossType(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $LossTypesTable createAlias(String alias) {
+    return $LossTypesTable(attachedDatabase, alias);
+  }
+}
+
+class LossType extends DataClass implements Insertable<LossType> {
+  final int id;
+  final String name;
+  final String? description;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  const LossType({
+    required this.id,
+    required this.name,
+    this.description,
+    required this.createdAt,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  LossTypesCompanion toCompanion(bool nullToAbsent) {
+    return LossTypesCompanion(
+      id: Value(id),
+      name: Value(name),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory LossType.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LossType(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      description: serializer.fromJson<String?>(json['description']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'description': serializer.toJson<String?>(description),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  LossType copyWith({
+    int? id,
+    String? name,
+    Value<String?> description = const Value.absent(),
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => LossType(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    description: description.present ? description.value : this.description,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  LossType copyWithCompanion(LossTypesCompanion data) {
+    return LossType(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LossType(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, description, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LossType &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.description == this.description &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class LossTypesCompanion extends UpdateCompanion<LossType> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String?> description;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  const LossTypesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.description = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  LossTypesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.description = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<LossType> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? description,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (description != null) 'description': description,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  LossTypesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String?>? description,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+  }) {
+    return LossTypesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LossTypesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('description: $description, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -6011,6 +7004,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $IncomesTable incomes = $IncomesTable(this);
   late final $ProductSubproductsTable productSubproducts =
       $ProductSubproductsTable(this);
+  late final $InventoryLossesTable inventoryLosses = $InventoryLossesTable(
+    this,
+  );
+  late final $LossTypesTable lossTypes = $LossTypesTable(this);
   late final PaymentMethodDao paymentMethodDao = PaymentMethodDao(
     this as AppDatabase,
   );
@@ -6038,6 +7035,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     paymentMethods,
     incomes,
     productSubproducts,
+    inventoryLosses,
+    lossTypes,
   ];
 }
 
@@ -8939,6 +9938,502 @@ typedef $$ProductSubproductsTableProcessedTableManager =
       ProductSubproduct,
       PrefetchHooks Function()
     >;
+typedef $$InventoryLossesTableCreateCompanionBuilder =
+    InventoryLossesCompanion Function({
+      Value<int> id,
+      required int productId,
+      Value<int?> cashRegisterId,
+      required int lossTypeId,
+      Value<double> quantity,
+      Value<String?> description,
+      Value<RecordStatus> status,
+      Value<DateTime> lossDate,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+typedef $$InventoryLossesTableUpdateCompanionBuilder =
+    InventoryLossesCompanion Function({
+      Value<int> id,
+      Value<int> productId,
+      Value<int?> cashRegisterId,
+      Value<int> lossTypeId,
+      Value<double> quantity,
+      Value<String?> description,
+      Value<RecordStatus> status,
+      Value<DateTime> lossDate,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+
+class $$InventoryLossesTableFilterComposer
+    extends Composer<_$AppDatabase, $InventoryLossesTable> {
+  $$InventoryLossesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get cashRegisterId => $composableBuilder(
+    column: $table.cashRegisterId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lossTypeId => $composableBuilder(
+    column: $table.lossTypeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<RecordStatus, RecordStatus, String>
+  get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lossDate => $composableBuilder(
+    column: $table.lossDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$InventoryLossesTableOrderingComposer
+    extends Composer<_$AppDatabase, $InventoryLossesTable> {
+  $$InventoryLossesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get cashRegisterId => $composableBuilder(
+    column: $table.cashRegisterId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lossTypeId => $composableBuilder(
+    column: $table.lossTypeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lossDate => $composableBuilder(
+    column: $table.lossDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$InventoryLossesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InventoryLossesTable> {
+  $$InventoryLossesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<int> get cashRegisterId => $composableBuilder(
+    column: $table.cashRegisterId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lossTypeId => $composableBuilder(
+    column: $table.lossTypeId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lossDate =>
+      $composableBuilder(column: $table.lossDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$InventoryLossesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InventoryLossesTable,
+          InventoryLossesData,
+          $$InventoryLossesTableFilterComposer,
+          $$InventoryLossesTableOrderingComposer,
+          $$InventoryLossesTableAnnotationComposer,
+          $$InventoryLossesTableCreateCompanionBuilder,
+          $$InventoryLossesTableUpdateCompanionBuilder,
+          (
+            InventoryLossesData,
+            BaseReferences<
+              _$AppDatabase,
+              $InventoryLossesTable,
+              InventoryLossesData
+            >,
+          ),
+          InventoryLossesData,
+          PrefetchHooks Function()
+        > {
+  $$InventoryLossesTableTableManager(
+    _$AppDatabase db,
+    $InventoryLossesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InventoryLossesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InventoryLossesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InventoryLossesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> productId = const Value.absent(),
+                Value<int?> cashRegisterId = const Value.absent(),
+                Value<int> lossTypeId = const Value.absent(),
+                Value<double> quantity = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
+                Value<DateTime> lossDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => InventoryLossesCompanion(
+                id: id,
+                productId: productId,
+                cashRegisterId: cashRegisterId,
+                lossTypeId: lossTypeId,
+                quantity: quantity,
+                description: description,
+                status: status,
+                lossDate: lossDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int productId,
+                Value<int?> cashRegisterId = const Value.absent(),
+                required int lossTypeId,
+                Value<double> quantity = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
+                Value<DateTime> lossDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => InventoryLossesCompanion.insert(
+                id: id,
+                productId: productId,
+                cashRegisterId: cashRegisterId,
+                lossTypeId: lossTypeId,
+                quantity: quantity,
+                description: description,
+                status: status,
+                lossDate: lossDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$InventoryLossesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InventoryLossesTable,
+      InventoryLossesData,
+      $$InventoryLossesTableFilterComposer,
+      $$InventoryLossesTableOrderingComposer,
+      $$InventoryLossesTableAnnotationComposer,
+      $$InventoryLossesTableCreateCompanionBuilder,
+      $$InventoryLossesTableUpdateCompanionBuilder,
+      (
+        InventoryLossesData,
+        BaseReferences<
+          _$AppDatabase,
+          $InventoryLossesTable,
+          InventoryLossesData
+        >,
+      ),
+      InventoryLossesData,
+      PrefetchHooks Function()
+    >;
+typedef $$LossTypesTableCreateCompanionBuilder =
+    LossTypesCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<String?> description,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+typedef $$LossTypesTableUpdateCompanionBuilder =
+    LossTypesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String?> description,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+    });
+
+class $$LossTypesTableFilterComposer
+    extends Composer<_$AppDatabase, $LossTypesTable> {
+  $$LossTypesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LossTypesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LossTypesTable> {
+  $$LossTypesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LossTypesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LossTypesTable> {
+  $$LossTypesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$LossTypesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LossTypesTable,
+          LossType,
+          $$LossTypesTableFilterComposer,
+          $$LossTypesTableOrderingComposer,
+          $$LossTypesTableAnnotationComposer,
+          $$LossTypesTableCreateCompanionBuilder,
+          $$LossTypesTableUpdateCompanionBuilder,
+          (LossType, BaseReferences<_$AppDatabase, $LossTypesTable, LossType>),
+          LossType,
+          PrefetchHooks Function()
+        > {
+  $$LossTypesTableTableManager(_$AppDatabase db, $LossTypesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LossTypesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LossTypesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LossTypesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => LossTypesCompanion(
+                id: id,
+                name: name,
+                description: description,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<String?> description = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+              }) => LossTypesCompanion.insert(
+                id: id,
+                name: name,
+                description: description,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LossTypesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LossTypesTable,
+      LossType,
+      $$LossTypesTableFilterComposer,
+      $$LossTypesTableOrderingComposer,
+      $$LossTypesTableAnnotationComposer,
+      $$LossTypesTableCreateCompanionBuilder,
+      $$LossTypesTableUpdateCompanionBuilder,
+      (LossType, BaseReferences<_$AppDatabase, $LossTypesTable, LossType>),
+      LossType,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8965,4 +10460,8 @@ class $AppDatabaseManager {
       $$IncomesTableTableManager(_db, _db.incomes);
   $$ProductSubproductsTableTableManager get productSubproducts =>
       $$ProductSubproductsTableTableManager(_db, _db.productSubproducts);
+  $$InventoryLossesTableTableManager get inventoryLosses =>
+      $$InventoryLossesTableTableManager(_db, _db.inventoryLosses);
+  $$LossTypesTableTableManager get lossTypes =>
+      $$LossTypesTableTableManager(_db, _db.lossTypes);
 }
