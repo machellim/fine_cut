@@ -12,6 +12,7 @@ import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_crud/sale_crud_bloc.dart';
+import 'package:fine_cut/bloc/sale/sale_list/sale_list_bloc.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
@@ -112,6 +113,9 @@ class AppInitializer extends StatelessWidget {
                 ),
                 BlocProvider<PurchaseListBloc>(
                   create: (_) => PurchaseListBloc(purchaseDao: purchaseDao),
+                ),
+                BlocProvider<SaleListBloc>(
+                  create: (_) => SaleListBloc(saleDao: saleDao),
                 ),
               ],
               child: FineCutApp(database: database),

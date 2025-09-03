@@ -1,9 +1,14 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
+import 'package:fine_cut/bloc/sale/sale_crud/sale_crud_bloc.dart';
+import 'package:fine_cut/bloc/sale/sale_list/sale_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
+import 'package:fine_cut/core/constants/app_messages.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/widgets/app_button.dart';
+import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:fine_cut/widgets/app_number_field.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -18,23 +23,26 @@ class NewSaleScreen extends StatefulWidget {
 
 class NewSaleScreenState extends State<NewSaleScreen> {
   final _formKey = GlobalKey<FormState>();
+  final dropDownProductKey = GlobalKey<DropdownSearchState>();
+  final dropDownPMKey = GlobalKey<DropdownSearchState>();
 
   // controllers
   final TextEditingController _saleQuantityController = TextEditingController();
   final TextEditingController _saleTotalPriceController =
       TextEditingController();
-
-  final dropDownKey = GlobalKey<DropdownSearchState>();
-  final fpDropDownKey = GlobalKey<DropdownSearchState>();
+  final TextEditingController _notesController = TextEditingController();
 
   SalesCompanion saleCompanion = SalesCompanion();
-  //PaymentMethod? selectedPaymentMethod;
+
   bool isNewSale = true;
+  Product? selectedProduct;
+  PaymentMethod? selectedPaymentMethod;
 
   @override
   void dispose() {
     _saleQuantityController.dispose();
     _saleTotalPriceController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -44,34 +52,57 @@ class NewSaleScreenState extends State<NewSaleScreen> {
 
     Future.microtask(() {
       if (!mounted) return;
-      final args = ModalRoute.of(context)?.settings.arguments as Sale?;
+      final args = ModalRoute.of(context)?.settings.arguments as Map;
+      final sale = (args['sale']) as Sale?;
+      selectedProduct = (args['selectedProduct']) as Product?;
+      selectedPaymentMethod = (args['selectedPaymentMethod']) as PaymentMethod?;
+      final cashRegisterId = args['cashRegisterId'];
 
-      if (args != null) {
+      if (sale != null) {
         saleCompanion = saleCompanion.copyWith(
-          id: drift.Value(args.id),
-          productId: drift.Value(args.productId),
-          quantity: drift.Value(args.quantity),
-          totalPrice: drift.Value(args.totalPrice),
+          id: drift.Value(sale.id),
+          productId: drift.Value(sale.productId),
+          quantity: drift.Value(sale.quantity),
+          totalPrice: drift.Value(sale.totalPrice),
         );
-        _saleQuantityController.text = args.quantity.toString();
-        _saleTotalPriceController.text = args.totalPrice.toString();
+        _saleQuantityController.text = sale.quantity.toString();
+        _saleTotalPriceController.text = sale.totalPrice.toString();
+        _notesController.text = sale.notes ?? '';
         setState(() {
           isNewSale = false;
+        });
+      } else {
+        saleCompanion = saleCompanion.copyWith(
+          cashRegisterId: drift.Value(cashRegisterId),
+        );
+        setState(() {
+          selectedPaymentMethod =
+              (args?['defaultSelectedPaymentMethod']) as PaymentMethod?;
+          saleCompanion = saleCompanion.copyWith(
+            paymentMethodId: drift.Value(selectedPaymentMethod?.id ?? 0),
+          );
         });
       }
     });
   }
 
-  void goBack() {
+  void goBack(AppEventSource eventSource) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pop(context, true);
+      context.read<SaleListBloc>().add(LoadSalesListEvent(eventSource));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      appBar: AppBar(title: Text('oo')),
+      appBar: AppBar(
+        title: Text(
+          isNewSale
+              ? AppMessages.getSaleMessage('messageNewSaleScreen')
+              : AppMessages.getSaleMessage('messageEditSaleScreen'),
+        ),
+      ),
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
@@ -90,14 +121,22 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         DropdownSearch<Product>(
-                          key: dropDownKey,
-                          selectedItem: null,
+                          key: dropDownProductKey,
+                          selectedItem: selectedProduct,
                           items: (filter, loadProps) async {
                             final repo = context.read<ProductsListBloc>();
                             return await repo.productDao.searchProducts(filter);
                           },
                           itemAsString: (item) => item.name,
                           compareFn: (item1, item2) => item1.id == item2.id,
+                          onChanged: (selProduct) {
+                            if (selProduct != null) {
+                              saleCompanion = saleCompanion.copyWith(
+                                productId: drift.Value(selProduct.id),
+                              );
+                              selectedProduct = selProduct;
+                            }
+                          },
                           validator: (value) =>
                               (value == null || value.name.isEmpty)
                               ? 'Seleccione un producto.'
@@ -147,7 +186,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                         AppNumberField(
                           controller: _saleTotalPriceController,
                           label: 'Ingrese el precio de venta',
-                          prefixText: '\$ ',
+                          suffixText: '\$ ',
                           onSaved: (value) {
                             saleCompanion = saleCompanion.copyWith(
                               totalPrice: drift.Value(double.parse(value)),
@@ -156,8 +195,8 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                         ),
                         const SizedBox(height: 30.0),
                         DropdownSearch<PaymentMethod>(
-                          key: fpDropDownKey,
-                          selectedItem: null,
+                          key: dropDownPMKey,
+                          selectedItem: selectedPaymentMethod,
                           items: (filter, loadProps) async {
                             final repo = context.read<PaymentMethodListBloc>();
                             return await repo.paymentMethodDao
@@ -165,6 +204,15 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                           },
                           itemAsString: (item) => item.name,
                           compareFn: (item1, item2) => item1.id == item2.id,
+                          onChanged: (selectedPaymentMethod) {
+                            if (selectedPaymentMethod != null) {
+                              saleCompanion = saleCompanion.copyWith(
+                                paymentMethodId: drift.Value(
+                                  selectedPaymentMethod.id,
+                                ),
+                              );
+                            }
+                          },
                           validator: (value) =>
                               (value == null || value.name.isEmpty)
                               ? 'Seleccione una Forma de Pago.'
@@ -200,14 +248,63 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                           ),
                         ),
                         const SizedBox(height: 30),
-                        SizedBox(
-                          width: double.infinity,
-                          child: AppButton(
-                            title: isNewSale
-                                ? 'Crear Venta'
-                                : 'Actualizar Venta',
-                            onPressed: () {},
-                          ),
+                        BlocConsumer<SaleCrudBloc, SaleCrudState>(
+                          listener: (context, state) {
+                            if (state is SaleCreationSuccess) {
+                              goBack(AppEventSource.create);
+                            }
+                            if (state is SaleUpdateSuccess) {
+                              goBack(AppEventSource.update);
+                            }
+                          },
+                          builder: (context, state) {
+                            final isLoading = state is SaleCreationInProgress;
+                            return Column(
+                              children: [
+                                if (state is SaleCreationFailure)
+                                  AppMessageType(
+                                    message: state.message,
+                                    messageType: MessageType.error,
+                                  )
+                                else if (state is SaleUpdateFailure)
+                                  AppMessageType(
+                                    message: state.message,
+                                    messageType: MessageType.error,
+                                  )
+                                else
+                                  Container(),
+
+                                const SizedBox(height: 30),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: AppButton(
+                                    title: isNewSale
+                                        ? 'Crear Venta'
+                                        : 'Actualizar Venta',
+                                    isLoading: isLoading,
+                                    onPressed: isLoading
+                                        ? null
+                                        : () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              _formKey.currentState!.save();
+
+                                              context.read<SaleCrudBloc>().add(
+                                                CreateSaleEvent(
+                                                  isNewSale
+                                                      ? RecordAction.create
+                                                      : RecordAction.update,
+                                                  saleCompanion,
+                                                  selectedProduct!,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),

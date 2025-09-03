@@ -28,7 +28,7 @@ class AppMessages {
 
   static const _purchaseMessages = {
     'messageNewPurchaseScreen': 'Crear Nueva Compra',
-    'messageEditPurchaseScreen': 'Editar Compra',
+    'messageEditPurchaseScreen': 'Editando Compra',
     'messageLoadingPurchase': 'Cargando compras',
   };
 

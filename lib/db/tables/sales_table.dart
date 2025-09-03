@@ -28,6 +28,10 @@ class Sales extends Table {
       .named('payment_method_id')
       .customConstraint('REFERENCES payment_methods(id) ON DELETE SET NULL')();
 
+  //alias from product name
+  TextColumn get aliasProductName =>
+      text().withLength(min: 1, max: 300).named('alias_product_name')();
+
   // Quantity sold
   RealColumn get quantity =>
       real().named('quantity').withDefault(const Constant(0.0))();

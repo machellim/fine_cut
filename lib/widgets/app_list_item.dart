@@ -53,7 +53,7 @@ class AppListItem extends StatelessWidget {
             Text(
               "\$${price!.toStringAsFixed(2)}",
               style: textTheme.bodyMedium!.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
                 color: colorScheme.tertiary, // verde/azul adaptable
               ),
             ),

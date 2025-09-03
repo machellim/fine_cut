@@ -98,7 +98,11 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
   Widget build(BuildContext context) {
     return AppScaffold(
       appBar: AppBar(
-        title: Text(AppMessages.getPurchaseMessage('messageNewPurchaseScreen')),
+        title: Text(
+          isNewPurchase
+              ? AppMessages.getPurchaseMessage('messageNewPurchaseScreen')
+              : AppMessages.getPurchaseMessage('messageEditPurchaseScreen'),
+        ),
       ),
       body: GestureDetector(
         onTap: () {
@@ -291,21 +295,27 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
                                     title: isNewPurchase
                                         ? 'Crear Compra'
                                         : 'Actualizar Compra',
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        _formKey.currentState!.save();
+                                    isLoading: isLoading,
+                                    onPressed: isLoading
+                                        ? null
+                                        : () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              _formKey.currentState!.save();
 
-                                        context.read<PurchaseCrudBloc>().add(
-                                          CreatePurchaseEvent(
-                                            isNewPurchase
-                                                ? RecordAction.create
-                                                : RecordAction.update,
-                                            purchaseCompanion,
-                                            selectedProduct!,
-                                          ),
-                                        );
-                                      }
-                                    },
+                                              context
+                                                  .read<PurchaseCrudBloc>()
+                                                  .add(
+                                                    CreatePurchaseEvent(
+                                                      isNewPurchase
+                                                          ? RecordAction.create
+                                                          : RecordAction.update,
+                                                      purchaseCompanion,
+                                                      selectedProduct!,
+                                                    ),
+                                                  );
+                                            }
+                                          },
                                   ),
                                 ),
                               ],

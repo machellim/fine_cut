@@ -13,9 +13,9 @@ final class SaleCrudInitial extends SaleCrudState {}
 class SaleCreationInProgress extends SaleCrudState {}
 
 class SaleCreationSuccess extends SaleCrudState {
-  final Sale? sale;
+  final int purchaseId;
 
-  const SaleCreationSuccess(this.sale);
+  const SaleCreationSuccess(this.purchaseId);
 }
 
 class SaleCreationFailure extends SaleCrudState {

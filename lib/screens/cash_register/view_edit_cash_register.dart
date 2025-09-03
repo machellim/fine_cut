@@ -2,6 +2,7 @@ import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
+import 'package:fine_cut/bloc/sale/sale_list/sale_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
@@ -13,6 +14,8 @@ import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_drawer.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
+import 'package:fine_cut/widgets/app_message_type.dart';
+import 'package:fine_cut/widgets/app_simple_center_text.dart';
 import 'package:fine_cut/widgets/app_title.dart';
 import 'package:fine_cut/widgets/app_top_banner.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +36,7 @@ class _ViewEditCashRegisterScreenState
     extends State<ViewEditCashRegisterScreen> {
   bool isNew = true;
 
-  // ===== banner ========
+  // ===== banner purchase ========
   BannerState _bannerPurchaseState = BannerState.initial();
   void _showTopBannerPurchase(
     String message, {
@@ -54,6 +57,27 @@ class _ViewEditCashRegisterScreenState
     });
   }
 
+  // ===== banner sale ========
+  BannerState _bannerSaleState = BannerState.initial();
+  void _showTopBannerSale(
+    String message, {
+    AppBannerType type = AppBannerType.success,
+  }) {
+    setState(() {
+      _bannerPurchaseState = _bannerPurchaseState.copyWith(
+        show: true,
+        message: message,
+        type: type,
+      );
+    });
+  }
+
+  void _closeBannerSale() {
+    setState(() {
+      _bannerPurchaseState = _bannerPurchaseState.copyWith(show: false);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +85,9 @@ class _ViewEditCashRegisterScreenState
     context.read<PurchaseListBloc>().add(
       LoadPurchasesListEvent(AppEventSource.list),
     );
+
+    // load Purchases
+    context.read<SaleListBloc>().add(LoadSalesListEvent(AppEventSource.list));
   }
 
   @override
@@ -149,7 +176,7 @@ class _ViewEditCashRegisterScreenState
 
             // ExpansionPanelList.radio con primer panel abierto por defecto
             ExpansionPanelList.radio(
-              initialOpenPanelValue: 1,
+              initialOpenPanelValue: 0,
               expansionCallback: (index, isExpanded) {
                 if (isExpanded) {
                   print("Panel $index abierto");
@@ -169,37 +196,120 @@ class _ViewEditCashRegisterScreenState
                       children: [
                         AppButton(
                           title: 'Agregar Venta',
-                          onPressed: () {
-                            Navigator.pushNamed(context, 'new-sale');
+                          onPressed: () async {
+                            _closeBannerSale();
+
+                            final repoPaymentMethod = context
+                                .read<PaymentMethodListBloc>();
+                            final paymentMethod = await repoPaymentMethod
+                                .paymentMethodDao
+                                .getPaymentMethodByName('Efectivo');
+                            Navigator.pushNamed(
+                              context,
+                              'new-sale',
+                              arguments: {
+                                'defaultSelectedPaymentMethod': paymentMethod,
+                                'cashRegisterId': cashRegister.id,
+                              },
+                            );
                           },
                         ),
                         const SizedBox(height: 16),
-                        ListView.builder(
-                          shrinkWrap:
-                              true, // importante para que funcione dentro de Column
-                          physics:
-                              const NeverScrollableScrollPhysics(), // evita scroll interno
-                          itemCount: 5, // número de elementos
-                          itemBuilder: (context, index) {
-                            return Column(
-                              children: [
-                                AppListItem(
-                                  title: Text(
-                                    'product',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                    ),
+                        if (_bannerSaleState.show)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AppTopBanner(
+                              message: _bannerSaleState.message,
+                              type: _bannerSaleState.type,
+                              onClose: _closeBannerPurchase,
+                            ),
+                          ),
+                        MultiBlocListener(
+                          listeners: [
+                            // List listener
+                            BlocListener<SaleListBloc, SaleListState>(
+                              listener: (context, state) {
+                                if (state is SaleListLoadSuccess) {
+                                  if (state.eventSource ==
+                                      AppEventSource.create) {
+                                    _showTopBannerSale(
+                                      'Venta creada con éxito',
+                                    );
+                                  } else if (state.eventSource ==
+                                      AppEventSource.update) {
+                                    _showTopBannerSale(
+                                      'Venta actualizada con éxito',
+                                    );
+                                  } else if (state.eventSource ==
+                                      AppEventSource.delete) {
+                                    _showTopBannerSale(
+                                      'Venta eliminada con éxito',
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                          ],
+                          child: BlocBuilder<SaleListBloc, SaleListState>(
+                            builder: (context, state) {
+                              if (state is SaleListLoading) {
+                                return AppLoadingScreen(
+                                  message: AppMessages.getPurchaseMessage(
+                                    'messageLoadingPurchase',
                                   ),
-                                  description: Text('2'),
-                                  price: 5,
-                                  onEdit: () {},
+                                );
+                              } else if (state is SaleListLoadSuccess) {
+                                if (state.sales.isEmpty) {
+                                  return AppSimpleCenterText(
+                                    message: 'No hay información.',
+                                  );
+                                } else {
+                                  return ListView.builder(
+                                    shrinkWrap:
+                                        true, // importante para que funcione dentro de Column
+                                    physics:
+                                        const NeverScrollableScrollPhysics(), // evita scroll interno
+                                    itemCount: state
+                                        .sales
+                                        .length, // número de elementos
+                                    itemBuilder: (context, index) {
+                                      final sale = state.sales[index];
+                                      return Column(
+                                        children: [
+                                          AppListItem(
+                                            title: Text(
+                                              sale.aliasProductName,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            description: Text(
+                                              'Cantidad: ${sale.quantity}',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            price: sale.totalPrice,
+                                            onEdit: () {},
 
-                                  onDelete: () {},
-                                ),
-                              ],
-                            );
-                          },
+                                            onDelete: () {},
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                }
+                              } else if (state is SaleListLoadFailure) {
+                                return const Center(
+                                  child: Text('Error al cargar ventas'),
+                                );
+                              } else {
+                                return const Center(
+                                  child: Text('Estado desconocido'),
+                                );
+                              }
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -235,6 +345,7 @@ class _ViewEditCashRegisterScreenState
                             );
                           },
                         ),
+                        const SizedBox(height: 16),
                         if (_bannerPurchaseState.show)
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -297,69 +408,79 @@ class _ViewEditCashRegisterScreenState
                                       ),
                                     );
                                   } else if (state is PurchaseListLoadSuccess) {
-                                    return ListView.builder(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemCount: state.products.length,
-                                      itemBuilder: (context, index) {
-                                        final purchase = state.products[index];
-                                        return AppListItem(
-                                          title: Text(
-                                            purchase.aliasProductName,
-                                            style: const TextStyle(
-                                              fontSize: 14,
+                                    if (state.purchases.isEmpty) {
+                                      return AppSimpleCenterText(
+                                        message: 'No hay información.',
+                                      );
+                                    } else {
+                                      return ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: state.purchases.length,
+                                        itemBuilder: (context, index) {
+                                          final purchase =
+                                              state.purchases[index];
+                                          return AppListItem(
+                                            title: Text(
+                                              purchase.aliasProductName,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
                                             ),
-                                          ),
-                                          description: Text(
-                                            'Cantidad ${purchase.quantity}',
-                                            style: const TextStyle(
-                                              color: Colors.grey,
+                                            description: Text(
+                                              'Cantidad ${purchase.quantity}',
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                          ),
-                                          price: purchase.totalCost,
-                                          onEdit: () async {
-                                            _closeBannerPurchase();
-                                            // get selected product
-                                            final repoProduct = context
-                                                .read<ProductsListBloc>();
-                                            final selectedProduct =
-                                                await repoProduct.productDao
-                                                    .getById(
-                                                      purchase.productId,
-                                                    );
+                                            price: purchase.totalCost,
+                                            onEdit: () async {
+                                              _closeBannerPurchase();
+                                              // get selected product
+                                              final repoProduct = context
+                                                  .read<ProductsListBloc>();
+                                              final selectedProduct =
+                                                  await repoProduct.productDao
+                                                      .getById(
+                                                        purchase.productId,
+                                                      );
 
-                                            // get selected payment form
-                                            final repoPaymentMethod = context
-                                                .read<PaymentMethodListBloc>();
-                                            final selectedPaymentMethod =
-                                                await repoPaymentMethod
-                                                    .paymentMethodDao
-                                                    .getById(
-                                                      purchase.paymentMethodId,
-                                                    );
+                                              // get selected payment form
+                                              final repoPaymentMethod = context
+                                                  .read<
+                                                    PaymentMethodListBloc
+                                                  >();
+                                              final selectedPaymentMethod =
+                                                  await repoPaymentMethod
+                                                      .paymentMethodDao
+                                                      .getById(
+                                                        purchase
+                                                            .paymentMethodId,
+                                                      );
 
-                                            Navigator.pushNamed(
-                                              context,
-                                              'new-purchase',
-                                              arguments: {
-                                                'selectedProduct':
-                                                    selectedProduct,
-                                                'selectedPaymentMethod':
-                                                    selectedPaymentMethod,
-                                                'purchase': purchase,
-                                              },
-                                            );
-                                          },
-                                          onDelete: () {
-                                            _showDeleteConfirmationPurchase(
-                                              context,
-                                              purchase.id,
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
+                                              Navigator.pushNamed(
+                                                context,
+                                                'new-purchase',
+                                                arguments: {
+                                                  'selectedProduct':
+                                                      selectedProduct,
+                                                  'selectedPaymentMethod':
+                                                      selectedPaymentMethod,
+                                                  'purchase': purchase,
+                                                },
+                                              );
+                                            },
+                                            onDelete: () {
+                                              _showDeleteConfirmationPurchase(
+                                                context,
+                                                purchase.id,
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }
                                   } else if (state is PurchaseListLoadFailure) {
                                     return const Center(
                                       child: Text('Error al cargar compras'),
@@ -381,8 +502,8 @@ class _ViewEditCashRegisterScreenState
                   headerBuilder: (context, isExpanded) =>
                       const ListTile(title: AppTitle(text: 'Gastos')),
                   body: const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text('Contenido de compras'),
+                    padding: AppConstants.gridPadding,
+                    child: Text('Contenido de gastos'),
                   ),
                 ),
                 ExpansionPanelRadio(
@@ -390,8 +511,8 @@ class _ViewEditCashRegisterScreenState
                   headerBuilder: (context, isExpanded) =>
                       const ListTile(title: AppTitle(text: 'Ingresos Varios')),
                   body: const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text('Contenido de otros gastos'),
+                    padding: AppConstants.gridPadding,
+                    child: Text('Contenido de ingresos'),
                   ),
                 ),
                 ExpansionPanelRadio(
@@ -399,7 +520,7 @@ class _ViewEditCashRegisterScreenState
                   headerBuilder: (context, isExpanded) =>
                       const ListTile(title: AppTitle(text: 'Pérdidas')),
                   body: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 0),
+                    padding: AppConstants.gridPadding,
                     child: Text('Productos dañados, robados, perdidos, etc.'),
                   ),
                 ),

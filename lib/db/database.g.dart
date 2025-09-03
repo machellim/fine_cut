@@ -3153,6 +3153,21 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
     requiredDuringInsert: true,
     $customConstraints: 'REFERENCES payment_methods(id) ON DELETE SET NULL',
   );
+  static const VerificationMeta _aliasProductNameMeta = const VerificationMeta(
+    'aliasProductName',
+  );
+  @override
+  late final GeneratedColumn<String> aliasProductName = GeneratedColumn<String>(
+    'alias_product_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 300,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _quantityMeta = const VerificationMeta(
     'quantity',
   );
@@ -3246,6 +3261,7 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
     purchaseId,
     cashRegisterId,
     paymentMethodId,
+    aliasProductName,
     quantity,
     totalPrice,
     notes,
@@ -3302,6 +3318,17 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
       );
     } else if (isInserting) {
       context.missing(_paymentMethodIdMeta);
+    }
+    if (data.containsKey('alias_product_name')) {
+      context.handle(
+        _aliasProductNameMeta,
+        aliasProductName.isAcceptableOrUnknown(
+          data['alias_product_name']!,
+          _aliasProductNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_aliasProductNameMeta);
     }
     if (data.containsKey('quantity')) {
       context.handle(
@@ -3368,6 +3395,10 @@ class $SalesTable extends Sales with TableInfo<$SalesTable, Sale> {
         DriftSqlType.int,
         data['${effectivePrefix}payment_method_id'],
       )!,
+      aliasProductName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}alias_product_name'],
+      )!,
       quantity: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}quantity'],
@@ -3416,6 +3447,7 @@ class Sale extends DataClass implements Insertable<Sale> {
   final int? purchaseId;
   final int? cashRegisterId;
   final int paymentMethodId;
+  final String aliasProductName;
   final double quantity;
   final double totalPrice;
   final String? notes;
@@ -3429,6 +3461,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     this.purchaseId,
     this.cashRegisterId,
     required this.paymentMethodId,
+    required this.aliasProductName,
     required this.quantity,
     required this.totalPrice,
     this.notes,
@@ -3449,6 +3482,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       map['cash_register_id'] = Variable<int>(cashRegisterId);
     }
     map['payment_method_id'] = Variable<int>(paymentMethodId);
+    map['alias_product_name'] = Variable<String>(aliasProductName);
     map['quantity'] = Variable<double>(quantity);
     map['total_price'] = Variable<double>(totalPrice);
     if (!nullToAbsent || notes != null) {
@@ -3478,6 +3512,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           ? const Value.absent()
           : Value(cashRegisterId),
       paymentMethodId: Value(paymentMethodId),
+      aliasProductName: Value(aliasProductName),
       quantity: Value(quantity),
       totalPrice: Value(totalPrice),
       notes: notes == null && nullToAbsent
@@ -3503,6 +3538,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       purchaseId: serializer.fromJson<int?>(json['purchaseId']),
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
       paymentMethodId: serializer.fromJson<int>(json['paymentMethodId']),
+      aliasProductName: serializer.fromJson<String>(json['aliasProductName']),
       quantity: serializer.fromJson<double>(json['quantity']),
       totalPrice: serializer.fromJson<double>(json['totalPrice']),
       notes: serializer.fromJson<String?>(json['notes']),
@@ -3523,6 +3559,7 @@ class Sale extends DataClass implements Insertable<Sale> {
       'purchaseId': serializer.toJson<int?>(purchaseId),
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
       'paymentMethodId': serializer.toJson<int>(paymentMethodId),
+      'aliasProductName': serializer.toJson<String>(aliasProductName),
       'quantity': serializer.toJson<double>(quantity),
       'totalPrice': serializer.toJson<double>(totalPrice),
       'notes': serializer.toJson<String?>(notes),
@@ -3541,6 +3578,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     Value<int?> purchaseId = const Value.absent(),
     Value<int?> cashRegisterId = const Value.absent(),
     int? paymentMethodId,
+    String? aliasProductName,
     double? quantity,
     double? totalPrice,
     Value<String?> notes = const Value.absent(),
@@ -3556,6 +3594,7 @@ class Sale extends DataClass implements Insertable<Sale> {
         ? cashRegisterId.value
         : this.cashRegisterId,
     paymentMethodId: paymentMethodId ?? this.paymentMethodId,
+    aliasProductName: aliasProductName ?? this.aliasProductName,
     quantity: quantity ?? this.quantity,
     totalPrice: totalPrice ?? this.totalPrice,
     notes: notes.present ? notes.value : this.notes,
@@ -3577,6 +3616,9 @@ class Sale extends DataClass implements Insertable<Sale> {
       paymentMethodId: data.paymentMethodId.present
           ? data.paymentMethodId.value
           : this.paymentMethodId,
+      aliasProductName: data.aliasProductName.present
+          ? data.aliasProductName.value
+          : this.aliasProductName,
       quantity: data.quantity.present ? data.quantity.value : this.quantity,
       totalPrice: data.totalPrice.present
           ? data.totalPrice.value
@@ -3597,6 +3639,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           ..write('purchaseId: $purchaseId, ')
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
+          ..write('aliasProductName: $aliasProductName, ')
           ..write('quantity: $quantity, ')
           ..write('totalPrice: $totalPrice, ')
           ..write('notes: $notes, ')
@@ -3615,6 +3658,7 @@ class Sale extends DataClass implements Insertable<Sale> {
     purchaseId,
     cashRegisterId,
     paymentMethodId,
+    aliasProductName,
     quantity,
     totalPrice,
     notes,
@@ -3632,6 +3676,7 @@ class Sale extends DataClass implements Insertable<Sale> {
           other.purchaseId == this.purchaseId &&
           other.cashRegisterId == this.cashRegisterId &&
           other.paymentMethodId == this.paymentMethodId &&
+          other.aliasProductName == this.aliasProductName &&
           other.quantity == this.quantity &&
           other.totalPrice == this.totalPrice &&
           other.notes == this.notes &&
@@ -3647,6 +3692,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
   final Value<int?> purchaseId;
   final Value<int?> cashRegisterId;
   final Value<int> paymentMethodId;
+  final Value<String> aliasProductName;
   final Value<double> quantity;
   final Value<double> totalPrice;
   final Value<String?> notes;
@@ -3660,6 +3706,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     this.purchaseId = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
     this.paymentMethodId = const Value.absent(),
+    this.aliasProductName = const Value.absent(),
     this.quantity = const Value.absent(),
     this.totalPrice = const Value.absent(),
     this.notes = const Value.absent(),
@@ -3674,6 +3721,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     this.purchaseId = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
     required int paymentMethodId,
+    required String aliasProductName,
     this.quantity = const Value.absent(),
     this.totalPrice = const Value.absent(),
     this.notes = const Value.absent(),
@@ -3682,13 +3730,15 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : productId = Value(productId),
-       paymentMethodId = Value(paymentMethodId);
+       paymentMethodId = Value(paymentMethodId),
+       aliasProductName = Value(aliasProductName);
   static Insertable<Sale> custom({
     Expression<int>? id,
     Expression<int>? productId,
     Expression<int>? purchaseId,
     Expression<int>? cashRegisterId,
     Expression<int>? paymentMethodId,
+    Expression<String>? aliasProductName,
     Expression<double>? quantity,
     Expression<double>? totalPrice,
     Expression<String>? notes,
@@ -3703,6 +3753,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
       if (purchaseId != null) 'purchase_id': purchaseId,
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
       if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
+      if (aliasProductName != null) 'alias_product_name': aliasProductName,
       if (quantity != null) 'quantity': quantity,
       if (totalPrice != null) 'total_price': totalPrice,
       if (notes != null) 'notes': notes,
@@ -3719,6 +3770,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     Value<int?>? purchaseId,
     Value<int?>? cashRegisterId,
     Value<int>? paymentMethodId,
+    Value<String>? aliasProductName,
     Value<double>? quantity,
     Value<double>? totalPrice,
     Value<String?>? notes,
@@ -3733,6 +3785,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
       purchaseId: purchaseId ?? this.purchaseId,
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
       paymentMethodId: paymentMethodId ?? this.paymentMethodId,
+      aliasProductName: aliasProductName ?? this.aliasProductName,
       quantity: quantity ?? this.quantity,
       totalPrice: totalPrice ?? this.totalPrice,
       notes: notes ?? this.notes,
@@ -3760,6 +3813,9 @@ class SalesCompanion extends UpdateCompanion<Sale> {
     }
     if (paymentMethodId.present) {
       map['payment_method_id'] = Variable<int>(paymentMethodId.value);
+    }
+    if (aliasProductName.present) {
+      map['alias_product_name'] = Variable<String>(aliasProductName.value);
     }
     if (quantity.present) {
       map['quantity'] = Variable<double>(quantity.value);
@@ -3795,6 +3851,7 @@ class SalesCompanion extends UpdateCompanion<Sale> {
           ..write('purchaseId: $purchaseId, ')
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('paymentMethodId: $paymentMethodId, ')
+          ..write('aliasProductName: $aliasProductName, ')
           ..write('quantity: $quantity, ')
           ..write('totalPrice: $totalPrice, ')
           ..write('notes: $notes, ')
@@ -7419,6 +7476,7 @@ typedef $$SalesTableCreateCompanionBuilder =
       Value<int?> purchaseId,
       Value<int?> cashRegisterId,
       required int paymentMethodId,
+      required String aliasProductName,
       Value<double> quantity,
       Value<double> totalPrice,
       Value<String?> notes,
@@ -7434,6 +7492,7 @@ typedef $$SalesTableUpdateCompanionBuilder =
       Value<int?> purchaseId,
       Value<int?> cashRegisterId,
       Value<int> paymentMethodId,
+      Value<String> aliasProductName,
       Value<double> quantity,
       Value<double> totalPrice,
       Value<String?> notes,
@@ -7473,6 +7532,11 @@ class $$SalesTableFilterComposer extends Composer<_$AppDatabase, $SalesTable> {
 
   ColumnFilters<int> get paymentMethodId => $composableBuilder(
     column: $table.paymentMethodId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aliasProductName => $composableBuilder(
+    column: $table.aliasProductName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7547,6 +7611,11 @@ class $$SalesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get aliasProductName => $composableBuilder(
+    column: $table.aliasProductName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get quantity => $composableBuilder(
     column: $table.quantity,
     builder: (column) => ColumnOrderings(column),
@@ -7613,6 +7682,11 @@ class $$SalesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get aliasProductName => $composableBuilder(
+    column: $table.aliasProductName,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get quantity =>
       $composableBuilder(column: $table.quantity, builder: (column) => column);
 
@@ -7670,6 +7744,7 @@ class $$SalesTableTableManager
                 Value<int?> purchaseId = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
                 Value<int> paymentMethodId = const Value.absent(),
+                Value<String> aliasProductName = const Value.absent(),
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalPrice = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -7683,6 +7758,7 @@ class $$SalesTableTableManager
                 purchaseId: purchaseId,
                 cashRegisterId: cashRegisterId,
                 paymentMethodId: paymentMethodId,
+                aliasProductName: aliasProductName,
                 quantity: quantity,
                 totalPrice: totalPrice,
                 notes: notes,
@@ -7698,6 +7774,7 @@ class $$SalesTableTableManager
                 Value<int?> purchaseId = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
                 required int paymentMethodId,
+                required String aliasProductName,
                 Value<double> quantity = const Value.absent(),
                 Value<double> totalPrice = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -7711,6 +7788,7 @@ class $$SalesTableTableManager
                 purchaseId: purchaseId,
                 cashRegisterId: cashRegisterId,
                 paymentMethodId: paymentMethodId,
+                aliasProductName: aliasProductName,
                 quantity: quantity,
                 totalPrice: totalPrice,
                 notes: notes,

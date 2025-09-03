@@ -9,11 +9,16 @@ sealed class SaleCrudEvent extends Equatable {
 
 // create or update sale
 class CreateSaleEvent extends SaleCrudEvent {
-  final String action;
-  final SalesCompanion sale;
+  final RecordAction recordAction;
+  final SalesCompanion saleCompanion;
+  final Product selectedProduct;
 
-  const CreateSaleEvent(this.action, this.sale);
+  const CreateSaleEvent(
+    this.recordAction,
+    this.saleCompanion,
+    this.selectedProduct,
+  );
 
   @override
-  List<Object> get props => [action, sale];
+  List<Object> get props => [recordAction, saleCompanion, selectedProduct];
 }

@@ -13,10 +13,10 @@ final class PurchaseListInitial extends PurchaseListState {}
 class PurchaseListLoading extends PurchaseListState {}
 
 class PurchaseListLoadSuccess extends PurchaseListState {
-  final List<Purchase> products;
+  final List<Purchase> purchases;
   final AppEventSource eventSource;
 
-  const PurchaseListLoadSuccess(this.products, this.eventSource);
+  const PurchaseListLoadSuccess(this.purchases, this.eventSource);
 }
 
 class PurchaseListLoadFailure extends PurchaseListState {
