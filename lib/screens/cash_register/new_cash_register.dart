@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
+import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_date_field.dart';
@@ -44,7 +45,7 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
     final String today = DateFormat('dd-MM-yyyy').format(DateTime.now());
     _registerDateController = TextEditingController(text: today);
 
-    context.read<CashRegisterBloc>().add(LoadDataCashRegisterEvent());
+    context.read<CashRegisterDataBloc>().add(LoadDataCashRegisterEvent());
   }
 
   void goBack() {}
@@ -53,15 +54,17 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
   Widget build(BuildContext context) {
     return AppScaffold(
       appBar: AppBarCustom(title: isNew ? 'Crear Nueva Caja' : 'Editar Caja'),
-      body: BlocBuilder<CashRegisterBloc, CashRegisterState>(
+      body: BlocBuilder<CashRegisterDataBloc, CashRegisterDataState>(
         builder: (context, state) {
           if (state is DataCashRegisterLoading) {
             return AppLoadingScreen(
-              message: AppMessages.getDataCashRegistersMessage(
+              message: AppMessages.getCashRegistersMessage(
                 'messageLoadingDataCashRegisters',
               ),
             );
           } else if (state is DataCashRegisterLoadSuccess) {
+            final lastClosingAmount = state.lastClosingAmount;
+            final nextRegisterDate = state.nextRegisterDate;
             _openingAmountController.text = state.lastClosingAmount.toString();
             return GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
@@ -85,7 +88,7 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                         AppDateField(
                           label: "Fecha de la caja",
                           controller: _registerDateController,
-                          initialDate: DateTime.now(),
+                          initialDate: nextRegisterDate,
                           firstDate: DateTime.now().subtract(
                             const Duration(days: 30),
                           ),
@@ -97,8 +100,11 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                         const SizedBox(height: 20),
                         AppTextField(
                           label: 'Saldo Inicial',
+                          initialValue: AppUtils.formatDouble(
+                            lastClosingAmount,
+                          ),
                           controller: _openingAmountController,
-                          prefixIcon: Icons.monetization_on_outlined,
+                          suffixIcon: Icons.monetization_on_outlined,
                           readOnly: true,
                           //enabled: false,
                           validator: (value) => (value == null || value.isEmpty)
@@ -190,7 +196,7 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
           } else if (state is DataCashRegisterLoadFailure) {
             return Center(
               child: Text(
-                AppMessages.getDataCashRegistersMessage(
+                AppMessages.getCashRegistersMessage(
                   'messageLoadFailureDataCashRegisters',
                 ),
               ),

@@ -43,8 +43,6 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
     super.initState();
     final String today = DateFormat('dd-MM-yyyy').format(DateTime.now());
     _registerDateController = TextEditingController(text: today);
-
-    context.read<CashRegisterBloc>().add(LoadDataCashRegisterEvent());
   }
 
   void goBack() {}
@@ -52,7 +50,7 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      appBar: AppBarCustom(title: isNew ? 'Crear Nueva Caja' : 'Editar Caja'),
+      appBar: AppBarCustom(title: isNew ? '' : ''),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: ListView(

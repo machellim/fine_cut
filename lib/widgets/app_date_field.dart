@@ -1,3 +1,4 @@
+import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:flutter/material.dart';
 
 class AppDateField extends StatefulWidget {
@@ -39,16 +40,16 @@ class _AppDateFieldState extends State<AppDateField> {
     _selectedDate = widget.initialDate ?? DateTime.now();
 
     _internalController = TextEditingController(
-      text: _formatDate(_selectedDate!),
+      text: AppUtils.formatDate(_selectedDate!),
     );
     _controller = widget.controller ?? _internalController;
   }
 
-  String _formatDate(DateTime date) {
+  /*String _formatDate(DateTime date) {
     return "${date.year}-${_twoDigits(date.month)}-${_twoDigits(date.day)}";
-  }
+  }*/
 
-  String _twoDigits(int n) => n.toString().padLeft(2, '0');
+  //String _twoDigits(int n) => n.toString().padLeft(2, '0');
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -60,7 +61,7 @@ class _AppDateFieldState extends State<AppDateField> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _controller.text = _formatDate(picked);
+        _controller.text = AppUtils.formatDate(picked);
       });
       if (widget.onDateSelected != null) widget.onDateSelected!(picked);
     }

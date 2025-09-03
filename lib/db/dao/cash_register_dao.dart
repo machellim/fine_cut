@@ -32,6 +32,26 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     return lastRegister?.closingAmount ?? 0.0;
   }
 
+  Future<Map<String, dynamic>> getDataLastCashRegister() async {
+    final query = select(cashRegisters)
+      ..orderBy([
+        (t) =>
+            OrderingTerm(expression: t.registerDate, mode: OrderingMode.desc),
+      ])
+      ..limit(1);
+
+    final lastRegister = await query.getSingleOrNull();
+
+    if (lastRegister != null) {
+      return {
+        'closingAmount': lastRegister.closingAmount ?? 0.0,
+        'nextDate': lastRegister.registerDate.add(const Duration(days: 1)),
+      };
+    } else {
+      return {'closingAmount': 0.0, 'nextDate': DateTime.now()};
+    }
+  }
+
   Future<CashRegister?> createCashRegister({
     required String registerDateString,
     required double openingAmount,
@@ -119,5 +139,19 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     );
     // available balance
     return cashRegister.openingAmount + totalSales - totalPurchases;
+  }
+
+  Future<void> closeCashRegister({required int cashRegisterId}) async {
+    final closingAmount = await getAvailableBalanceByCashRegisterId(
+      cashRegisterId,
+    );
+    await (update(
+      cashRegisters,
+    )..where((t) => t.id.equals(cashRegisterId))).write(
+      CashRegistersCompanion(
+        closingAmount: Value(closingAmount),
+        status: Value(CashRegisterStatus.closed),
+      ),
+    );
   }
 }

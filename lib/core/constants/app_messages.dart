@@ -8,6 +8,8 @@ class AppMessages {
     'messageLoadingDataCashRegisters': 'Cargando informacion de última caja.',
     'messageLoadFailureDataCashRegisters':
         'Error al cargar información de última caja.',
+    'messageClosingCashRegister': 'Cerrando caja',
+    'messageErrorClosingCashRegister': 'Error al cerrar la caja.',
   };
 
   static const _categoryMessages = {
@@ -38,7 +40,7 @@ class AppMessages {
     return _paymentMethodMessages[key] ?? 'mensaje no parametrizado';
   }
 
-  static String getDataCashRegistersMessage(String key) {
+  static String getCashRegistersMessage(String key) {
     return _cashRegisterMessages[key] ?? 'mensaje no parametrizado';
   }
 

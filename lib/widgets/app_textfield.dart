@@ -21,6 +21,7 @@ class AppTextField extends StatefulWidget {
   final bool readOnly;
   final String? Function(String?)? validator;
   final IconData? prefixIcon;
+  final IconData? suffixIcon;
   final int? minLength;
   final int? maxLength;
 
@@ -46,6 +47,7 @@ class AppTextField extends StatefulWidget {
     this.readOnly = false,
     this.validator,
     this.prefixIcon,
+    this.suffixIcon,
     this.minLength,
     this.maxLength,
   });
@@ -77,6 +79,24 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // Configurar suffixIcon: se muestra el icono pasado, o el toggle si obscureText = true
+    Widget? suffix;
+    if (widget.suffixIcon != null) {
+      suffix = Icon(widget.suffixIcon, color: colorScheme.primary);
+    } else if (widget.obscureText) {
+      suffix = IconButton(
+        icon: Icon(
+          _isObscured ? Icons.visibility : Icons.visibility_off,
+          color: colorScheme.primary,
+        ),
+        onPressed: () {
+          setState(() {
+            _isObscured = !_isObscured;
+          });
+        },
+      );
+    }
 
     return TextFormField(
       controller: widget.controller ?? _internalController,
@@ -114,20 +134,7 @@ class _AppTextFieldState extends State<AppTextField> {
         prefixIcon: widget.prefixIcon != null
             ? Icon(widget.prefixIcon, color: colorScheme.primary)
             : null,
-
-        suffixIcon: widget.obscureText
-            ? IconButton(
-                icon: Icon(
-                  _isObscured ? Icons.visibility : Icons.visibility_off,
-                  color: colorScheme.primary,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isObscured = !_isObscured;
-                  });
-                },
-              )
-            : null,
+        suffixIcon: suffix,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: widget.hintText,
         hintStyle:

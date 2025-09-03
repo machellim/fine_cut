@@ -65,7 +65,7 @@ class AppAlertDialog extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               child: Text(
-                'Eliminar',
+                'Continuar',
                 style: TextStyle(color: Colors.redAccent),
               ),
             ),

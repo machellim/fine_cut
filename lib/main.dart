@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:fine_cut/bloc/bloc_observer.dart';
 import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
 import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/view_edit_cash_register.dart';
+import 'package:fine_cut/screens/home_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -75,9 +77,9 @@ class AppInitializer extends StatelessWidget {
             ],
             child: MultiBlocProvider(
               providers: [
-                BlocProvider<CashRegisterBloc>(
+                BlocProvider<CashRegisterDataBloc>(
                   create: (_) =>
-                      CashRegisterBloc(cashRegisterDao: cashRegisterDao),
+                      CashRegisterDataBloc(cashRegisterDao: cashRegisterDao),
                 ),
                 BlocProvider<PaymentMethodListBloc>(
                   create: (_) =>
@@ -121,6 +123,10 @@ class AppInitializer extends StatelessWidget {
                 BlocProvider<AvailableBalanceBloc>(
                   create: (_) =>
                       AvailableBalanceBloc(cashRegisterDao: cashRegisterDao),
+                ),
+                BlocProvider<CashRegisterCloseBloc>(
+                  create: (_) =>
+                      CashRegisterCloseBloc(cashRegisterDao: cashRegisterDao),
                 ),
               ],
               child: FineCutApp(database: database),
@@ -206,21 +212,7 @@ class FineCutApp extends StatelessWidget {
 
       // o .dark, .light
       debugShowCheckedModeBanner: false,
-      home: FutureBuilder<CashRegister?>(
-        future: database.cashRegisterDao.getLastOpenCashRegister(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            return MainCashRegisterScreen();
-          } else {
-            final cashRegister = snapshot.data!;
-            return ViewEditCashRegisterScreen(cashRegister: cashRegister);
-          }
-        },
-      ),
+      home: HomeWrapper(database: database),
       routes: appRoutes,
       //onGenerateRoute: generateRoute,
     );

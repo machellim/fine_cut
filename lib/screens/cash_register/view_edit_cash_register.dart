@@ -1,4 +1,5 @@
 import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
@@ -11,8 +12,10 @@ import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/models/banner_state.dart';
+import 'package:fine_cut/screens/home_wrapper.dart';
 import 'package:fine_cut/widgets/app_alert_dialog.dart';
 import 'package:fine_cut/widgets/app_button.dart';
+import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_drawer.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
@@ -117,13 +120,19 @@ class _ViewEditCashRegisterScreenState
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'close-cash-register') {
-                // acción de cerrar caja
+                _showConfirmationCloseCashRegister(context, cashRegister.id);
               }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'close-cash-register',
-                child: Text('Cerrar Caja'),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.lock),
+                    SizedBox(width: 8),
+                    Text('Cerrar Caja'),
+                  ],
+                ),
               ),
             ],
           ),
@@ -132,395 +141,437 @@ class _ViewEditCashRegisterScreenState
       drawer: AppDrawer(appContext: context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 5),
-        child: Column(
-          children: [
-            // Fila de Fecha y Saldo Inicial
-            Row(
+        child: BlocConsumer<CashRegisterCloseBloc, CashRegisterCloseState>(
+          listener: (context, state) {
+            if (state is CloseCashRegisterSuccess) {
+              final database = RepositoryProvider.of<AppDatabase>(context);
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => HomeWrapper(database: database),
+                ),
+                (route) => false, // elimina todas las rutas anteriores
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is CloseCashRegisterLoading) {
+              return Center(
+                child: AppCircularProgressText(
+                  messageLoading: AppMessages.getCashRegistersMessage(
+                    'messageClosingCashRegister',
+                  ),
+                ),
+              );
+            }
+            return Column(
               children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(4.0),
-                    margin: const EdgeInsets.only(right: 4.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
-                      borderRadius: BorderRadius.circular(8),
+                if (state is CloseCashRegisterFailure)
+                  AppMessageType(
+                    message: AppMessages.getCashRegistersMessage(
+                      'messageErrorClosingCashRegister',
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Fecha Caja:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(registerDate),
-                      ],
-                    ),
+                    messageType: MessageType.error,
                   ),
-                ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(4.0),
-                    margin: const EdgeInsets.only(left: 4.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Saldo Inicial:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(4.0),
+                        margin: const EdgeInsets.only(right: 4.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        Text(
-                          '\$ ${AppUtils.formatDouble(cashRegister.openingAmount)}',
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(4.0),
-                    margin: const EdgeInsets.only(left: 4.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Disponible:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        BlocBuilder<
-                          AvailableBalanceBloc,
-                          AvailableBalanceState
-                        >(
-                          builder: (context, state) {
-                            if (state is AvailableBalanceLoading) {
-                              return Text('Loading . .');
-                            } else if (state is AvailableBalanceLoadSuccess) {
-                              return Text(
-                                '\$ ${AppUtils.formatDouble(state.availableBalance)}',
-                              );
-                            } else if (state is AvailableBalanceLoadFailure) {
-                              return Text('Error');
-                            } else {
-                              return Text('Desconocido');
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // ExpansionPanelList.radio con primer panel abierto por defecto
-            ExpansionPanelList.radio(
-              initialOpenPanelValue: 0,
-              expansionCallback: (index, isExpanded) {
-                if (isExpanded) {
-                } else {}
-              },
-              children: [
-                ExpansionPanelRadio(
-                  value: 0,
-                  headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: AppTitle(text: 'Ventas')),
-                  body: Padding(
-                    padding: AppConstants.gridPadding,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        AppButton(
-                          title: 'Agregar Venta',
-                          onPressed: () async {
-                            _closeBannerSale();
-
-                            final repoPaymentMethod = context
-                                .read<PaymentMethodListBloc>();
-                            final paymentMethod = await repoPaymentMethod
-                                .paymentMethodDao
-                                .getPaymentMethodByName('Efectivo');
-                            Navigator.pushNamed(
-                              context,
-                              'new-sale',
-                              arguments: {
-                                'defaultSelectedPaymentMethod': paymentMethod,
-                                'cashRegisterId': cashRegister.id,
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        if (_bannerSaleState.show)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AppTopBanner(
-                              message: _bannerSaleState.message,
-                              type: _bannerSaleState.type,
-                              onClose: _closeBannerSale,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Fecha Caja:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                          ),
-                        MultiBlocListener(
-                          listeners: [
-                            BlocListener<SaleCrudBloc, SaleCrudState>(
-                              listener: (context, state) {
-                                if (state is SaleDeletionSuccess) {
-                                  _loadAvailableBalance();
-                                  context.read<SaleListBloc>().add(
-                                    LoadSalesListEvent(
-                                      AppEventSource.list,
-                                      widget.cashRegister.id,
-                                    ),
-                                  );
-                                }
-                                if (state is SaleDeletionFailure) {
-                                  _showTopBannerPurchase(
-                                    'Error al eliminar venta',
-                                    type: AppBannerType.error,
-                                  );
-                                }
-                                if (state is SaleCreationSuccess) {
-                                  _loadAvailableBalance();
-                                }
-                                if (state is SaleUpdateSuccess) {
-                                  _loadAvailableBalance();
-                                }
-                              },
+                            Text(registerDate),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(4.0),
+                        margin: const EdgeInsets.only(left: 4.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Saldo Inicial:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            // List listener
-                            BlocListener<SaleListBloc, SaleListState>(
-                              listener: (context, state) {
-                                if (state is SaleListLoadSuccess) {
-                                  if (state.eventSource ==
-                                      AppEventSource.create) {
-                                    _showTopBannerSale(
-                                      'Venta creada con éxito',
-                                    );
-                                  } else if (state.eventSource ==
-                                      AppEventSource.update) {
-                                    _showTopBannerSale(
-                                      'Venta actualizada con éxito',
-                                    );
-                                  } else if (state.eventSource ==
-                                      AppEventSource.delete) {
-                                    _showTopBannerSale(
-                                      'Venta eliminada con éxito',
-                                    );
-                                  }
-                                }
-                              },
+                            Text(
+                              '\$ ${AppUtils.formatDouble(cashRegister.openingAmount)}',
                             ),
                           ],
-                          child: BlocBuilder<SaleListBloc, SaleListState>(
-                            builder: (context, state) {
-                              if (state is SaleListLoading) {
-                                return AppLoadingScreen(
-                                  message: AppMessages.getPurchaseMessage(
-                                    'messageLoadingPurchase',
-                                  ),
-                                );
-                              } else if (state is SaleListLoadSuccess) {
-                                if (state.sales.isEmpty) {
-                                  return AppSimpleCenterText(
-                                    message: 'No hay información.',
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(4.0),
+                        margin: const EdgeInsets.only(left: 4.0),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Disponible:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            BlocBuilder<
+                              AvailableBalanceBloc,
+                              AvailableBalanceState
+                            >(
+                              builder: (context, state) {
+                                if (state is AvailableBalanceLoading) {
+                                  return Text('Loading . .');
+                                } else if (state
+                                    is AvailableBalanceLoadSuccess) {
+                                  return Text(
+                                    '\$ ${AppUtils.formatDouble(state.availableBalance)}',
                                   );
+                                } else if (state
+                                    is AvailableBalanceLoadFailure) {
+                                  return Text('Error');
                                 } else {
-                                  return ListView.builder(
-                                    shrinkWrap:
-                                        true, // importante para que funcione dentro de Column
-                                    physics:
-                                        const NeverScrollableScrollPhysics(), // evita scroll interno
-                                    itemCount: state
-                                        .sales
-                                        .length, // número de elementos
-                                    itemBuilder: (context, index) {
-                                      final sale = state.sales[index];
-                                      return Column(
-                                        children: [
-                                          AppListItem(
-                                            title: Text(
-                                              sale.aliasProductName,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            description: Text(
-                                              'Cantidad: ${sale.quantity}',
-                                              style: const TextStyle(
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                            price: sale.totalPrice,
-                                            onEdit: () async {
-                                              _closeBannerSale();
-                                              // get selected product
-                                              final repoProduct = context
-                                                  .read<ProductsListBloc>();
-                                              final selectedProduct =
-                                                  await repoProduct.productDao
-                                                      .getById(sale.productId);
-
-                                              // get selected payment form
-                                              final repoPaymentMethod = context
-                                                  .read<
-                                                    PaymentMethodListBloc
-                                                  >();
-                                              final selectedPaymentMethod =
-                                                  await repoPaymentMethod
-                                                      .paymentMethodDao
-                                                      .getById(
-                                                        sale.paymentMethodId,
-                                                      );
-
-                                              Navigator.pushNamed(
-                                                context,
-                                                'new-sale',
-                                                arguments: {
-                                                  'selectedProduct':
-                                                      selectedProduct,
-                                                  'selectedPaymentMethod':
-                                                      selectedPaymentMethod,
-                                                  'sale': sale,
-                                                },
-                                              );
-                                            },
-                                            onDelete: () {
-                                              _showDeleteConfirmationSale(
-                                                context,
-                                                sale.id,
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                }
-                              } else if (state is SaleListLoadFailure) {
-                                return const Center(
-                                  child: Text('Error al cargar ventas'),
-                                );
-                              } else {
-                                return const Center(
-                                  child: Text('Estado desconocido'),
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                ExpansionPanelRadio(
-                  value: 1,
-                  headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: AppTitle(text: 'Compras')),
-
-                  body: Padding(
-                    padding: AppConstants.gridPadding,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        AppButton(
-                          title: 'Agregar Compra',
-                          onPressed: () async {
-                            _closeBannerPurchase();
-                            final repoPaymentMethod = context
-                                .read<PaymentMethodListBloc>();
-                            final paymentMethod = await repoPaymentMethod
-                                .paymentMethodDao
-                                .getPaymentMethodByName('Efectivo');
-
-                            Navigator.pushNamed(
-                              context,
-                              'new-purchase',
-                              arguments: {
-                                'defaultSelectedPaymentMethod': paymentMethod,
-                                'cashRegisterId': cashRegister.id,
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        if (_bannerPurchaseState.show)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AppTopBanner(
-                              message: _bannerPurchaseState.message,
-                              type: _bannerPurchaseState.type,
-                              onClose: _closeBannerPurchase,
-                            ),
-                          ),
-                        MultiBlocListener(
-                          listeners: [
-                            // Listener del bloc de creación/edición/eliminación
-                            BlocListener<PurchaseCrudBloc, PurchaseCrudState>(
-                              listener: (context, state) {
-                                if (state is PurchaseDeletionSuccess) {
-                                  _loadAvailableBalance();
-                                  context.read<PurchaseListBloc>().add(
-                                    LoadPurchasesListEvent(
-                                      AppEventSource.list,
-                                      widget.cashRegister.id,
-                                    ),
-                                  );
-                                }
-                                if (state is PurchaseDeletionFailure) {
-                                  _showTopBannerPurchase(
-                                    'Error al eliminar compra',
-                                    type: AppBannerType.error,
-                                  );
-                                }
-                                if (state is PurchaseCreationSuccess) {
-                                  _loadAvailableBalance();
-                                }
-                                if (state is PurchaseUpdateSuccess) {
-                                  _loadAvailableBalance();
-                                }
-                              },
-                            ),
-
-                            // Listener de la lista
-                            BlocListener<PurchaseListBloc, PurchaseListState>(
-                              listener: (context, state) {
-                                if (state is PurchaseListLoadSuccess) {
-                                  if (state.eventSource ==
-                                      AppEventSource.create) {
-                                    _showTopBannerPurchase(
-                                      'Compra creada con éxito',
-                                    );
-                                  } else if (state.eventSource ==
-                                      AppEventSource.update) {
-                                    _showTopBannerPurchase(
-                                      'Compra actualizada con éxito',
-                                    );
-                                  } else if (state.eventSource ==
-                                      AppEventSource.delete) {
-                                    _showTopBannerPurchase(
-                                      'Compra eliminada con éxito',
-                                    );
-                                  }
+                                  return Text('Desconocido');
                                 }
                               },
                             ),
                           ],
-                          child:
-                              BlocBuilder<PurchaseListBloc, PurchaseListState>(
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // ExpansionPanelList.radio con primer panel abierto por defecto
+                ExpansionPanelList.radio(
+                  initialOpenPanelValue: 0,
+                  expansionCallback: (index, isExpanded) {
+                    if (isExpanded) {
+                    } else {}
+                  },
+                  children: [
+                    ExpansionPanelRadio(
+                      value: 0,
+                      headerBuilder: (context, isExpanded) =>
+                          const ListTile(title: AppTitle(text: 'Ventas')),
+                      body: Padding(
+                        padding: AppConstants.gridPadding,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            AppButton(
+                              title: 'Agregar Venta',
+                              onPressed: () async {
+                                _closeBannerSale();
+
+                                final repoPaymentMethod = context
+                                    .read<PaymentMethodListBloc>();
+                                final paymentMethod = await repoPaymentMethod
+                                    .paymentMethodDao
+                                    .getPaymentMethodByName('Efectivo');
+                                Navigator.pushNamed(
+                                  context,
+                                  'new-sale',
+                                  arguments: {
+                                    'defaultSelectedPaymentMethod':
+                                        paymentMethod,
+                                    'cashRegisterId': cashRegister.id,
+                                  },
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            if (_bannerSaleState.show)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: AppTopBanner(
+                                  message: _bannerSaleState.message,
+                                  type: _bannerSaleState.type,
+                                  onClose: _closeBannerSale,
+                                ),
+                              ),
+                            MultiBlocListener(
+                              listeners: [
+                                BlocListener<SaleCrudBloc, SaleCrudState>(
+                                  listener: (context, state) {
+                                    if (state is SaleDeletionSuccess) {
+                                      _loadAvailableBalance();
+                                      context.read<SaleListBloc>().add(
+                                        LoadSalesListEvent(
+                                          AppEventSource.list,
+                                          widget.cashRegister.id,
+                                        ),
+                                      );
+                                    }
+                                    if (state is SaleDeletionFailure) {
+                                      _showTopBannerPurchase(
+                                        'Error al eliminar venta',
+                                        type: AppBannerType.error,
+                                      );
+                                    }
+                                    if (state is SaleCreationSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                    if (state is SaleUpdateSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                  },
+                                ),
+                                // List listener
+                                BlocListener<SaleListBloc, SaleListState>(
+                                  listener: (context, state) {
+                                    if (state is SaleListLoadSuccess) {
+                                      if (state.eventSource ==
+                                          AppEventSource.create) {
+                                        _showTopBannerSale(
+                                          'Venta creada con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.update) {
+                                        _showTopBannerSale(
+                                          'Venta actualizada con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.delete) {
+                                        _showTopBannerSale(
+                                          'Venta eliminada con éxito',
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                              child: BlocBuilder<SaleListBloc, SaleListState>(
+                                builder: (context, state) {
+                                  if (state is SaleListLoading) {
+                                    return AppLoadingScreen(
+                                      message: AppMessages.getPurchaseMessage(
+                                        'messageLoadingPurchase',
+                                      ),
+                                    );
+                                  } else if (state is SaleListLoadSuccess) {
+                                    if (state.sales.isEmpty) {
+                                      return AppSimpleCenterText(
+                                        message: 'No hay información.',
+                                      );
+                                    } else {
+                                      return ListView.builder(
+                                        shrinkWrap:
+                                            true, // importante para que funcione dentro de Column
+                                        physics:
+                                            const NeverScrollableScrollPhysics(), // evita scroll interno
+                                        itemCount: state
+                                            .sales
+                                            .length, // número de elementos
+                                        itemBuilder: (context, index) {
+                                          final sale = state.sales[index];
+                                          return Column(
+                                            children: [
+                                              AppListItem(
+                                                title: Text(
+                                                  sale.aliasProductName,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                description: Text(
+                                                  'Cantidad: ${sale.quantity}',
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                                price: sale.totalPrice,
+                                                onEdit: () async {
+                                                  _closeBannerSale();
+                                                  // get selected product
+                                                  final repoProduct = context
+                                                      .read<ProductsListBloc>();
+                                                  final selectedProduct =
+                                                      await repoProduct
+                                                          .productDao
+                                                          .getById(
+                                                            sale.productId,
+                                                          );
+
+                                                  // get selected payment form
+                                                  final repoPaymentMethod =
+                                                      context
+                                                          .read<
+                                                            PaymentMethodListBloc
+                                                          >();
+                                                  final selectedPaymentMethod =
+                                                      await repoPaymentMethod
+                                                          .paymentMethodDao
+                                                          .getById(
+                                                            sale.paymentMethodId,
+                                                          );
+
+                                                  Navigator.pushNamed(
+                                                    context,
+                                                    'new-sale',
+                                                    arguments: {
+                                                      'selectedProduct':
+                                                          selectedProduct,
+                                                      'selectedPaymentMethod':
+                                                          selectedPaymentMethod,
+                                                      'sale': sale,
+                                                    },
+                                                  );
+                                                },
+                                                onDelete: () {
+                                                  _showDeleteConfirmationSale(
+                                                    context,
+                                                    sale.id,
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
+                                  } else if (state is SaleListLoadFailure) {
+                                    return const Center(
+                                      child: Text('Error al cargar ventas'),
+                                    );
+                                  } else {
+                                    return const Center(
+                                      child: Text('Estado desconocido'),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    ExpansionPanelRadio(
+                      value: 1,
+                      headerBuilder: (context, isExpanded) =>
+                          const ListTile(title: AppTitle(text: 'Compras')),
+
+                      body: Padding(
+                        padding: AppConstants.gridPadding,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            AppButton(
+                              title: 'Agregar Compra',
+                              onPressed: () async {
+                                _closeBannerPurchase();
+                                final repoPaymentMethod = context
+                                    .read<PaymentMethodListBloc>();
+                                final paymentMethod = await repoPaymentMethod
+                                    .paymentMethodDao
+                                    .getPaymentMethodByName('Efectivo');
+
+                                Navigator.pushNamed(
+                                  context,
+                                  'new-purchase',
+                                  arguments: {
+                                    'defaultSelectedPaymentMethod':
+                                        paymentMethod,
+                                    'cashRegisterId': cashRegister.id,
+                                  },
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            if (_bannerPurchaseState.show)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: AppTopBanner(
+                                  message: _bannerPurchaseState.message,
+                                  type: _bannerPurchaseState.type,
+                                  onClose: _closeBannerPurchase,
+                                ),
+                              ),
+                            MultiBlocListener(
+                              listeners: [
+                                // Listener del bloc de creación/edición/eliminación
+                                BlocListener<
+                                  PurchaseCrudBloc,
+                                  PurchaseCrudState
+                                >(
+                                  listener: (context, state) {
+                                    if (state is PurchaseDeletionSuccess) {
+                                      _loadAvailableBalance();
+                                      context.read<PurchaseListBloc>().add(
+                                        LoadPurchasesListEvent(
+                                          AppEventSource.list,
+                                          widget.cashRegister.id,
+                                        ),
+                                      );
+                                    }
+                                    if (state is PurchaseDeletionFailure) {
+                                      _showTopBannerPurchase(
+                                        'Error al eliminar compra',
+                                        type: AppBannerType.error,
+                                      );
+                                    }
+                                    if (state is PurchaseCreationSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                    if (state is PurchaseUpdateSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                  },
+                                ),
+
+                                // Listener de la lista
+                                BlocListener<
+                                  PurchaseListBloc,
+                                  PurchaseListState
+                                >(
+                                  listener: (context, state) {
+                                    if (state is PurchaseListLoadSuccess) {
+                                      if (state.eventSource ==
+                                          AppEventSource.create) {
+                                        _showTopBannerPurchase(
+                                          'Compra creada con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.update) {
+                                        _showTopBannerPurchase(
+                                          'Compra actualizada con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.delete) {
+                                        _showTopBannerPurchase(
+                                          'Compra eliminada con éxito',
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                              child: BlocBuilder<PurchaseListBloc, PurchaseListState>(
                                 builder: (context, state) {
                                   if (state is PurchaseListLoading) {
                                     return AppLoadingScreen(
@@ -613,41 +664,46 @@ class _ViewEditCashRegisterScreenState
                                   }
                                 },
                               ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                ExpansionPanelRadio(
-                  value: 2,
-                  headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: AppTitle(text: 'Gastos')),
-                  body: const Padding(
-                    padding: AppConstants.gridPadding,
-                    child: Text('Contenido de gastos'),
-                  ),
-                ),
-                ExpansionPanelRadio(
-                  value: 3,
-                  headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: AppTitle(text: 'Ingresos Varios')),
-                  body: const Padding(
-                    padding: AppConstants.gridPadding,
-                    child: Text('Contenido de ingresos'),
-                  ),
-                ),
-                ExpansionPanelRadio(
-                  value: 4,
-                  headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: AppTitle(text: 'Pérdidas')),
-                  body: const Padding(
-                    padding: AppConstants.gridPadding,
-                    child: Text('Productos dañados, robados, perdidos, etc.'),
-                  ),
+                    ExpansionPanelRadio(
+                      value: 2,
+                      headerBuilder: (context, isExpanded) =>
+                          const ListTile(title: AppTitle(text: 'Gastos')),
+                      body: const Padding(
+                        padding: AppConstants.gridPadding,
+                        child: Text('Contenido de gastos'),
+                      ),
+                    ),
+                    ExpansionPanelRadio(
+                      value: 3,
+                      headerBuilder: (context, isExpanded) => const ListTile(
+                        title: AppTitle(text: 'Ingresos Varios'),
+                      ),
+                      body: const Padding(
+                        padding: AppConstants.gridPadding,
+                        child: Text('Contenido de ingresos'),
+                      ),
+                    ),
+                    ExpansionPanelRadio(
+                      value: 4,
+                      headerBuilder: (context, isExpanded) =>
+                          const ListTile(title: AppTitle(text: 'Pérdidas')),
+                      body: const Padding(
+                        padding: AppConstants.gridPadding,
+                        child: Text(
+                          'Productos dañados, robados, perdidos, etc.',
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -687,6 +743,30 @@ class _ViewEditCashRegisterScreenState
           onConfirm: () {
             // Acción de confirmar
             context.read<SaleCrudBloc>().add(DeleteSaleEvent(saleId));
+          },
+        );
+      },
+    );
+  }
+
+  void _showConfirmationCloseCashRegister(
+    BuildContext context,
+    int cashRegisterId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppAlertDialog(
+          title: '¿Seguro que deseas cerrar esta caja?',
+          content: 'Esta acción no se puede deshacer.',
+          onCancel: () {
+            // close dialog
+          },
+          onConfirm: () {
+            // Acción de confirmar
+            context.read<CashRegisterCloseBloc>().add(
+              CloseCashRegisterEvent(cashRegisterId),
+            );
           },
         );
       },

@@ -1,11 +1,11 @@
 part of 'cash_register_data_bloc.dart';
 
-sealed class CashRegisterEvent extends Equatable {
-  const CashRegisterEvent();
+sealed class CashRegisterDataEvent extends Equatable {
+  const CashRegisterDataEvent();
 
   @override
   List<Object> get props => [];
 }
 
 // === Event to load initial data ===
-class LoadDataCashRegisterEvent extends CashRegisterEvent {}
+class LoadDataCashRegisterEvent extends CashRegisterDataEvent {}
