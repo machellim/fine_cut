@@ -18,7 +18,9 @@ class PurchaseListBloc extends Bloc<PurchaseListEvent, PurchaseListState> {
       try {
         emit(PurchaseListLoading());
         // await Future.delayed(Duration(seconds: 3));
-        final purchases = await purchaseDao.getAllPurchases();
+        final purchases = await purchaseDao.getPurchasesByCashRegisterId(
+          event.cashRegisterId,
+        );
         emit(PurchaseListLoadSuccess(purchases, event.eventSource));
       } catch (e) {
         emit(PurchaseListLoadFailure(message: 'Error al cargar las compras.'));

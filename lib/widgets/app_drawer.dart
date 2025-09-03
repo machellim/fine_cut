@@ -110,7 +110,10 @@ class AppDrawer extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             title: Text('Historial de Cajas', style: textStyle),
-            onTap: () async {},
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, 'cash-register-list');
+            },
           ),
           Divider(),
 

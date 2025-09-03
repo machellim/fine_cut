@@ -10,9 +10,10 @@ sealed class SaleListEvent extends Equatable {
 // Event to load sales
 class LoadSalesListEvent extends SaleListEvent {
   final AppEventSource eventSource;
+  final int cashRegisterId;
 
-  const LoadSalesListEvent(this.eventSource);
+  const LoadSalesListEvent(this.eventSource, this.cashRegisterId);
 
   @override
-  List<Object> get props => [eventSource];
+  List<Object> get props => [eventSource, cashRegisterId];
 }

@@ -4,6 +4,7 @@ import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_dat
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
 import 'package:fine_cut/widgets/app_button.dart';
+import 'package:fine_cut/widgets/app_date_field.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:intl/intl.dart';
@@ -81,14 +82,17 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                         ),
 
                         const SizedBox(height: 30),
-                        AppTextField(
-                          label: 'Fecha',
+                        AppDateField(
+                          label: "Fecha de la caja",
                           controller: _registerDateController,
-                          readOnly: true,
-                          prefixIcon: Icons.calendar_today,
-                          validator: (value) => (value == null || value.isEmpty)
-                              ? 'Por favor ingrese la fecha.'
-                              : null,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now().subtract(
+                            const Duration(days: 30),
+                          ),
+                          lastDate: DateTime.now(),
+                          onDateSelected: (date) {
+                            print("Fecha seleccionada: $date");
+                          },
                         ),
                         const SizedBox(height: 20),
                         AppTextField(

@@ -20,6 +20,18 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
         .get();
   }
 
+  Future<List<Sale>> getSalesByCashRegisterId(int cashRegisterId) {
+    return (select(sales)
+          ..where(
+            (t) =>
+                t.status.equals('active') &
+                t.cashRegisterId.equals(cashRegisterId),
+          )
+          ..limit(AppConstants.listResultsLimit)
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
+  }
+
   Future<int> createOrUpdateSale(
     SalesCompanion saleCompanion,
     RecordAction recordAction,

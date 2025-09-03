@@ -22,6 +22,18 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
+  Future<List<Purchase>> getPurchasesByCashRegisterId(int cashRegisterId) {
+    return (select(purchases)
+          ..where(
+            (t) =>
+                t.status.equals('active') &
+                t.cashRegisterId.equals(cashRegisterId),
+          )
+          ..limit(AppConstants.listResultsLimit)
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
+  }
+
   Future<int> createOrUpdatePurchase(
     PurchasesCompanion purchaseCompanion,
     RecordAction recordAction,

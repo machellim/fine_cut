@@ -18,7 +18,9 @@ class SaleListBloc extends Bloc<SaleListEvent, SaleListState> {
       try {
         emit(SaleListLoading());
         // await Future.delayed(Duration(seconds: 3));
-        final purchases = await saleDao.getAllSales();
+        final purchases = await saleDao.getSalesByCashRegisterId(
+          event.cashRegisterId,
+        );
         emit(SaleListLoadSuccess(purchases, event.eventSource));
       } catch (e) {
         emit(SaleListLoadFailure(message: 'Error al cargar las compras.'));

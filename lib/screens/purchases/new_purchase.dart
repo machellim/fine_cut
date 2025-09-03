@@ -37,6 +37,7 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
   bool isNewPurchase = true;
   Product? selectedProduct;
   PaymentMethod? selectedPaymentMethod;
+  int? cashRegisterId;
 
   @override
   void dispose() {
@@ -49,7 +50,9 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
   void goBack(AppEventSource eventSource) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pop(context, true);
-      context.read<PurchaseListBloc>().add(LoadPurchasesListEvent(eventSource));
+      context.read<PurchaseListBloc>().add(
+        LoadPurchasesListEvent(eventSource, cashRegisterId!),
+      );
     });
   }
 
@@ -64,7 +67,7 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
       final purchase = (args['purchase']) as Purchase?;
       selectedProduct = (args['selectedProduct']) as Product?;
       selectedPaymentMethod = (args['selectedPaymentMethod']) as PaymentMethod?;
-      final cashRegisterId = args['cashRegisterId'];
+      cashRegisterId = args['cashRegisterId'];
 
       if (purchase != null) {
         purchaseCompanion = purchaseCompanion.copyWith(

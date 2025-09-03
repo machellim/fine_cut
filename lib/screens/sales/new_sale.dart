@@ -37,6 +37,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
   bool isNewSale = true;
   Product? selectedProduct;
   PaymentMethod? selectedPaymentMethod;
+  int? cashRegisterId;
 
   @override
   void dispose() {
@@ -56,7 +57,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
       final sale = (args['sale']) as Sale?;
       selectedProduct = (args['selectedProduct']) as Product?;
       selectedPaymentMethod = (args['selectedPaymentMethod']) as PaymentMethod?;
-      final cashRegisterId = args['cashRegisterId'];
+      cashRegisterId = args['cashRegisterId'];
 
       if (sale != null) {
         saleCompanion = saleCompanion.copyWith(
@@ -89,7 +90,9 @@ class NewSaleScreenState extends State<NewSaleScreen> {
   void goBack(AppEventSource eventSource) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pop(context, true);
-      context.read<SaleListBloc>().add(LoadSalesListEvent(eventSource));
+      context.read<SaleListBloc>().add(
+        LoadSalesListEvent(eventSource, cashRegisterId!),
+      );
     });
   }
 

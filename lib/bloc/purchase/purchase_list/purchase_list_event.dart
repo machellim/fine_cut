@@ -10,8 +10,9 @@ sealed class PurchaseListEvent extends Equatable {
 // Event to load purchases
 class LoadPurchasesListEvent extends PurchaseListEvent {
   final AppEventSource eventSource;
+  final int cashRegisterId;
 
-  const LoadPurchasesListEvent(this.eventSource);
+  const LoadPurchasesListEvent(this.eventSource, this.cashRegisterId);
 
   @override
   List<Object> get props => [eventSource];

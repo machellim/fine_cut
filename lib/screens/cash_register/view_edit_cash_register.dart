@@ -95,11 +95,13 @@ class _ViewEditCashRegisterScreenState
 
     // load Purchases
     context.read<PurchaseListBloc>().add(
-      LoadPurchasesListEvent(AppEventSource.list),
+      LoadPurchasesListEvent(AppEventSource.list, widget.cashRegister.id),
     );
 
     // load Purchases
-    context.read<SaleListBloc>().add(LoadSalesListEvent(AppEventSource.list));
+    context.read<SaleListBloc>().add(
+      LoadSalesListEvent(AppEventSource.list, widget.cashRegister.id),
+    );
   }
 
   @override
@@ -279,7 +281,10 @@ class _ViewEditCashRegisterScreenState
                                 if (state is SaleDeletionSuccess) {
                                   _loadAvailableBalance();
                                   context.read<SaleListBloc>().add(
-                                    LoadSalesListEvent(AppEventSource.list),
+                                    LoadSalesListEvent(
+                                      AppEventSource.list,
+                                      widget.cashRegister.id,
+                                    ),
                                   );
                                 }
                                 if (state is SaleDeletionFailure) {
@@ -469,7 +474,10 @@ class _ViewEditCashRegisterScreenState
                                 if (state is PurchaseDeletionSuccess) {
                                   _loadAvailableBalance();
                                   context.read<PurchaseListBloc>().add(
-                                    LoadPurchasesListEvent(AppEventSource.list),
+                                    LoadPurchasesListEvent(
+                                      AppEventSource.list,
+                                      widget.cashRegister.id,
+                                    ),
                                   );
                                 }
                                 if (state is PurchaseDeletionFailure) {
