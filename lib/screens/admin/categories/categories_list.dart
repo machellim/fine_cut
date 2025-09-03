@@ -109,6 +109,7 @@ class _CategoriesListScreenState extends State<CategoriesListScreen> {
                                   )
                                 : null, // Flutter ignora la propiedad si es null
                             onEdit: () {
+                              _closeBanner();
                               Navigator.pushNamed(
                                 context,
                                 'new-category',
@@ -138,6 +139,7 @@ class _CategoriesListScreenState extends State<CategoriesListScreen> {
       ),
       floatingActionButton: AppFloatingActionButton(
         onPressed: () async {
+          _closeBanner();
           await Navigator.pushNamed(context, 'new-category');
         },
         tooltip: 'Agregar Categoría',

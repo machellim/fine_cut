@@ -9,6 +9,8 @@ class AppNumberField extends StatefulWidget {
   final bool? readOnly;
   final bool validate;
   final Function(String)? onChanged;
+  final String? suffixText;
+  final String? prefixText;
 
   const AppNumberField({
     super.key,
@@ -19,6 +21,8 @@ class AppNumberField extends StatefulWidget {
     this.readOnly,
     this.validate = true,
     this.onChanged,
+    this.suffixText,
+    this.prefixText,
   });
 
   @override
@@ -33,7 +37,7 @@ class _AppNumberFieldState extends State<AppNumberField> {
     return TextFormField(
       controller: widget.controller,
       readOnly: widget.readOnly ?? false,
-      style: TextStyle(color: colorScheme.onSurface), // texto adaptable
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
@@ -52,12 +56,12 @@ class _AppNumberFieldState extends State<AppNumberField> {
           borderSide: BorderSide(color: colorScheme.error, width: 2.0),
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixText: widget.suffixText,
+        prefixText: widget.prefixText,
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
-        FilteringTextInputFormatter.allow(
-          RegExp(r'^\d*\.?\d{0,2}$'),
-        ), // enteros y hasta 2 decimales
+        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$')),
       ],
       validator: widget.validate
           ? (value) {

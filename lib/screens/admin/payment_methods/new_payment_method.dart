@@ -5,6 +5,7 @@ import 'package:fine_cut/bloc/category/category_crud/category_event.dart';
 import 'package:fine_cut/bloc/category/category_crud/category_state.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_crud/payment_method_crud_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/widgets/app_button.dart';
@@ -89,7 +90,7 @@ class _NewPaymentMethodScreenState extends State<NewPaymentMethodScreen> {
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+          padding: AppConstants.screenPadding,
           children: [
             Form(
               key: _formKey,

@@ -1,14 +1,26 @@
+import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
+import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
+import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
+import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
+import 'package:fine_cut/core/constants/app_messages.dart';
+import 'package:fine_cut/core/enums/enums.dart';
+import 'package:fine_cut/core/utils/helpers.dart';
+import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/widgets/app_alert_dialog.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_drawer.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
+import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_title.dart';
+import 'package:fine_cut/widgets/app_top_banner.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
 
 class ViewEditCashRegisterScreen extends StatefulWidget {
-  const ViewEditCashRegisterScreen({super.key});
+  final CashRegister cashRegister;
+  const ViewEditCashRegisterScreen({super.key, required this.cashRegister});
 
   @override
   State<ViewEditCashRegisterScreen> createState() =>
@@ -19,9 +31,37 @@ class _ViewEditCashRegisterScreenState
     extends State<ViewEditCashRegisterScreen> {
   bool isNew = true;
 
+  // ===== banner ========
+  bool _showBannerPurchase = false;
+  String _bannerMessagePurchase = '';
+
+  void _showTopBannerPurchase(String message) {
+    setState(() {
+      _showBannerPurchase = true;
+      _bannerMessagePurchase = message;
+    });
+  }
+
+  void _closeBannerPurchase() {
+    setState(() {
+      _showBannerPurchase = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // load Purchases
+    context.read<PurchaseListBloc>().add(
+      LoadPurchasesListEvent(AppEventSource.list),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    //final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    final cashRegister = widget.cashRegister;
+    final registerDate = AppUtils.formatDate(cashRegister.registerDate);
 
     return AppScaffold(
       appBar: AppBarCustom(
@@ -67,7 +107,7 @@ class _ViewEditCashRegisterScreenState
                           'Fecha:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Text(today),
+                        Text(registerDate),
                       ],
                     ),
                   ),
@@ -84,12 +124,14 @@ class _ViewEditCashRegisterScreenState
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
                           'Saldo Inicial:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Text('\$25000.00'),
+                        Text(
+                          '\$ ${AppUtils.formatDouble(cashRegister.openingAmount)}',
+                        ),
                       ],
                     ),
                   ),
@@ -101,12 +143,19 @@ class _ViewEditCashRegisterScreenState
 
             // ExpansionPanelList.radio con primer panel abierto por defecto
             ExpansionPanelList.radio(
-              initialOpenPanelValue: 0, // <-- Aquí se abre el primer panel
+              initialOpenPanelValue: 1,
+              expansionCallback: (index, isExpanded) {
+                if (isExpanded) {
+                  print("Panel $index abierto");
+                } else {
+                  print("Panel $index cerrado");
+                }
+              },
               children: [
                 ExpansionPanelRadio(
                   value: 0,
                   headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: AppTitle(text: 'Ventas del día')),
+                      const ListTile(title: AppTitle(text: 'Ventas')),
                   body: Padding(
                     padding: const EdgeInsets.all(0),
                     child: Column(
@@ -153,16 +202,140 @@ class _ViewEditCashRegisterScreenState
                 ExpansionPanelRadio(
                   value: 1,
                   headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: Text('Compras')),
-                  body: const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text('Contenido de compras'),
+                      const ListTile(title: AppTitle(text: 'Compras')),
+
+                  body: Padding(
+                    padding: EdgeInsets.all(0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        AppButton(
+                          title: 'Agregar Compra',
+                          onPressed: () async {
+                            _closeBannerPurchase();
+                            final repoPaymentMethod = context
+                                .read<PaymentMethodListBloc>();
+                            final paymentMethod = await repoPaymentMethod
+                                .paymentMethodDao
+                                .getPaymentMethodByName('Efectivo');
+
+                            Navigator.pushNamed(
+                              context,
+                              'new-purchase',
+                              arguments: {
+                                'defaultSelectedPaymentMethod': paymentMethod,
+                                'cashRegisterId': cashRegister.id,
+                              },
+                            );
+                          },
+                        ),
+                        if (_showBannerPurchase)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AppTopBanner(
+                              message: _bannerMessagePurchase,
+                              type: AppBannerType.success,
+                              onClose: _closeBannerPurchase,
+                            ),
+                          ),
+                        MultiBlocListener(
+                          listeners: [
+                            // Listener del bloc de creación/edición/eliminación
+                            BlocListener<PurchaseCrudBloc, PurchaseCrudState>(
+                              listener: (context, state) {
+                                if (state is PurchaseDeletionSuccess) {
+                                  context.read<PurchaseListBloc>().add(
+                                    LoadPurchasesListEvent(AppEventSource.list),
+                                  );
+                                }
+                              },
+                            ),
+
+                            // Listener de la lista
+                            BlocListener<PurchaseListBloc, PurchaseListState>(
+                              listener: (context, state) {
+                                if (state is PurchaseListLoadSuccess) {
+                                  if (state.eventSource ==
+                                      AppEventSource.create) {
+                                    _showTopBannerPurchase(
+                                      'Compra creada con éxito',
+                                    );
+                                  } else if (state.eventSource ==
+                                      AppEventSource.update) {
+                                    _showTopBannerPurchase(
+                                      'Compra actualizada con éxito',
+                                    );
+                                  } else if (state.eventSource ==
+                                      AppEventSource.delete) {
+                                    _showTopBannerPurchase(
+                                      'Compra eliminada con éxito',
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                          ],
+                          child:
+                              BlocBuilder<PurchaseListBloc, PurchaseListState>(
+                                builder: (context, state) {
+                                  if (state is PurchaseListLoading) {
+                                    return AppLoadingScreen(
+                                      message: AppMessages.getPurchaseMessage(
+                                        'messageLoadingPurchase',
+                                      ),
+                                    );
+                                  } else if (state is PurchaseListLoadSuccess) {
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: state.products.length,
+                                      itemBuilder: (context, index) {
+                                        final purchase = state.products[index];
+                                        return AppListItem(
+                                          title: Text(
+                                            purchase.aliasProductName,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          description: Text(
+                                            'Cantidad ${purchase.quantity}',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          price: purchase.totalCost,
+                                          onEdit: () {},
+                                          onDelete: () {
+                                            _showDeleteConfirmationPurchase(
+                                              context,
+                                              purchase.id,
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  } else if (state is PurchaseListLoadFailure) {
+                                    return const Center(
+                                      child: Text('Error al cargar compras'),
+                                    );
+                                  } else {
+                                    return const Center(
+                                      child: Text('Estado desconocido'),
+                                    );
+                                  }
+                                },
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 ExpansionPanelRadio(
                   value: 2,
                   headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: Text('Gastos')),
+                      const ListTile(title: AppTitle(text: 'Gastos')),
                   body: const Padding(
                     padding: EdgeInsets.all(16),
                     child: Text('Contenido de compras'),
@@ -171,7 +344,7 @@ class _ViewEditCashRegisterScreenState
                 ExpansionPanelRadio(
                   value: 3,
                   headerBuilder: (context, isExpanded) =>
-                      const ListTile(title: Text('Ingresos Varios')),
+                      const ListTile(title: AppTitle(text: 'Ingresos Varios')),
                   body: const Padding(
                     padding: EdgeInsets.all(16),
                     child: Text('Contenido de otros gastos'),
@@ -179,12 +352,11 @@ class _ViewEditCashRegisterScreenState
                 ),
                 ExpansionPanelRadio(
                   value: 4,
-                  headerBuilder: (context, isExpanded) => const ListTile(
-                    title: Text('Productos dañados, robados, perdidos, etc.'),
-                  ),
+                  headerBuilder: (context, isExpanded) =>
+                      const ListTile(title: AppTitle(text: 'Pérdidas')),
                   body: const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text('Contenido de otros gastos'),
+                    padding: EdgeInsets.symmetric(vertical: 0),
+                    child: Text('Productos dañados, robados, perdidos, etc.'),
                   ),
                 ),
               ],
@@ -192,6 +364,27 @@ class _ViewEditCashRegisterScreenState
           ],
         ),
       ),
+    );
+  }
+
+  void _showDeleteConfirmationPurchase(BuildContext context, int purchaseId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppAlertDialog(
+          title: '¿Seguro que deseas eliminar esta venta?',
+          content: 'Esta acción no se puede deshacer.',
+          onCancel: () {
+            // close dialog
+          },
+          onConfirm: () {
+            // Acción de confirmar
+            context.read<PurchaseCrudBloc>().add(
+              DeletePurchaseEvent(purchaseId),
+            );
+          },
+        );
+      },
     );
   }
 }

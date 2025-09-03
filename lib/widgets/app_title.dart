@@ -24,7 +24,7 @@ class AppTitle extends StatelessWidget {
         style:
             style ??
             TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.onSurface,
             ),

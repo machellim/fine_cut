@@ -15,9 +15,10 @@ class CategoryDao extends DatabaseAccessor<AppDatabase>
   CategoryDao(this.db) : super(db);
 
   Future<List<Category>> getAllCategories() {
-    return (select(
-      categories,
-    )..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
+    return (select(categories)
+          ..limit(AppConstants.listResultsLimit)
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+        .get();
   }
 
   Future<Category?> getById(int id) {

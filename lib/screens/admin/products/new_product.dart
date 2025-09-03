@@ -5,6 +5,7 @@ import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart
 import 'package:fine_cut/bloc/category/search_categories/search_categories_bloc.dart';
 import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
@@ -149,7 +150,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
           FocusScope.of(context).requestFocus(FocusNode());
         },
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+          padding: AppConstants.screenPadding,
           children: [
             Form(
               key: _formKey,

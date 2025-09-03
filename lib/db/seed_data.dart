@@ -6,7 +6,7 @@ import 'package:drift/drift.dart';
 Future<void> insertInitialData(AppDatabase db) async {
   // Insert unit types if they don't exist
   // Example:Units
-  final unitExists = await (db.select(
+  /*final unitExists = await (db.select(
     db.units,
   )..where((u) => u.name.equals('Unidades'))).getSingleOrNull();
   if (unitExists == null) {
@@ -49,7 +49,7 @@ Future<void> insertInitialData(AppDatabase db) async {
     await db
         .into(db.units)
         .insert(UnitsCompanion.insert(name: 'Onzas', symbol: 'oz'));
-  }
+  }*/
 
   // Insert payment methods if they don't exist
   final cashExists = await (db.select(

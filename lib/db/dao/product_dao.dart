@@ -15,7 +15,14 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   ProductDao(this.db) : super(db);
 
   Future<List<Product>> getAllProducts() {
-    return (select(products)..orderBy([(t) => OrderingTerm.asc(t.name)])).get();
+    return (select(products)
+          ..limit(AppConstants.listResultsLimit)
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+        .get();
+  }
+
+  Future<Product?> getById(int id) {
+    return (select(products)..where((c) => c.id.equals(id))).getSingleOrNull();
   }
 
   Future<bool> _isNameTaken(String name, {int? excludeId}) async {

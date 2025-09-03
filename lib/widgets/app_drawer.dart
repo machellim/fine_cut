@@ -161,31 +161,6 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, 'payment-method-list');
             },
           ),
-          ListTile(
-            leading: Icon(
-              Icons.straighten_outlined,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            title: Text('Unidades de Medida', style: textStyle),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'sales-list');
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.link,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            title: Text(
-              'Asignar Unidades de Medida a Productos',
-              style: textStyle,
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, 'sales-list');
-            },
-          ),
           Divider(),
 
           // --- Sección: Gestión de Información ---

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AppConstants {
   // database name
   static const String databaseName = 'fine_cut.sqlite';
@@ -6,5 +8,11 @@ class AppConstants {
   static const int searchResultsLimit = 100;
 
   // limit results for listing
-  static const int listResultsLimit = 1000;
+  static const int listResultsLimit = 500;
+
+  // default padding for screens
+  static const EdgeInsets screenPadding = EdgeInsets.symmetric(
+    horizontal: 18.0,
+    vertical: 40.0,
+  );
 }

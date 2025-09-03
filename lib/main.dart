@@ -9,6 +9,9 @@ import 'package:fine_cut/bloc/payment_method/payment_method_crud/payment_method_
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
+import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
+import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
+import 'package:fine_cut/bloc/sale/sale_crud/sale_crud_bloc.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
@@ -62,6 +65,8 @@ class AppInitializer extends StatelessWidget {
           final cashRegisterDao = database.cashRegisterDao;
           final categoryDao = database.categoryDao;
           final productDao = database.productDao;
+          final purchaseDao = database.purchaseDao;
+          final saleDao = database.saleDao;
           return MultiRepositoryProvider(
             providers: [
               RepositoryProvider<AppDatabase>(create: (_) => database),
@@ -98,6 +103,15 @@ class AppInitializer extends StatelessWidget {
                 ),
                 BlocProvider<SearchCategoriesBloc>(
                   create: (_) => SearchCategoriesBloc(categoryDao: categoryDao),
+                ),
+                BlocProvider<PurchaseCrudBloc>(
+                  create: (_) => PurchaseCrudBloc(purchaseDao: purchaseDao),
+                ),
+                BlocProvider<SaleCrudBloc>(
+                  create: (_) => SaleCrudBloc(saleDao: saleDao),
+                ),
+                BlocProvider<PurchaseListBloc>(
+                  create: (_) => PurchaseListBloc(purchaseDao: purchaseDao),
                 ),
               ],
               child: FineCutApp(database: database),
@@ -194,7 +208,7 @@ class FineCutApp extends StatelessWidget {
             return MainCashRegisterScreen();
           } else {
             final cashRegister = snapshot.data!;
-            return ViewEditCashRegisterScreen();
+            return ViewEditCashRegisterScreen(cashRegister: cashRegister);
           }
         },
       ),

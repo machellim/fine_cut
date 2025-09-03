@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import '../database.dart';
 
@@ -14,9 +15,36 @@ class PaymentMethodDao extends DatabaseAccessor<AppDatabase>
   PaymentMethodDao(this.db) : super(db);
 
   Future<List<PaymentMethod>> getAllPaymentMethods() {
-    return (select(
-      paymentMethods,
-    )..orderBy([(t) => OrderingTerm.asc(t.displayOrder)])).get();
+    return (select(paymentMethods)
+          ..limit(AppConstants.listResultsLimit)
+          ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)]))
+        .get();
+  }
+
+  Future<List<PaymentMethod>> searchPaymentMethods(String query) {
+    final trimmedQuery = query.trim();
+
+    // Filter categories in the database
+    return (select(paymentMethods)
+          ..where(
+            (c) =>
+                c.name.lower().like('%${trimmedQuery.toLowerCase()}%') &
+                (c.status.equals(AppActiveStatus.active.name)),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.displayOrder)])
+          ..limit(AppConstants.searchResultsLimit))
+        .get();
+  }
+
+  Future<PaymentMethod?> getPaymentMethodByName(String query) {
+    final trimmedQuery = query.trim().toLowerCase();
+
+    return (select(paymentMethods)..where(
+          (c) =>
+              c.name.lower().equals(trimmedQuery) &
+              (c.status.equals(AppActiveStatus.active.name)),
+        ))
+        .getSingleOrNull();
   }
 
   Future<bool> _isNameTaken(String name, {int? excludeId}) async {

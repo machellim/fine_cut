@@ -3,6 +3,7 @@ import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart
 import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
 import 'package:fine_cut/bloc/category/category_crud/category_event.dart';
 import 'package:fine_cut/bloc/category/category_crud/category_state.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/widgets/app_button.dart';
@@ -82,7 +83,7 @@ class _NewCategoryScreenState extends State<NewCategoryScreen> {
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+          padding: AppConstants.screenPadding,
           children: [
             Form(
               key: _formKey,

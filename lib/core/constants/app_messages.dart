@@ -20,6 +20,18 @@ class AppMessages {
     'messageLoadingProducts': 'Cargando productos.',
   };
 
+  static const _saleMessages = {
+    'messageNewSaleScreen': 'Crear Nueva Venta',
+    'messageEditSaleScreen': 'Editar Venta',
+    'messageLoadingSales': 'Cargando ventas',
+  };
+
+  static const _purchaseMessages = {
+    'messageNewPurchaseScreen': 'Crear Nueva Compra',
+    'messageEditPurchaseScreen': 'Editar Compra',
+    'messageLoadingPurchase': 'Cargando compras',
+  };
+
   static const appMessages = {'emptyList': 'No hay información.'};
 
   static String getPaymentMethodMessage(String key) {
@@ -40,5 +52,13 @@ class AppMessages {
 
   static String getAppMessage(String key) {
     return appMessages[key] ?? 'mensaje no parametrizado';
+  }
+
+  static String getSaleMessage(String key) {
+    return _saleMessages[key] ?? 'mensaje no parametrizado';
+  }
+
+  static String getPurchaseMessage(String key) {
+    return _purchaseMessages[key] ?? 'mensaje no parametrizado';
   }
 }

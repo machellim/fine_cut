@@ -9,7 +9,7 @@ sealed class ProductsListState extends Equatable {
 
 final class ProductListInitial extends ProductsListState {}
 
-// load list of categories
+// load list of products
 class ProductsListLoading extends ProductsListState {}
 
 class ProductsListLoadSuccess extends ProductsListState {

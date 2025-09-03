@@ -10,12 +10,6 @@ class Sales extends Table {
       .named('product_id')
       .customConstraint('REFERENCES products(id) ON DELETE CASCADE')();
 
-  // Optional reference to unit used for the sale
-  IntColumn get unitId => integer()
-      .nullable()
-      .named('unit_id')
-      .customConstraint('REFERENCES units(id) ON DELETE SET NULL')();
-
   // Foreign key to the specific purchase (if applicable),
   // only to products that track stock (i.e., trackStock = false)
   IntColumn get purchaseId => integer()

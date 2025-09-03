@@ -16,6 +16,8 @@ enum AppEventSource {
 
   /// Executed after updating an existing record.
   update,
+
+  delete,
 }
 
 /// Enum to represent the action type when creating or updating a record

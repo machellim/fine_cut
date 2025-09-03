@@ -10,12 +10,6 @@ class Purchases extends Table {
       .named('product_id')
       .customConstraint('REFERENCES products(id) ON DELETE CASCADE')();
 
-  // Optional reference to unit used for the purchase
-  IntColumn get unitId => integer()
-      .nullable()
-      .named('unit_id')
-      .customConstraint('REFERENCES units(id) ON DELETE SET NULL')();
-
   // Reference to cash register for daily sales
   IntColumn get cashRegisterId => integer()
       .nullable()
@@ -28,10 +22,8 @@ class Purchases extends Table {
       .customConstraint('REFERENCES payment_methods(id) ON DELETE SET NULL')();
 
   //alias from product name
-  TextColumn get aliasProductName => text()
-      .withLength(min: 5, max: 300)
-      .named('alias_product_name')
-      .customConstraint('UNIQUE')();
+  TextColumn get aliasProductName =>
+      text().withLength(min: 1, max: 300).named('alias_product_name')();
 
   // Quantity purchased
   RealColumn get quantity =>
@@ -54,7 +46,7 @@ class Purchases extends Table {
   BoolColumn get isSoldOut =>
       boolean().named('is_sold_out').withDefault(const Constant(false))();
 
-  // Status: active/inactive (soft delete)
+  // Status: active/deleted (soft delete)
   TextColumn get status => text()
       .named('status')
       .withLength(min: 1, max: 50)
