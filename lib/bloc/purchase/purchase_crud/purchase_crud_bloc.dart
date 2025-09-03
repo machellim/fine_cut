@@ -58,7 +58,7 @@ class PurchaseCrudBloc extends Bloc<PurchaseCrudEvent, PurchaseCrudState> {
         final rowsUpdated = await purchaseDao.softDeletePurchase(
           event.purchaseId,
         );
-
+        //final rowsUpdated = 0;
         if (rowsUpdated > 0) {
           emit(
             PurchaseDeletionSuccess(message: 'Compra eliminada correctamente.'),

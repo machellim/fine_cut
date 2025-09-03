@@ -47,6 +47,12 @@ class PaymentMethodDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
   }
 
+  Future<PaymentMethod?> getById(int id) {
+    return (select(
+      paymentMethods,
+    )..where((c) => c.id.equals(id))).getSingleOrNull();
+  }
+
   Future<bool> _isNameTaken(String name, {int? excludeId}) async {
     final normalizedName = name.toLowerCase();
     final conflict =

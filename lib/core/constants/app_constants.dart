@@ -15,4 +15,7 @@ class AppConstants {
     horizontal: 18.0,
     vertical: 40.0,
   );
+
+  // grid padding
+  static const EdgeInsets gridPadding = EdgeInsets.only(bottom: 16.0);
 }

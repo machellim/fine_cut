@@ -35,8 +35,8 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
   PurchasesCompanion purchaseCompanion = PurchasesCompanion();
 
   bool isNewPurchase = true;
-  PaymentMethod? selectedPaymentMethod;
   Product? selectedProduct;
+  PaymentMethod? selectedPaymentMethod;
 
   @override
   void dispose() {
@@ -62,10 +62,9 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
       //final args = ModalRoute.of(context)?.settings.arguments as Purchase?;
       final args = ModalRoute.of(context)?.settings.arguments as Map;
       final purchase = (args['purchase']) as Purchase?;
+      selectedProduct = (args['selectedProduct']) as Product?;
+      selectedPaymentMethod = (args['selectedPaymentMethod']) as PaymentMethod?;
       final cashRegisterId = args['cashRegisterId'];
-      purchaseCompanion = purchaseCompanion.copyWith(
-        cashRegisterId: drift.Value(cashRegisterId),
-      );
 
       if (purchase != null) {
         purchaseCompanion = purchaseCompanion.copyWith(
@@ -81,6 +80,9 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
           isNewPurchase = false;
         });
       } else {
+        purchaseCompanion = purchaseCompanion.copyWith(
+          cashRegisterId: drift.Value(cashRegisterId),
+        );
         setState(() {
           selectedPaymentMethod =
               (args?['defaultSelectedPaymentMethod']) as PaymentMethod?;
@@ -117,7 +119,7 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
                       children: [
                         DropdownSearch<Product>(
                           key: dropDownProductKey,
-                          selectedItem: null,
+                          selectedItem: selectedProduct,
                           items: (filter, loadProps) async {
                             final repo = context.read<ProductsListBloc>();
                             return await repo.productDao.searchProducts(filter);

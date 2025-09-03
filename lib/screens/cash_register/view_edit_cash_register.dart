@@ -1,11 +1,13 @@
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
-import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
+import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/models/banner_state.dart';
 import 'package:fine_cut/widgets/app_alert_dialog.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_drawer.dart';
@@ -32,19 +34,23 @@ class _ViewEditCashRegisterScreenState
   bool isNew = true;
 
   // ===== banner ========
-  bool _showBannerPurchase = false;
-  String _bannerMessagePurchase = '';
-
-  void _showTopBannerPurchase(String message) {
+  BannerState _bannerPurchaseState = BannerState.initial();
+  void _showTopBannerPurchase(
+    String message, {
+    AppBannerType type = AppBannerType.success,
+  }) {
     setState(() {
-      _showBannerPurchase = true;
-      _bannerMessagePurchase = message;
+      _bannerPurchaseState = _bannerPurchaseState.copyWith(
+        show: true,
+        message: message,
+        type: type,
+      );
     });
   }
 
   void _closeBannerPurchase() {
     setState(() {
-      _showBannerPurchase = false;
+      _bannerPurchaseState = _bannerPurchaseState.copyWith(show: false);
     });
   }
 
@@ -157,7 +163,7 @@ class _ViewEditCashRegisterScreenState
                   headerBuilder: (context, isExpanded) =>
                       const ListTile(title: AppTitle(text: 'Ventas')),
                   body: Padding(
-                    padding: const EdgeInsets.all(0),
+                    padding: AppConstants.gridPadding,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -205,7 +211,7 @@ class _ViewEditCashRegisterScreenState
                       const ListTile(title: AppTitle(text: 'Compras')),
 
                   body: Padding(
-                    padding: EdgeInsets.all(0),
+                    padding: AppConstants.gridPadding,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -229,12 +235,12 @@ class _ViewEditCashRegisterScreenState
                             );
                           },
                         ),
-                        if (_showBannerPurchase)
+                        if (_bannerPurchaseState.show)
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: AppTopBanner(
-                              message: _bannerMessagePurchase,
-                              type: AppBannerType.success,
+                              message: _bannerPurchaseState.message,
+                              type: _bannerPurchaseState.type,
                               onClose: _closeBannerPurchase,
                             ),
                           ),
@@ -246,6 +252,12 @@ class _ViewEditCashRegisterScreenState
                                 if (state is PurchaseDeletionSuccess) {
                                   context.read<PurchaseListBloc>().add(
                                     LoadPurchasesListEvent(AppEventSource.list),
+                                  );
+                                }
+                                if (state is PurchaseDeletionFailure) {
+                                  _showTopBannerPurchase(
+                                    'Error al eliminar compra',
+                                    type: AppBannerType.error,
                                   );
                                 }
                               },
@@ -306,7 +318,39 @@ class _ViewEditCashRegisterScreenState
                                             ),
                                           ),
                                           price: purchase.totalCost,
-                                          onEdit: () {},
+                                          onEdit: () async {
+                                            _closeBannerPurchase();
+                                            // get selected product
+                                            final repoProduct = context
+                                                .read<ProductsListBloc>();
+                                            final selectedProduct =
+                                                await repoProduct.productDao
+                                                    .getById(
+                                                      purchase.productId,
+                                                    );
+
+                                            // get selected payment form
+                                            final repoPaymentMethod = context
+                                                .read<PaymentMethodListBloc>();
+                                            final selectedPaymentMethod =
+                                                await repoPaymentMethod
+                                                    .paymentMethodDao
+                                                    .getById(
+                                                      purchase.paymentMethodId,
+                                                    );
+
+                                            Navigator.pushNamed(
+                                              context,
+                                              'new-purchase',
+                                              arguments: {
+                                                'selectedProduct':
+                                                    selectedProduct,
+                                                'selectedPaymentMethod':
+                                                    selectedPaymentMethod,
+                                                'purchase': purchase,
+                                              },
+                                            );
+                                          },
                                           onDelete: () {
                                             _showDeleteConfirmationPurchase(
                                               context,
