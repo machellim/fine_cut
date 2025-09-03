@@ -77,4 +77,47 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
 
     return query.getSingleOrNull();
   }
+
+  Future<double> getTotalSalesByCashRegisterId(int cashRegisterId) async {
+    final totalSalesExp = db.sales.totalPrice.sum();
+
+    final query =
+        await (selectOnly(db.sales)
+              ..addColumns([totalSalesExp])
+              ..where(
+                db.sales.cashRegisterId.equals(cashRegisterId) &
+                    db.sales.status.equals(AppActiveStatus.active.name),
+              ))
+            .getSingle();
+
+    return query.read(totalSalesExp) ?? 0.0;
+  }
+
+  Future<double> getTotalPurchasesByCashRegisterId(int cashRegisterId) async {
+    final totalPurchasesExp = db.purchases.totalCost.sum();
+
+    final query =
+        await (selectOnly(db.purchases)
+              ..addColumns([totalPurchasesExp])
+              ..where(
+                db.purchases.cashRegisterId.equals(cashRegisterId) &
+                    db.purchases.status.equals(AppActiveStatus.active.name),
+              ))
+            .getSingle();
+
+    return query.read(totalPurchasesExp) ?? 0.0;
+  }
+
+  Future<double> getAvailableBalanceByCashRegisterId(int cashRegisterId) async {
+    final cashRegister = await (select(
+      cashRegisters,
+    )..where((tbl) => tbl.id.equals(cashRegisterId))).getSingle();
+
+    final totalSales = await getTotalSalesByCashRegisterId(cashRegisterId);
+    final totalPurchases = await getTotalPurchasesByCashRegisterId(
+      cashRegisterId,
+    );
+    // available balance
+    return cashRegister.openingAmount + totalSales - totalPurchases;
+  }
 }

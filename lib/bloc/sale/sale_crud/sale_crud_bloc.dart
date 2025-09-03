@@ -45,5 +45,20 @@ class SaleCrudBloc extends Bloc<SaleCrudEvent, SaleCrudState> {
         emit(SaleCreationFailure(message: 'Exception: Error al crear venta'));
       }
     });
+
+    on<DeleteSaleEvent>((event, emit) async {
+      try {
+        emit(SaleDeletionInProgress());
+        final rowsUpdated = await saleDao.softDeleteSale(event.saleId);
+        //final rowsUpdated = 0;
+        if (rowsUpdated > 0) {
+          emit(SaleDeletionSuccess(message: 'Venta eliminada correctamente.'));
+        } else {
+          emit(SaleDeletionFailure(message: 'No se encontró la venta.'));
+        }
+      } catch (e) {
+        emit(SaleDeletionFailure(message: 'Error al eliminar venta.'));
+      }
+    });
   }
 }

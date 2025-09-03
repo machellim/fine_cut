@@ -22,3 +22,13 @@ class CreateSaleEvent extends SaleCrudEvent {
   @override
   List<Object> get props => [recordAction, saleCompanion, selectedProduct];
 }
+
+// delete sale (soft delete)
+class DeleteSaleEvent extends SaleCrudEvent {
+  final int saleId;
+
+  const DeleteSaleEvent(this.saleId);
+
+  @override
+  List<Object> get props => [saleId];
+}

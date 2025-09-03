@@ -1,7 +1,9 @@
+import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
+import 'package:fine_cut/bloc/sale/sale_crud/sale_crud_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_list/sale_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
@@ -64,7 +66,7 @@ class _ViewEditCashRegisterScreenState
     AppBannerType type = AppBannerType.success,
   }) {
     setState(() {
-      _bannerPurchaseState = _bannerPurchaseState.copyWith(
+      _bannerSaleState = _bannerSaleState.copyWith(
         show: true,
         message: message,
         type: type,
@@ -74,13 +76,23 @@ class _ViewEditCashRegisterScreenState
 
   void _closeBannerSale() {
     setState(() {
-      _bannerPurchaseState = _bannerPurchaseState.copyWith(show: false);
+      _bannerSaleState = _bannerSaleState.copyWith(show: false);
     });
+  }
+
+  void _loadAvailableBalance() {
+    context.read<AvailableBalanceBloc>().add(
+      LoadAvailableBalanceEvent(widget.cashRegister.id),
+    );
   }
 
   @override
   void initState() {
     super.initState();
+
+    // load available balance
+    _loadAvailableBalance();
+
     // load Purchases
     context.read<PurchaseListBloc>().add(
       LoadPurchasesListEvent(AppEventSource.list),
@@ -125,8 +137,8 @@ class _ViewEditCashRegisterScreenState
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(12.0),
-                    margin: const EdgeInsets.only(right: 8.0),
+                    padding: const EdgeInsets.all(4.0),
+                    margin: const EdgeInsets.only(right: 4.0),
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
@@ -137,7 +149,7 @@ class _ViewEditCashRegisterScreenState
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
-                          'Fecha:',
+                          'Fecha Caja:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(registerDate),
@@ -147,8 +159,8 @@ class _ViewEditCashRegisterScreenState
                 ),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(12.0),
-                    margin: const EdgeInsets.only(left: 8.0),
+                    padding: const EdgeInsets.all(4.0),
+                    margin: const EdgeInsets.only(left: 4.0),
                     decoration: BoxDecoration(
                       color: Theme.of(
                         context,
@@ -169,6 +181,45 @@ class _ViewEditCashRegisterScreenState
                     ),
                   ),
                 ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(4.0),
+                    margin: const EdgeInsets.only(left: 4.0),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Disponible:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        BlocBuilder<
+                          AvailableBalanceBloc,
+                          AvailableBalanceState
+                        >(
+                          builder: (context, state) {
+                            if (state is AvailableBalanceLoading) {
+                              return Text('Loading . .');
+                            } else if (state is AvailableBalanceLoadSuccess) {
+                              return Text(
+                                '\$ ${AppUtils.formatDouble(state.availableBalance)}',
+                              );
+                            } else if (state is AvailableBalanceLoadFailure) {
+                              return Text('Error');
+                            } else {
+                              return Text('Desconocido');
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
 
@@ -179,10 +230,7 @@ class _ViewEditCashRegisterScreenState
               initialOpenPanelValue: 0,
               expansionCallback: (index, isExpanded) {
                 if (isExpanded) {
-                  print("Panel $index abierto");
-                } else {
-                  print("Panel $index cerrado");
-                }
+                } else {}
               },
               children: [
                 ExpansionPanelRadio(
@@ -221,11 +269,33 @@ class _ViewEditCashRegisterScreenState
                             child: AppTopBanner(
                               message: _bannerSaleState.message,
                               type: _bannerSaleState.type,
-                              onClose: _closeBannerPurchase,
+                              onClose: _closeBannerSale,
                             ),
                           ),
                         MultiBlocListener(
                           listeners: [
+                            BlocListener<SaleCrudBloc, SaleCrudState>(
+                              listener: (context, state) {
+                                if (state is SaleDeletionSuccess) {
+                                  _loadAvailableBalance();
+                                  context.read<SaleListBloc>().add(
+                                    LoadSalesListEvent(AppEventSource.list),
+                                  );
+                                }
+                                if (state is SaleDeletionFailure) {
+                                  _showTopBannerPurchase(
+                                    'Error al eliminar venta',
+                                    type: AppBannerType.error,
+                                  );
+                                }
+                                if (state is SaleCreationSuccess) {
+                                  _loadAvailableBalance();
+                                }
+                                if (state is SaleUpdateSuccess) {
+                                  _loadAvailableBalance();
+                                }
+                              },
+                            ),
                             // List listener
                             BlocListener<SaleListBloc, SaleListState>(
                               listener: (context, state) {
@@ -290,9 +360,45 @@ class _ViewEditCashRegisterScreenState
                                               ),
                                             ),
                                             price: sale.totalPrice,
-                                            onEdit: () {},
+                                            onEdit: () async {
+                                              _closeBannerSale();
+                                              // get selected product
+                                              final repoProduct = context
+                                                  .read<ProductsListBloc>();
+                                              final selectedProduct =
+                                                  await repoProduct.productDao
+                                                      .getById(sale.productId);
 
-                                            onDelete: () {},
+                                              // get selected payment form
+                                              final repoPaymentMethod = context
+                                                  .read<
+                                                    PaymentMethodListBloc
+                                                  >();
+                                              final selectedPaymentMethod =
+                                                  await repoPaymentMethod
+                                                      .paymentMethodDao
+                                                      .getById(
+                                                        sale.paymentMethodId,
+                                                      );
+
+                                              Navigator.pushNamed(
+                                                context,
+                                                'new-sale',
+                                                arguments: {
+                                                  'selectedProduct':
+                                                      selectedProduct,
+                                                  'selectedPaymentMethod':
+                                                      selectedPaymentMethod,
+                                                  'sale': sale,
+                                                },
+                                              );
+                                            },
+                                            onDelete: () {
+                                              _showDeleteConfirmationSale(
+                                                context,
+                                                sale.id,
+                                              );
+                                            },
                                           ),
                                         ],
                                       );
@@ -361,6 +467,7 @@ class _ViewEditCashRegisterScreenState
                             BlocListener<PurchaseCrudBloc, PurchaseCrudState>(
                               listener: (context, state) {
                                 if (state is PurchaseDeletionSuccess) {
+                                  _loadAvailableBalance();
                                   context.read<PurchaseListBloc>().add(
                                     LoadPurchasesListEvent(AppEventSource.list),
                                   );
@@ -370,6 +477,12 @@ class _ViewEditCashRegisterScreenState
                                     'Error al eliminar compra',
                                     type: AppBannerType.error,
                                   );
+                                }
+                                if (state is PurchaseCreationSuccess) {
+                                  _loadAvailableBalance();
+                                }
+                                if (state is PurchaseUpdateSuccess) {
+                                  _loadAvailableBalance();
                                 }
                               },
                             ),
@@ -537,7 +650,7 @@ class _ViewEditCashRegisterScreenState
       context: context,
       builder: (BuildContext context) {
         return AppAlertDialog(
-          title: '¿Seguro que deseas eliminar esta venta?',
+          title: '¿Seguro que deseas eliminar esta compra?',
           content: 'Esta acción no se puede deshacer.',
           onCancel: () {
             // close dialog
@@ -547,6 +660,25 @@ class _ViewEditCashRegisterScreenState
             context.read<PurchaseCrudBloc>().add(
               DeletePurchaseEvent(purchaseId),
             );
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationSale(BuildContext context, int saleId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppAlertDialog(
+          title: '¿Seguro que deseas eliminar esta venta?',
+          content: 'Esta acción no se puede deshacer.',
+          onCancel: () {
+            // close dialog
+          },
+          onConfirm: () {
+            // Acción de confirmar
+            context.read<SaleCrudBloc>().add(DeleteSaleEvent(saleId));
           },
         );
       },

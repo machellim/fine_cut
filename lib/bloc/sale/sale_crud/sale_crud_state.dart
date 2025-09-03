@@ -36,3 +36,18 @@ class SaleUpdateFailure extends SaleCrudState {
 
   const SaleUpdateFailure({required this.message});
 }
+
+// delete sale
+class SaleDeletionInProgress extends SaleCrudState {}
+
+class SaleDeletionSuccess extends SaleCrudState {
+  final String message;
+
+  const SaleDeletionSuccess({required this.message});
+}
+
+class SaleDeletionFailure extends SaleCrudState {
+  final String message;
+
+  const SaleDeletionFailure({required this.message});
+}

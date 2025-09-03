@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:fine_cut/bloc/bloc_observer.dart';
+import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
@@ -116,6 +117,10 @@ class AppInitializer extends StatelessWidget {
                 ),
                 BlocProvider<SaleListBloc>(
                   create: (_) => SaleListBloc(saleDao: saleDao),
+                ),
+                BlocProvider<AvailableBalanceBloc>(
+                  create: (_) =>
+                      AvailableBalanceBloc(cashRegisterDao: cashRegisterDao),
                 ),
               ],
               child: FineCutApp(database: database),

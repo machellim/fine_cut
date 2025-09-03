@@ -41,4 +41,10 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
           : -1; // retorna id actualizado o -1 si no existe
     }
   }
+
+  Future<int> softDeleteSale(int id) {
+    return (update(sales)..where((t) => t.id.equals(id))).write(
+      SalesCompanion(status: Value(RecordStatus.deleted)),
+    );
+  }
 }
