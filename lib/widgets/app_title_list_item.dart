@@ -10,7 +10,7 @@ class AppTitleListItem extends StatelessWidget {
   const AppTitleListItem({
     super.key,
     required this.text,
-    required this.status,
+    this.status = 'active', // valor por defecto
     this.style,
   });
 

@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart';
 import 'package:fine_cut/bloc/bloc_observer.dart';
 import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_can_edit/cash_register_can_edit_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_list/cash_register_list_bloc.dart';
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
 import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
 import 'package:fine_cut/bloc/category/search_categories/search_categories_bloc.dart';
@@ -128,6 +130,14 @@ class AppInitializer extends StatelessWidget {
                   create: (_) =>
                       CashRegisterCloseBloc(cashRegisterDao: cashRegisterDao),
                 ),
+                BlocProvider<CashRegisterListBloc>(
+                  create: (_) =>
+                      CashRegisterListBloc(cashRegisterDao: cashRegisterDao),
+                ),
+                BlocProvider<CashRegisterCanEditBloc>(
+                  create: (_) =>
+                      CashRegisterCanEditBloc(cashRegisterDao: cashRegisterDao),
+                ),
               ],
               child: FineCutApp(database: database),
             ),
@@ -158,7 +168,7 @@ class FineCutApp extends StatelessWidget {
       theme:
           ThemeData.from(
             colorScheme: ColorScheme.light(
-              primary: Colors.deepPurple,
+              primary: Colors.purple,
               onPrimary: Colors.white,
               secondary: Colors.deepPurpleAccent,
               onSecondary: Colors.white,
@@ -214,7 +224,7 @@ class FineCutApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: HomeWrapper(database: database),
       routes: appRoutes,
-      //onGenerateRoute: generateRoute,
+      onGenerateRoute: generateRoute,
     );
   }
 }

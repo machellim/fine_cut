@@ -28,22 +28,24 @@ class AppListItem extends StatelessWidget {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       leading: leading,
-      title: DefaultTextStyle(
-        style: textTheme.bodyLarge!.copyWith(color: colorScheme.onSurface),
-        child: title,
-      ),
-      subtitle: Column(
+      // 👇 Aquí todo se maneja en title
+      title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (description != null) description!,
-          if (date != null && date!.isNotEmpty) const SizedBox(height: 4),
-          if (date != null && date!.isNotEmpty)
+          DefaultTextStyle(
+            style: textTheme.bodyLarge!.copyWith(color: colorScheme.onSurface),
+            child: title,
+          ),
+          if (description != null) ...[const SizedBox(height: 4), description!],
+          if (date != null && date!.isNotEmpty) ...[
+            const SizedBox(height: 2),
             Text(
               "📅 $date",
               style: textTheme.bodySmall!.copyWith(
                 color: colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
+          ],
         ],
       ),
       trailing: Row(
@@ -54,7 +56,7 @@ class AppListItem extends StatelessWidget {
               "\$${price!.toStringAsFixed(2)}",
               style: textTheme.bodyMedium!.copyWith(
                 fontWeight: FontWeight.w500,
-                color: colorScheme.tertiary, // verde/azul adaptable
+                color: colorScheme.tertiary,
               ),
             ),
           const SizedBox(width: 8),
@@ -73,7 +75,6 @@ class AppListItem extends StatelessWidget {
         ],
       ),
       tileColor: colorScheme.surfaceContainerHighest,
-      // se adapta a claro/oscuro
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
   }

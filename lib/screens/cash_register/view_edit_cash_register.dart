@@ -156,9 +156,12 @@ class _ViewEditCashRegisterScreenState
           builder: (context, state) {
             if (state is CloseCashRegisterLoading) {
               return Center(
-                child: AppCircularProgressText(
-                  messageLoading: AppMessages.getCashRegistersMessage(
-                    'messageClosingCashRegister',
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 64),
+                  child: AppCircularProgressText(
+                    messageLoading: AppMessages.getCashRegistersMessage(
+                      'messageClosingCashRegister',
+                    ),
                   ),
                 ),
               );
@@ -396,13 +399,14 @@ class _ViewEditCashRegisterScreenState
                                                 title: Text(
                                                   sale.aliasProductName,
                                                   style: const TextStyle(
-                                                    fontSize: 14,
+                                                    fontSize: 16,
                                                   ),
                                                 ),
                                                 description: Text(
                                                   'Cantidad: ${sale.quantity}',
                                                   style: const TextStyle(
                                                     color: Colors.grey,
+                                                    fontSize: 14,
                                                   ),
                                                 ),
                                                 price: sale.totalPrice,

@@ -6,3 +6,15 @@ sealed class CashRegisterListEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+// reset
+
+// Event to load cash registers
+class LoadCashRegisterListEvent extends CashRegisterListEvent {
+  final AppEventSource eventSource;
+
+  const LoadCashRegisterListEvent(this.eventSource);
+
+  @override
+  List<Object> get props => [eventSource];
+}

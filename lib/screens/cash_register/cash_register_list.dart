@@ -1,12 +1,20 @@
 import 'package:drift/drift.dart' as drift;
+import 'package:fine_cut/bloc/cash_register/cash_register_can_edit/cash_register_can_edit_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_list/cash_register_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
+import 'package:fine_cut/core/enums/enums.dart';
+import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
 import 'package:fine_cut/widgets/app_button.dart';
+import 'package:fine_cut/widgets/app_circular_progress_text.dart';
+import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
+import 'package:fine_cut/widgets/app_title_list_item.dart';
+import 'package:fine_cut/widgets/app_top_banner.dart';
 import 'package:intl/intl.dart';
 
 import 'package:fine_cut/widgets/app_scaffold.dart';
@@ -22,71 +30,169 @@ class CashRegisterListScreen extends StatefulWidget {
 }
 
 class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-  late TextEditingController _registerDateController;
-  final _notesController = TextEditingController();
-  final _openingAmountController = TextEditingController();
-
-  bool isNew = true;
-
-  @override
-  void dispose() {
-    _registerDateController.dispose();
-    _openingAmountController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
-
   @override
   void initState() {
     super.initState();
-    final String today = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    _registerDateController = TextEditingController(text: today);
+
+    context.read<CashRegisterListBloc>().add(
+      LoadCashRegisterListEvent(AppEventSource.list),
+    );
   }
 
-  void goBack() {}
+  void _closeBanner() {
+    context.read<CashRegisterCanEditBloc>().add(
+      ResetCashRegisterCanEditEvent(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      appBar: AppBarCustom(title: isNew ? '' : ''),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: ListView(
-          padding: AppConstants.screenPadding,
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  AppTextField(
-                    label: 'Fecha',
-                    controller: _registerDateController,
-                    readOnly: true,
-                    prefixIcon: Icons.calendar_today,
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Por favor ingrese la fecha.'
-                        : null,
-                  ),
-                  const SizedBox(height: 20),
-                  AppTextField(
-                    label: 'Saldo Inicial',
-                    controller: _openingAmountController,
-                    prefixIcon: Icons.monetization_on_outlined,
-                    readOnly: true,
-                    //enabled: false,
-                    validator: (value) => (value == null || value.isEmpty)
-                        ? 'Please enter your username'
-                        : null,
-                  ),
-                  const SizedBox(height: 20),
-                  AppButton(title: '', onPressed: () {}),
-                ],
+      appBar: AppBarCustom(title: 'Historial de Cajas'),
+      body: BlocConsumer<CashRegisterListBloc, CashRegisterListState>(
+        listener: (context, state) {
+          // TODO: implement listener
+        },
+        builder: (context, state) {
+          if (state is CashRegisterListLoading) {
+            return AppLoadingScreen(
+              message: AppMessages.getCashRegistersMessage(
+                'messageLoadingCashRegisters',
               ),
-            ),
-          ],
-        ),
+            );
+          } else if (state is CashRegisterListLoadSuccess) {
+            return Column(
+              children: [
+                BlocConsumer<CashRegisterCanEditBloc, CashRegisterCanEditState>(
+                  listener: (context, state) => {
+                    if (state is CashRegisterEditCheckLoadSuccess)
+                      {
+                        Navigator.pushNamed(
+                          context,
+                          'view-edit-cash-register',
+                          arguments: state.cashRegister,
+                        ),
+                      },
+                  },
+                  builder: (context, state) {
+                    if (state is CashRegisterEditCheckLoading) {
+                      return AppCircularProgressText(
+                        messageLoading: AppMessages.getCashRegistersMessage(
+                          'messageLoadingEditCashRegister',
+                        ),
+                      );
+                    } else if (state is CashRegisterEditCheckLoadFailure) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: AppTopBanner(
+                          message: state.message,
+                          type: AppBannerType.error,
+                          onClose: _closeBanner,
+                        ),
+                      );
+                    } else {
+                      return Center();
+                    }
+                  },
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.cashRegisters.length,
+                    itemBuilder: (context, index) {
+                      final cashRegister = state.cashRegisters[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  AppUtils.formatDate(
+                                    cashRegister.registerDate,
+                                  ),
+                                ),
+                                if (cashRegister.status ==
+                                    CashRegisterStatus.open)
+                                  Text(
+                                    ' (Abierta)',
+                                    style: (TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 12,
+                                    )),
+                                  )
+                                else
+                                  Text(
+                                    ' (Cerrada)',
+                                    style: (TextStyle(
+                                      color: Colors.redAccent,
+                                      fontSize: 12,
+                                    )),
+                                  ),
+                              ],
+                            ),
+                            subtitle: (cashRegister.notes?.isNotEmpty == true)
+                                ? Text(
+                                    cashRegister.notes!,
+                                    style: const TextStyle(color: Colors.grey),
+                                  )
+                                : null,
+                            leading: Icon(
+                              cashRegister.status == CashRegisterStatus.open
+                                  ? Icons
+                                        .lock_open // caja abierta
+                                  : Icons.lock, // caja cerrada
+                              color:
+                                  cashRegister.status == CashRegisterStatus.open
+                                  ? Colors
+                                        .green // verde si está abierta
+                                  : Colors.redAccent, // rojo si está cerrada
+                            ),
+                            trailing:
+                                (index == 0 ||
+                                    cashRegister.status ==
+                                        CashRegisterStatus.open)
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.edit),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                        tooltip: 'Editar',
+                                        onPressed: () {
+                                          context
+                                              .read<CashRegisterCanEditBloc>()
+                                              .add(
+                                                CashRegisterEditCheckEvent(
+                                                  cashRegister,
+                                                ),
+                                              );
+                                        },
+                                      ),
+                                    ],
+                                  )
+                                : null,
+                          ),
+                          Divider(
+                            color: Colors.grey, // Color de la línea
+                            thickness: 0.4, // Grosor de la línea
+                            indent: 4, // Espaciado desde la izquierda
+                            endIndent: 4, // Espaciado desde la derecha
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          } else if (state is CashRegisterListLoadFailure) {
+            return Center(child: Text(state.message));
+          } else {
+            return const Center(child: Text('Estado desconocido'));
+          }
+        },
       ),
     );
   }

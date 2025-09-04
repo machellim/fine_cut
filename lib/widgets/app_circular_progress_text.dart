@@ -20,8 +20,8 @@ class AppCircularProgressText extends StatelessWidget {
           Text(
             messageLoading,
             style: theme.textTheme.bodyMedium?.copyWith(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
               color: theme.colorScheme.onSurface, // ✔️ Se adapta al tema
             ),
           ),

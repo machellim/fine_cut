@@ -13,9 +13,9 @@ final class CashRegisterCrudInitial extends CashRegisterCrudState {}
 class CreateCashRegisterLoading extends CashRegisterCrudState {}
 
 class CreateCashRegisterSuccess extends CashRegisterCrudState {
-  final CashRegister? cashRegister;
+  final CashRegisterResult? cashRegisterResult;
 
-  const CreateCashRegisterSuccess(this.cashRegister);
+  const CreateCashRegisterSuccess(this.cashRegisterResult);
 }
 
 class CreateCashRegisterFailure extends CashRegisterCrudState {

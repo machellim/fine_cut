@@ -2,6 +2,13 @@ enum AppActiveStatus { active, inactive }
 
 enum CashRegisterStatus { open, closed }
 
+enum CashRegisterError {
+  // cash register already exists
+  alreadyOpen,
+  // cash register already existed on the same date
+  sameDate,
+}
+
 enum RecordStatus { active, deleted }
 
 /// Defines the context from which an action is executed in the app.

@@ -1,7 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fine_cut/core/enums/enums.dart';
+import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/db/dao/cash_register_dao.dart';
 import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/models/cash_register_result.dart';
 
 part 'cash_register_crud_event.dart';
 part 'cash_register_crud_state.dart';
@@ -19,20 +22,31 @@ class CashRegisterCrudBloc
       emit(CreateCashRegisterLoading());
       //await Future.delayed(Duration(seconds: 3));
       try {
-        final cashRegister = await cashRegisterDao.createCashRegister(
+        final cashRegisterResult = await cashRegisterDao.createCashRegister(
           registerDateString: event.registerDate,
           openingAmount: event.openingAmount,
           notes: event.notes,
         );
-        if (cashRegister == null) {
-          emit(
-            CreateCashRegisterFailure(
-              message:
-                  'La Caja de la fecha ${event.registerDate} ya fue creada.',
-            ),
-          );
+        if (!cashRegisterResult.isSuccess) {
+          final cashRegister = cashRegisterResult.cashRegister!;
+
+          if (cashRegisterResult.error == CashRegisterError.alreadyOpen) {
+            emit(
+              CreateCashRegisterFailure(
+                message:
+                    'Existe una caja abierta en la fecha ${AppUtils.formatDate(cashRegister.registerDate)}, para poder crear una nueva primero debe cerrarse.',
+              ),
+            );
+          } else if (cashRegisterResult.error == CashRegisterError.sameDate) {
+            emit(
+              CreateCashRegisterFailure(
+                message:
+                    'La Caja de la fecha ${AppUtils.formatDate(cashRegister.registerDate)} ya fue creada.',
+              ),
+            );
+          }
         } else {
-          emit(CreateCashRegisterSuccess(cashRegister));
+          emit(CreateCashRegisterSuccess(cashRegisterResult));
         }
         //emit(CreateCashRegisterSuccess(null));
       } catch (e) {

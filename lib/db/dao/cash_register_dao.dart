@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/enums/enums.dart';
+import 'package:fine_cut/models/cash_register_result.dart';
 import 'package:intl/intl.dart';
 import '../database.dart';
 
@@ -15,9 +17,10 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
   CashRegisterDao(this.db) : super(db);
 
   Future<List<CashRegister>> getAllCashRegisters() {
-    return (select(
-      cashRegisters,
-    )..orderBy([(t) => OrderingTerm.desc(t.registerDate)])).get();
+    return (select(cashRegisters)
+          ..limit(AppConstants.listResultsLimit)
+          ..orderBy([(t) => OrderingTerm.desc(t.registerDate)]))
+        .get();
   }
 
   Future<double> getLastClosingAmount() async {
@@ -34,6 +37,7 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
 
   Future<Map<String, dynamic>> getDataLastCashRegister() async {
     final query = select(cashRegisters)
+      ..where((tbl) => tbl.status.equals(CashRegisterStatus.closed.name))
       ..orderBy([
         (t) =>
             OrderingTerm(expression: t.registerDate, mode: OrderingMode.desc),
@@ -52,12 +56,12 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  Future<CashRegister?> createCashRegister({
+  Future<CashRegisterResult> createCashRegister({
     required String registerDateString,
     required double openingAmount,
     String? notes,
   }) async {
-    // Parse date
+    // Parsear la fecha
     final dateFormat = DateFormat("dd-MM-yyyy");
     final parsedDate = dateFormat.parse(registerDateString);
 
@@ -68,14 +72,30 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
       parsedDate.day,
     );
 
+    // 1️⃣ Check if there is an open cash register
+    final openRegister =
+        await (select(cashRegisters)
+              ..where((tbl) => tbl.status.equals(CashRegisterStatus.open.name)))
+            .getSingleOrNull();
+
+    if (openRegister != null) {
+      return CashRegisterResult.failure(
+        CashRegisterError.alreadyOpen,
+        openRegister,
+      );
+    }
+
+    // 2️⃣ Check if a cash register already exists for the specified date
     final existing = await (select(
       cashRegisters,
     )..where((tbl) => tbl.registerDate.equals(dateOnly))).getSingleOrNull();
 
     if (existing != null) {
-      return null;
+      // Retornar error con la caja existente
+      return CashRegisterResult.failure(CashRegisterError.sameDate, existing);
     }
 
+    // 3️⃣ Create new cash register
     final companion = CashRegistersCompanion.insert(
       registerDate: Value(dateOnly),
       openingAmount: Value(openingAmount),
@@ -83,7 +103,9 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
       notes: Value(notes),
     );
 
-    return await into(cashRegisters).insertReturning(companion);
+    final newRegister = await into(cashRegisters).insertReturning(companion);
+
+    return CashRegisterResult.success(newRegister);
   }
 
   Future<CashRegister?> getLastOpenCashRegister() {
@@ -153,5 +175,16 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
         status: Value(CashRegisterStatus.closed),
       ),
     );
+  }
+
+  Future<bool> isLastCreated(CashRegister cashRegister) async {
+    final lastRegister =
+        await (select(cashRegisters)
+              ..orderBy([(t) => OrderingTerm.desc(t.registerDate)])
+              ..limit(1))
+            .getSingleOrNull();
+
+    if (lastRegister == null) return false;
+    return lastRegister.id == cashRegister.id;
   }
 }

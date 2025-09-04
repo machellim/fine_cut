@@ -102,7 +102,11 @@ class _CategoriesListScreenState extends State<CategoriesListScreen> {
                               status: state.categories[index].status.name,
                             ),
                             description:
-                                state.categories[index].description != null
+                                state
+                                        .categories[index]
+                                        .description
+                                        ?.isNotEmpty ==
+                                    true
                                 ? AppDescriptionListItem(
                                     text: state.categories[index].description!,
                                     status: state.categories[index].status.name,
