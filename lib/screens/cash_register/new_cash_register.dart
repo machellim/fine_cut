@@ -42,8 +42,7 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
   @override
   void initState() {
     super.initState();
-    final String today = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    _registerDateController = TextEditingController(text: today);
+    _registerDateController = TextEditingController();
 
     context.read<CashRegisterDataBloc>().add(LoadDataCashRegisterEvent());
   }
@@ -66,6 +65,9 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
             final lastClosingAmount = state.lastClosingAmount;
             final nextRegisterDate = state.nextRegisterDate;
             _openingAmountController.text = state.lastClosingAmount.toString();
+            _registerDateController.text = AppUtils.formatDate(
+              nextRegisterDate,
+            );
             return GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
               child: ListView(
@@ -88,7 +90,7 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                         AppDateField(
                           label: "Fecha de la caja",
                           controller: _registerDateController,
-                          initialDate: nextRegisterDate,
+                          //initialDate: nextRegisterDate,
                           firstDate: DateTime.now().subtract(
                             const Duration(days: 30),
                           ),

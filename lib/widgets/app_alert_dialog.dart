@@ -25,20 +25,27 @@ class AppAlertDialog extends StatelessWidget {
       backgroundColor: isDark ? Colors.grey[900] : Colors.white,
       title: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
-        maxLines: 2,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: textColor,
+          fontSize: 16,
+        ),
+        maxLines: 3,
         overflow: TextOverflow.ellipsis,
         softWrap: true,
       ),
       content: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.info_outline, color: iconColor),
           const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              content,
-              style: TextStyle(color: textColor),
-              overflow: TextOverflow.ellipsis,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Text(
+                content,
+                style: TextStyle(color: textColor),
+                softWrap: true,
+              ),
             ),
           ),
         ],
