@@ -65,9 +65,12 @@ class NewSaleScreenState extends State<NewSaleScreen> {
       cashRegisterId = args['cashRegisterId'];
 
       // trigger evento to Parent Product when is edit
-      context.read<SaleParentProductBloc>().add(
-        GetParentProductEvent(selectedProduct!),
-      );
+      if (selectedProduct != null) {
+        context.read<SaleParentProductBloc>().add(
+          GetParentProductEvent(selectedProduct!),
+        );
+      }
+      // remove purchaseId if it is not a subproduct
 
       if (sale != null) {
         saleCompanion = saleCompanion.copyWith(
@@ -79,6 +82,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
         _saleQuantityController.text = sale.quantity.toString();
         _saleTotalPriceController.text = sale.totalPrice.toString();
         _notesController.text = sale.notes ?? '';
+
         setState(() {
           isNewSale = false;
         });
@@ -189,10 +193,19 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                           ),
                         ),
                         // Parent Product
-                        BlocBuilder<
+                        BlocConsumer<
                           SaleParentProductBloc,
                           SaleParentProductState
                         >(
+                          listener: (context, state) => {
+                            if (state is SaleParentProductInitial)
+                              {
+                                print('*****'),
+                                saleCompanion = saleCompanion.copyWith(
+                                  purchaseId: drift.Value(null),
+                                ),
+                              },
+                          },
                           builder: (context, state) {
                             if (state is GetParentProductLoading) {
                               return AppCircularProgressText(

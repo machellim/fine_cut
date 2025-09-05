@@ -37,11 +37,10 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
     RecordAction recordAction,
     Product selectedProduct,
   ) async {
+    saleCompanion = saleCompanion.copyWith(
+      aliasProductName: Value(selectedProduct.name),
+    );
     if (recordAction == RecordAction.create) {
-      saleCompanion = saleCompanion.copyWith(
-        aliasProductName: Value(selectedProduct.name),
-      );
-
       return into(sales).insert(saleCompanion);
     } else {
       final id = saleCompanion.id.value;
