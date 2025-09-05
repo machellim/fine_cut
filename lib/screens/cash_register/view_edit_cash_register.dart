@@ -373,8 +373,8 @@ class _ViewEditCashRegisterScreenState
                                 builder: (context, state) {
                                   if (state is SaleListLoading) {
                                     return AppLoadingScreen(
-                                      message: AppMessages.getPurchaseMessage(
-                                        'messageLoadingPurchase',
+                                      message: AppMessages.getSaleMessage(
+                                        'messageLoadingSales',
                                       ),
                                     );
                                   } else if (state is SaleListLoadSuccess) {
@@ -435,6 +435,21 @@ class _ViewEditCashRegisterScreenState
                                                             sale.paymentMethodId,
                                                           );
 
+                                                  // check if the sale is from subproduct
+                                                  Purchase? selectedPurchase;
+                                                  if (sale.purchaseId != null) {
+                                                    final repoPurchase = context
+                                                        .read<
+                                                          PurchaseListBloc
+                                                        >();
+                                                    selectedPurchase =
+                                                        await repoPurchase
+                                                            .purchaseDao
+                                                            .getById(
+                                                              sale.purchaseId!,
+                                                            );
+                                                  }
+
                                                   Navigator.pushNamed(
                                                     context,
                                                     'new-sale',
@@ -444,6 +459,10 @@ class _ViewEditCashRegisterScreenState
                                                       'selectedPaymentMethod':
                                                           selectedPaymentMethod,
                                                       'sale': sale,
+                                                      'selectedPurchase':
+                                                          selectedPurchase,
+                                                      'cashRegisterId':
+                                                          cashRegister.id,
                                                     },
                                                   );
                                                 },
@@ -644,6 +663,8 @@ class _ViewEditCashRegisterScreenState
                                                   'selectedPaymentMethod':
                                                       selectedPaymentMethod,
                                                   'purchase': purchase,
+                                                  'cashRegisterId':
+                                                      cashRegister.id,
                                                 },
                                               );
                                             },

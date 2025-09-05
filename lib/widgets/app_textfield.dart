@@ -154,7 +154,7 @@ class _AppTextFieldState extends State<AppTextField> {
           widget.validator ??
           (widget.validate
               ? (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.trim().isEmpty) {
                     return widget.validationMessage ?? 'Campo requerido';
                   }
                   if (widget.minLength != null &&

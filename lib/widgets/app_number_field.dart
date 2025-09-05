@@ -11,6 +11,7 @@ class AppNumberField extends StatefulWidget {
   final Function(String)? onChanged;
   final String? suffixText;
   final String? prefixText;
+  final IconData? suffixIcon; // <-- solo IconData
 
   const AppNumberField({
     super.key,
@@ -23,6 +24,7 @@ class AppNumberField extends StatefulWidget {
     this.onChanged,
     this.suffixText,
     this.prefixText,
+    this.suffixIcon, // <-- inicialización
   });
 
   @override
@@ -58,6 +60,9 @@ class _AppNumberFieldState extends State<AppNumberField> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixText: widget.suffixText,
         prefixText: widget.prefixText,
+        suffixIcon: widget.suffixIcon != null
+            ? Icon(widget.suffixIcon, color: colorScheme.onSurface)
+            : null,
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [

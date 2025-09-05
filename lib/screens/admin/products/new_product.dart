@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart' as drift;
-import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
 import 'package:fine_cut/bloc/category/search_categories/search_categories_bloc.dart';
 import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
@@ -9,10 +8,8 @@ import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
-import 'package:fine_cut/db/tables/product_subproducts_table.dart';
 import 'package:fine_cut/widgets/app_bool_switch.dart';
 import 'package:fine_cut/widgets/app_button.dart';
-import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
 import 'package:fine_cut/widgets/app_string_switch.dart';
@@ -116,17 +113,6 @@ class _NewProductScreenState extends State<NewProductScreen> {
       Navigator.pop(context, true);
       context.read<ProductsListBloc>().add(LoadProductsListEvent(eventSource));
     });
-  }
-
-  FutureOr<List<Category>> fetchCategories(
-    String filter,
-    LoadProps? loadProps,
-  ) {
-    // Aquí haces la consulta, por ejemplo llamar al Bloc o filtrar localmente
-    final filteredCategories = AppDatabase().categoryDao.searchCategories(
-      filter,
-    );
-    return filteredCategories;
   }
 
   @override

@@ -3,11 +3,13 @@ import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_crud/sale_crud_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_list/sale_list_bloc.dart';
+import 'package:fine_cut/bloc/sale/sale_parent_product/sale_parent_product_bloc.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/widgets/app_button.dart';
+import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:fine_cut/widgets/app_number_field.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
@@ -25,6 +27,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
   final _formKey = GlobalKey<FormState>();
   final dropDownProductKey = GlobalKey<DropdownSearchState>();
   final dropDownPMKey = GlobalKey<DropdownSearchState>();
+  final dropDownParentProductKey = GlobalKey<DropdownSearchState>();
 
   // controllers
   final TextEditingController _saleQuantityController = TextEditingController();
@@ -37,6 +40,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
   bool isNewSale = true;
   Product? selectedProduct;
   PaymentMethod? selectedPaymentMethod;
+  Purchase? selectedPurchase;
   int? cashRegisterId;
 
   @override
@@ -57,7 +61,13 @@ class NewSaleScreenState extends State<NewSaleScreen> {
       final sale = (args['sale']) as Sale?;
       selectedProduct = (args['selectedProduct']) as Product?;
       selectedPaymentMethod = (args['selectedPaymentMethod']) as PaymentMethod?;
+      selectedPurchase = (args['selectedPurchase']) as Purchase?;
       cashRegisterId = args['cashRegisterId'];
+
+      // trigger evento to Parent Product when is edit
+      context.read<SaleParentProductBloc>().add(
+        GetParentProductEvent(selectedProduct!),
+      );
 
       if (sale != null) {
         saleCompanion = saleCompanion.copyWith(
@@ -138,6 +148,10 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                                 productId: drift.Value(selProduct.id),
                               );
                               selectedProduct = selProduct;
+
+                              context.read<SaleParentProductBloc>().add(
+                                GetParentProductEvent(selectedProduct!),
+                              );
                             }
                           },
                           validator: (value) =>
@@ -174,6 +188,102 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                             },
                           ),
                         ),
+                        // Parent Product
+                        BlocBuilder<
+                          SaleParentProductBloc,
+                          SaleParentProductState
+                        >(
+                          builder: (context, state) {
+                            if (state is GetParentProductLoading) {
+                              return AppCircularProgressText(
+                                messageLoading: 'Cargando productos padre.',
+                              );
+                            } else if (state is GetParentProductSuccess) {
+                              final subproductId = state.subproductId;
+                              return Column(
+                                children: [
+                                  const SizedBox(height: 30.0),
+                                  DropdownSearch<Purchase>(
+                                    key: dropDownParentProductKey,
+                                    selectedItem: selectedPurchase,
+                                    items: (filter, loadProps) async {
+                                      final repo = context.read<SaleListBloc>();
+                                      return await repo.saleDao
+                                          .getPurchasesSubproduct(
+                                            subproductId,
+                                            filter: filter,
+                                          );
+                                    },
+
+                                    itemAsString: (item) =>
+                                        item.aliasProductName,
+                                    compareFn: (item1, item2) =>
+                                        item1.id == item2.id,
+                                    onChanged: (selPurchase) {
+                                      if (selPurchase != null) {
+                                        saleCompanion = saleCompanion.copyWith(
+                                          purchaseId: drift.Value(
+                                            selPurchase.id,
+                                          ),
+                                        );
+                                        selectedPurchase = selPurchase;
+                                      }
+                                    },
+                                    validator: (value) =>
+                                        (value == null ||
+                                            value.aliasProductName.isEmpty)
+                                        ? 'Seleccione el producto principal.'
+                                        : null,
+                                    decoratorProps: DropDownDecoratorProps(
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            '🛍️ Eliga un producto principal',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8.0,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    popupProps: PopupProps.menu(
+                                      showSearchBox: true,
+                                      fit: FlexFit.loose,
+                                      constraints: BoxConstraints(
+                                        maxHeight: 200,
+                                      ),
+
+                                      errorBuilder:
+                                          (context, searchEntry, exception) {
+                                            return Center(
+                                              child: Text(
+                                                exception.toString(),
+                                                style: const TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                      emptyBuilder: (context, searchEntry) {
+                                        return const Center(
+                                          child: Text(
+                                            "No se encontraron productos",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else if (state is GetParentProductFailure) {
+                              return Center(child: Text(state.message));
+                            } else {
+                              return Center();
+                            }
+                          },
+                        ),
                         const SizedBox(height: 30.0),
                         AppNumberField(
                           controller: _saleQuantityController,
@@ -189,7 +299,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                         AppNumberField(
                           controller: _saleTotalPriceController,
                           label: 'Ingrese el precio de venta',
-                          suffixText: '\$ ',
+                          suffixIcon: Icons.monetization_on_outlined,
                           onSaved: (value) {
                             saleCompanion = saleCompanion.copyWith(
                               totalPrice: drift.Value(double.parse(value)),

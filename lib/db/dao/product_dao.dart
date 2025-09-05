@@ -64,6 +64,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     bool? trackStock,
     List<ProductSubproductsCompanion> subproducts = const [],
   }) async {
+    // Check if the name is already taken
     if (await _isNameTaken(name)) return null;
 
     return await transaction(() async {
@@ -79,11 +80,11 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
       final product = await into(products).insertReturning(productCompanion);
 
       // Insert subproducts if any
-      if (subproducts.isNotEmpty) {
+      if (hasSubProducts && subproducts.isNotEmpty) {
         final subproductCompanions = subproducts.map((sp) {
           return ProductSubproductsCompanion.insert(
             productId: product.id,
-            subproductId: sp.subproductId.value, // ya viene con Value()
+            subproductId: sp.subproductId.value,
           );
         }).toList();
 
@@ -96,36 +97,6 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     });
   }
 
-  /*Future<Product?> updateProduct({
-    required int id,
-    required int categoryId,
-    required String name,
-    required bool hasSubProducts,
-    String? description,
-    AppActiveStatus status = AppActiveStatus.active,
-    bool? trackStock,
-    List<ProductSubproductsCompanion> subproducts = const [],
-  }) async {
-    if (await _isNameTaken(name, excludeId: id)) return null;
-
-    final companion = ProductsCompanion(
-      categoryId: Value(categoryId),
-      name: Value(name),
-      hasSubProducts: Value(hasSubProducts),
-      description: Value(description),
-      status: Value(status),
-      trackStock: Value(trackStock ?? true),
-    );
-
-    await (update(
-      products,
-    )..where((tbl) => tbl.id.equals(id))).write(companion);
-
-    return await (select(
-      products,
-    )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
-  }*/
-
   Future<Product?> updateProduct({
     required int id,
     required int categoryId,
@@ -136,6 +107,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     bool? trackStock,
     List<ProductSubproductsCompanion> subproducts = const [],
   }) async {
+    // Check if the name is already taken (excluding current product ID)
     if (await _isNameTaken(name, excludeId: id)) return null;
 
     final companion = ProductsCompanion(
@@ -148,18 +120,17 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     );
 
     return await transaction(() async {
-      // Actualizar producto
+      // Update product
       await (update(
         products,
       )..where((tbl) => tbl.id.equals(id))).write(companion);
 
-      // Eliminar subproductos antiguos
       await (delete(
         db.productSubproducts,
       )..where((tbl) => tbl.productId.equals(id))).go();
 
-      // Insertar nuevos subproductos usando batch
-      if (subproducts.isNotEmpty) {
+      // If product supports subproducts, insert new ones
+      if (hasSubProducts && subproducts.isNotEmpty) {
         await batch((batch) {
           batch.insertAll(
             db.productSubproducts,
@@ -168,7 +139,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
         });
       }
 
-      // Retornar producto actualizado
+      // Return updated product
       return await (select(
         products,
       )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();

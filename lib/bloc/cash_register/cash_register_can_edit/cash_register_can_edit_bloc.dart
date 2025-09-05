@@ -18,7 +18,7 @@ class CashRegisterCanEditBloc
     on<CashRegisterEditCheckEvent>((event, emit) async {
       try {
         emit(CashRegisterEditCheckLoading());
-        await Future.delayed(Duration(seconds: 1));
+        //await Future.delayed(Duration(seconds: 1));
         final isEditable = await cashRegisterDao.isLastCreated(
           event.cashRegister,
         );

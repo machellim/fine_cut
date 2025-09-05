@@ -61,6 +61,14 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
               ),
             );
           } else if (state is CashRegisterListLoadSuccess) {
+            if (state.cashRegisters.isEmpty) {
+              return Center(
+                child: AppMessageType(
+                  message: AppMessages.getAppMessage('emptyList'),
+                  messageType: MessageType.info,
+                ),
+              );
+            }
             return Column(
               children: [
                 BlocConsumer<CashRegisterCanEditBloc, CashRegisterCanEditState>(

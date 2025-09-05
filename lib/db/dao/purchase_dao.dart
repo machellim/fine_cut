@@ -34,6 +34,10 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
+  Future<Purchase?> getById(int id) {
+    return (select(purchases)..where((c) => c.id.equals(id))).getSingleOrNull();
+  }
+
   Future<int> createOrUpdatePurchase(
     PurchasesCompanion purchaseCompanion,
     RecordAction recordAction,

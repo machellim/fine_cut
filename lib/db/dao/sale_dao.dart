@@ -59,4 +59,41 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
       SalesCompanion(status: Value(RecordStatus.deleted)),
     );
   }
+
+  Future<List<Purchase>> getPurchasesBySubproductId(int subproductId) async {
+    final query =
+        select(db.purchases).join([
+            innerJoin(
+              db.productSubproducts,
+              db.productSubproducts.productId.equalsExp(db.purchases.productId),
+            ),
+          ])
+          ..where(db.productSubproducts.subproductId.equals(subproductId))
+          ..where(db.purchases.isSoldOut.equals(false));
+    final results = await query.map((row) => row.readTable(db.purchases)).get();
+    return results;
+  }
+
+  Future<List<Purchase>> getPurchasesSubproduct(
+    int subproductId, {
+    String? filter,
+  }) async {
+    final query =
+        select(db.purchases).join([
+            innerJoin(
+              db.productSubproducts,
+              db.productSubproducts.productId.equalsExp(db.purchases.productId),
+            ),
+          ])
+          ..where(db.productSubproducts.subproductId.equals(subproductId))
+          ..where(db.purchases.isSoldOut.equals(false));
+
+    if (filter != null && filter.isNotEmpty) {
+      query.where(db.purchases.aliasProductName.like('%$filter%'));
+    }
+
+    final results = await query.map((row) => row.readTable(db.purchases)).get();
+
+    return results;
+  }
 }

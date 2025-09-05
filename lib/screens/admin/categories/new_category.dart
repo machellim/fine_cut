@@ -97,7 +97,7 @@ class _NewCategoryScreenState extends State<NewCategoryScreen> {
                     maxLength: 100,
                     onSaved: (value) {
                       categoryCompanion = categoryCompanion.copyWith(
-                        name: drift.Value(value),
+                        name: drift.Value(value.trim()),
                       );
                     },
                   ),

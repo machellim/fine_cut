@@ -189,7 +189,7 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
                         const SizedBox(height: 30.0),
                         AppNumberField(
                           controller: _totalPriceController,
-                          label: 'Ingrese el precio de venta',
+                          label: 'Ingrese el precio de compra',
                           suffixText: '\$ ',
                           onSaved: (value) {
                             purchaseCompanion = purchaseCompanion.copyWith(
