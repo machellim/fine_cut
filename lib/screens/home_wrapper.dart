@@ -1,3 +1,4 @@
+import 'package:fine_cut/core/enums/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
@@ -11,7 +12,9 @@ class HomeWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<CashRegister?>(
-      future: database.cashRegisterDao.getLastOpenCashRegister(),
+      future: database.cashRegisterDao.getLastCashRegisterByStatus(
+        CashRegisterStatus.open,
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(

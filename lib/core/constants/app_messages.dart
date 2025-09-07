@@ -12,6 +12,7 @@ class AppMessages {
     'messageErrorClosingCashRegister': 'Error al cerrar la caja.',
     'messageLoadingCashRegisters': 'Cargando historial de cajas.',
     'messageLoadingEditCashRegister': 'Editando Caja.',
+    'messageLoadingCashRegisterLastClosed': 'Obteniendo información.',
   };
 
   static const _categoryMessages = {

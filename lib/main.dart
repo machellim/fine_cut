@@ -5,6 +5,7 @@ import 'package:fine_cut/bloc/cash_register/cash_register_can_edit/cash_register
 import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_last_closed/cash_register_last_closed_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_list/cash_register_list_bloc.dart';
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
 import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
@@ -150,6 +151,11 @@ class AppInitializer extends StatelessWidget {
                 ),
                 BlocProvider<ParentProductSalesListBloc>(
                   create: (_) => ParentProductSalesListBloc(saleDao: saleDao),
+                ),
+                BlocProvider<CashRegisterLastClosedBloc>(
+                  create: (_) => CashRegisterLastClosedBloc(
+                    cashRegisterDao: cashRegisterDao,
+                  ),
                 ),
               ],
               child: FineCutApp(database: database),
