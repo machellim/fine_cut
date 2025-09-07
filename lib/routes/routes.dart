@@ -1,3 +1,4 @@
+import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/screens/admin/categories/categories_list.dart';
 import 'package:fine_cut/screens/admin/categories/new_category.dart';
@@ -10,6 +11,7 @@ import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/view_edit_cash_register.dart';
 import 'package:fine_cut/screens/purchases/new_purchase.dart';
+import 'package:fine_cut/screens/reports/parent_product_sales_list.dart';
 import 'package:fine_cut/screens/sales/new_sale.dart';
 import 'package:flutter/material.dart';
 
@@ -49,6 +51,9 @@ final Map<String, WidgetBuilder> appRoutes = {
   },
   'new-purchase': (BuildContext context) {
     return NewPurchaseScreen();
+  },
+  'parent-product-sales-list': (BuildContext context) {
+    return ParentProductSalesListScreen();
   },
 };
 

@@ -115,9 +115,9 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, 'cash-register-list');
             },
           ),
-          Divider(),
 
-          // --- Sección: Ventas & Compras ---
+          // --- Sección: Administración ---
+          Divider(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -164,9 +164,40 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, 'payment-method-list');
             },
           ),
+
+          // Sección Reportes
           Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.insert_chart_outlined,
+                  size: 20,
+                  color: Colors.grey[700],
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Reportes',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.attach_money,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Ventas productos principales', style: textStyle),
+            onTap: () async {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, 'parent-product-sales-list');
+            },
+          ),
 
           // --- Sección: Gestión de Información ---
+          Divider(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(

@@ -95,4 +95,8 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
 
     return results;
   }
+
+  Future<List<Sale>> getSalesByPurchaseId(int purchaseId) {
+    return (select(sales)..where((s) => s.purchaseId.equals(purchaseId))).get();
+  }
 }

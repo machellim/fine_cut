@@ -72,4 +72,20 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
       PurchasesCompanion(status: Value(RecordStatus.deleted)),
     );
   }
+
+  Future<List<Purchase>> getPurchasesWithSubproducts() async {
+    final query =
+        select(purchases).join([
+            innerJoin(
+              db.products,
+              db.products.id.equalsExp(purchases.productId),
+            ),
+          ])
+          ..where(db.products.hasSubProducts.equals(true))
+          ..limit(AppConstants.listResultsLimit);
+
+    final results = await query.map((row) => row.readTable(purchases)).get();
+
+    return results;
+  }
 }
