@@ -65,17 +65,6 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                     );
                   } else if (state is GetCashRegisterLastClosedLoadSuccess) {
                     final cashRegister = state.cashRegister;
-                    if (state.cashRegister == null) {
-                      return Expanded(
-                        flex: 1,
-                        child: Center(
-                          child: AppMessageType(
-                            message: AppMessages.getAppMessage('emptyList'),
-                            messageType: MessageType.info,
-                          ),
-                        ),
-                      );
-                    }
 
                     return Expanded(
                       flex: 1,

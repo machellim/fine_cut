@@ -24,7 +24,7 @@ class CashRegisterLastClosedBloc
         } else {
           emit(
             GetCashRegisterLastClosedLoadFailure(
-              message: 'No se encontró información.',
+              message: 'No se encontró información de la última caja.',
             ),
           );
         }

@@ -1,4 +1,6 @@
+import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
+import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fine_cut/db/database.dart';
@@ -40,9 +42,9 @@ class _ParentProductSalesListScreenState
           if (state is ParentProductPurchasesListSuccess) {
             if (state.purchases.isEmpty) {
               return Center(
-                child: Text(
-                  'No se encontraron compras.',
-                  style: theme.textTheme.titleMedium,
+                child: AppMessageType(
+                  message: AppMessages.getAppMessage('emptyList'),
+                  messageType: MessageType.info,
                 ),
               );
             }
