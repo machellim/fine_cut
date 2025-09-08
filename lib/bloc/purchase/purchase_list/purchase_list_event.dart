@@ -15,5 +15,5 @@ class LoadPurchasesListEvent extends PurchaseListEvent {
   const LoadPurchasesListEvent(this.eventSource, this.cashRegisterId);
 
   @override
-  List<Object> get props => [eventSource];
+  List<Object> get props => [eventSource, cashRegisterId];
 }

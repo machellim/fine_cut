@@ -14,14 +14,6 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
 
   PurchaseDao(this.db) : super(db);
 
-  Future<List<Purchase>> getAllPurchases() {
-    return (select(purchases)
-          ..where((t) => t.status.equals('active'))
-          ..limit(AppConstants.listResultsLimit)
-          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
-        .get();
-  }
-
   Future<List<Purchase>> getPurchasesByCashRegisterId(int cashRegisterId) {
     return (select(purchases)
           ..where(

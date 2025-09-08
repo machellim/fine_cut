@@ -1,5 +1,7 @@
 import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
+import 'package:fine_cut/bloc/expense/expense_crud/expense_crud_bloc.dart';
+import 'package:fine_cut/bloc/expense/expense_list/expense_list_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
@@ -83,6 +85,27 @@ class _ViewEditCashRegisterScreenState
     });
   }
 
+  // ===== banner sale ========
+  BannerState _bannerExpenseState = BannerState.initial();
+  void _showTopBannerExpense(
+    String message, {
+    AppBannerType type = AppBannerType.success,
+  }) {
+    setState(() {
+      _bannerExpenseState = _bannerExpenseState.copyWith(
+        show: true,
+        message: message,
+        type: type,
+      );
+    });
+  }
+
+  void _closeBannerExpense() {
+    setState(() {
+      _bannerExpenseState = _bannerExpenseState.copyWith(show: false);
+    });
+  }
+
   void _loadAvailableBalance() {
     context.read<AvailableBalanceBloc>().add(
       LoadAvailableBalanceEvent(widget.cashRegister.id),
@@ -104,6 +127,11 @@ class _ViewEditCashRegisterScreenState
     // load Purchases
     context.read<SaleListBloc>().add(
       LoadSalesListEvent(AppEventSource.list, widget.cashRegister.id),
+    );
+
+    // Load Expenses
+    context.read<ExpenseListBloc>().add(
+      LoadExpensesListEvent(AppEventSource.list, widget.cashRegister.id),
     );
   }
 
@@ -694,20 +722,166 @@ class _ViewEditCashRegisterScreenState
                         ),
                       ),
                     ),
+
                     ExpansionPanelRadio(
                       value: 2,
                       headerBuilder: (context, isExpanded) =>
                           const ListTile(title: AppTitle(text: 'Gastos')),
-                      body: const Padding(
+
+                      body: Padding(
                         padding: AppConstants.gridPadding,
-                        child: Text('Contenido de gastos'),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            AppButton(
+                              title: 'Agregar Gasto',
+                              onPressed: () async {
+                                _closeBannerExpense();
+                                Navigator.pushNamed(
+                                  context,
+                                  'new-expense',
+                                  arguments: {
+                                    'cashRegisterId': cashRegister.id,
+                                  },
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            if (_bannerExpenseState.show)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: AppTopBanner(
+                                  message: _bannerExpenseState.message,
+                                  type: _bannerExpenseState.type,
+                                  onClose: _closeBannerExpense,
+                                ),
+                              ),
+                            MultiBlocListener(
+                              listeners: [
+                                // Listener del bloc de creación/edición/eliminación
+                                BlocListener<ExpenseCrudBloc, ExpenseCrudState>(
+                                  listener: (context, state) {
+                                    if (state is ExpenseDeletionSuccess) {
+                                      _loadAvailableBalance();
+                                      context.read<ExpenseListBloc>().add(
+                                        LoadExpensesListEvent(
+                                          AppEventSource.list,
+                                          widget.cashRegister.id,
+                                        ),
+                                      );
+                                    }
+                                    if (state is ExpenseDeletionFailure) {
+                                      _showTopBannerExpense(
+                                        'Error al eliminar gasto',
+                                        type: AppBannerType.error,
+                                      );
+                                    }
+                                    if (state is ExpenseCreationSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                    if (state is ExpenseUpdateSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                  },
+                                ),
+
+                                // Listener de la lista
+                                BlocListener<ExpenseListBloc, ExpenseListState>(
+                                  listener: (context, state) {
+                                    if (state is ExpensesListLoadSuccess) {
+                                      if (state.eventSource ==
+                                          AppEventSource.create) {
+                                        _showTopBannerExpense(
+                                          'Gasto creado con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.update) {
+                                        _showTopBannerExpense(
+                                          'Gasto actualizado con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.delete) {
+                                        _showTopBannerExpense(
+                                          'Gasto eliminado con éxito',
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                              child: BlocBuilder<ExpenseListBloc, ExpenseListState>(
+                                builder: (context, state) {
+                                  if (state is ExpensesListLoading) {
+                                    return AppLoadingScreen(
+                                      message: AppMessages.getExpenseMessage(
+                                        'messageLoadingExpenses',
+                                      ),
+                                    );
+                                  } else if (state is ExpensesListLoadSuccess) {
+                                    if (state.expenses.isEmpty) {
+                                      return AppSimpleCenterText(
+                                        message: 'No hay información.',
+                                      );
+                                    } else {
+                                      return ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: state.expenses.length,
+                                        itemBuilder: (context, index) {
+                                          final expense = state.expenses[index];
+                                          return AppListItem(
+                                            title: Text(
+                                              expense.description,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            price: expense.amount,
+                                            onEdit: () async {
+                                              _closeBannerExpense();
+
+                                              Navigator.pushNamed(
+                                                context,
+                                                'new-expense',
+                                                arguments: {
+                                                  'expense': expense,
+                                                  'cashRegisterId':
+                                                      cashRegister.id,
+                                                },
+                                              );
+                                            },
+                                            onDelete: () {
+                                              _showDeleteConfirmationExpense(
+                                                context,
+                                                expense.id,
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }
+                                  } else if (state is PurchaseListLoadFailure) {
+                                    return const Center(
+                                      child: Text('Error al cargar compras'),
+                                    );
+                                  } else {
+                                    return const Center(
+                                      child: Text('Estado desconocido'),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+
                     ExpansionPanelRadio(
                       value: 3,
-                      headerBuilder: (context, isExpanded) => const ListTile(
-                        title: AppTitle(text: 'Ingresos Varios'),
-                      ),
+                      headerBuilder: (context, isExpanded) =>
+                          const ListTile(title: AppTitle(text: 'Ingresos')),
                       body: const Padding(
                         padding: AppConstants.gridPadding,
                         child: Text('Contenido de ingresos'),
@@ -768,6 +942,25 @@ class _ViewEditCashRegisterScreenState
           onConfirm: () {
             // Acción de confirmar
             context.read<SaleCrudBloc>().add(DeleteSaleEvent(saleId));
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationExpense(BuildContext context, int expenseId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppAlertDialog(
+          title: '¿Seguro que deseas eliminar este gasto?',
+          content: 'Esta acción no se puede deshacer.',
+          onCancel: () {
+            // close dialog
+          },
+          onConfirm: () {
+            // Acción de confirmar
+            context.read<ExpenseCrudBloc>().add(DeleteExpenseEvent(expenseId));
           },
         );
       },

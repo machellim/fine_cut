@@ -1708,18 +1708,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     requiredDuringInsert: false,
     $customConstraints: 'REFERENCES cash_registers(id) ON DELETE SET NULL',
   );
-  static const VerificationMeta _paymentMethodIdMeta = const VerificationMeta(
-    'paymentMethodId',
-  );
-  @override
-  late final GeneratedColumn<int> paymentMethodId = GeneratedColumn<int>(
-    'payment_method_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    $customConstraints: 'REFERENCES payment_methods(id) ON DELETE SET NULL',
-  );
   static const VerificationMeta _descriptionMeta = const VerificationMeta(
     'description',
   );
@@ -1811,7 +1799,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
   List<GeneratedColumn> get $columns => [
     id,
     cashRegisterId,
-    paymentMethodId,
     description,
     amount,
     notes,
@@ -1843,17 +1830,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
           _cashRegisterIdMeta,
         ),
       );
-    }
-    if (data.containsKey('payment_method_id')) {
-      context.handle(
-        _paymentMethodIdMeta,
-        paymentMethodId.isAcceptableOrUnknown(
-          data['payment_method_id']!,
-          _paymentMethodIdMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_paymentMethodIdMeta);
     }
     if (data.containsKey('description')) {
       context.handle(
@@ -1916,10 +1892,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         DriftSqlType.int,
         data['${effectivePrefix}cash_register_id'],
       ),
-      paymentMethodId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}payment_method_id'],
-      )!,
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}description'],
@@ -1965,7 +1937,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
 class Expense extends DataClass implements Insertable<Expense> {
   final int id;
   final int? cashRegisterId;
-  final int paymentMethodId;
   final String description;
   final double amount;
   final String? notes;
@@ -1976,7 +1947,6 @@ class Expense extends DataClass implements Insertable<Expense> {
   const Expense({
     required this.id,
     this.cashRegisterId,
-    required this.paymentMethodId,
     required this.description,
     required this.amount,
     this.notes,
@@ -1992,7 +1962,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     if (!nullToAbsent || cashRegisterId != null) {
       map['cash_register_id'] = Variable<int>(cashRegisterId);
     }
-    map['payment_method_id'] = Variable<int>(paymentMethodId);
     map['description'] = Variable<String>(description);
     map['amount'] = Variable<double>(amount);
     if (!nullToAbsent || notes != null) {
@@ -2017,7 +1986,6 @@ class Expense extends DataClass implements Insertable<Expense> {
       cashRegisterId: cashRegisterId == null && nullToAbsent
           ? const Value.absent()
           : Value(cashRegisterId),
-      paymentMethodId: Value(paymentMethodId),
       description: Value(description),
       amount: Value(amount),
       notes: notes == null && nullToAbsent
@@ -2040,7 +2008,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     return Expense(
       id: serializer.fromJson<int>(json['id']),
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
-      paymentMethodId: serializer.fromJson<int>(json['paymentMethodId']),
       description: serializer.fromJson<String>(json['description']),
       amount: serializer.fromJson<double>(json['amount']),
       notes: serializer.fromJson<String?>(json['notes']),
@@ -2058,7 +2025,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
-      'paymentMethodId': serializer.toJson<int>(paymentMethodId),
       'description': serializer.toJson<String>(description),
       'amount': serializer.toJson<double>(amount),
       'notes': serializer.toJson<String?>(notes),
@@ -2074,7 +2040,6 @@ class Expense extends DataClass implements Insertable<Expense> {
   Expense copyWith({
     int? id,
     Value<int?> cashRegisterId = const Value.absent(),
-    int? paymentMethodId,
     String? description,
     double? amount,
     Value<String?> notes = const Value.absent(),
@@ -2087,7 +2052,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     cashRegisterId: cashRegisterId.present
         ? cashRegisterId.value
         : this.cashRegisterId,
-    paymentMethodId: paymentMethodId ?? this.paymentMethodId,
     description: description ?? this.description,
     amount: amount ?? this.amount,
     notes: notes.present ? notes.value : this.notes,
@@ -2102,9 +2066,6 @@ class Expense extends DataClass implements Insertable<Expense> {
       cashRegisterId: data.cashRegisterId.present
           ? data.cashRegisterId.value
           : this.cashRegisterId,
-      paymentMethodId: data.paymentMethodId.present
-          ? data.paymentMethodId.value
-          : this.paymentMethodId,
       description: data.description.present
           ? data.description.value
           : this.description,
@@ -2124,7 +2085,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     return (StringBuffer('Expense(')
           ..write('id: $id, ')
           ..write('cashRegisterId: $cashRegisterId, ')
-          ..write('paymentMethodId: $paymentMethodId, ')
           ..write('description: $description, ')
           ..write('amount: $amount, ')
           ..write('notes: $notes, ')
@@ -2140,7 +2100,6 @@ class Expense extends DataClass implements Insertable<Expense> {
   int get hashCode => Object.hash(
     id,
     cashRegisterId,
-    paymentMethodId,
     description,
     amount,
     notes,
@@ -2155,7 +2114,6 @@ class Expense extends DataClass implements Insertable<Expense> {
       (other is Expense &&
           other.id == this.id &&
           other.cashRegisterId == this.cashRegisterId &&
-          other.paymentMethodId == this.paymentMethodId &&
           other.description == this.description &&
           other.amount == this.amount &&
           other.notes == this.notes &&
@@ -2168,7 +2126,6 @@ class Expense extends DataClass implements Insertable<Expense> {
 class ExpensesCompanion extends UpdateCompanion<Expense> {
   final Value<int> id;
   final Value<int?> cashRegisterId;
-  final Value<int> paymentMethodId;
   final Value<String> description;
   final Value<double> amount;
   final Value<String?> notes;
@@ -2179,7 +2136,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   const ExpensesCompanion({
     this.id = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
-    this.paymentMethodId = const Value.absent(),
     this.description = const Value.absent(),
     this.amount = const Value.absent(),
     this.notes = const Value.absent(),
@@ -2191,7 +2147,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   ExpensesCompanion.insert({
     this.id = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
-    required int paymentMethodId,
     required String description,
     this.amount = const Value.absent(),
     this.notes = const Value.absent(),
@@ -2199,12 +2154,10 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     this.expenseDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  }) : paymentMethodId = Value(paymentMethodId),
-       description = Value(description);
+  }) : description = Value(description);
   static Insertable<Expense> custom({
     Expression<int>? id,
     Expression<int>? cashRegisterId,
-    Expression<int>? paymentMethodId,
     Expression<String>? description,
     Expression<double>? amount,
     Expression<String>? notes,
@@ -2216,7 +2169,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
-      if (paymentMethodId != null) 'payment_method_id': paymentMethodId,
       if (description != null) 'description': description,
       if (amount != null) 'amount': amount,
       if (notes != null) 'notes': notes,
@@ -2230,7 +2182,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   ExpensesCompanion copyWith({
     Value<int>? id,
     Value<int?>? cashRegisterId,
-    Value<int>? paymentMethodId,
     Value<String>? description,
     Value<double>? amount,
     Value<String?>? notes,
@@ -2242,7 +2193,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     return ExpensesCompanion(
       id: id ?? this.id,
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
-      paymentMethodId: paymentMethodId ?? this.paymentMethodId,
       description: description ?? this.description,
       amount: amount ?? this.amount,
       notes: notes ?? this.notes,
@@ -2261,9 +2211,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     }
     if (cashRegisterId.present) {
       map['cash_register_id'] = Variable<int>(cashRegisterId.value);
-    }
-    if (paymentMethodId.present) {
-      map['payment_method_id'] = Variable<int>(paymentMethodId.value);
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
@@ -2296,7 +2243,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     return (StringBuffer('ExpensesCompanion(')
           ..write('id: $id, ')
           ..write('cashRegisterId: $cashRegisterId, ')
-          ..write('paymentMethodId: $paymentMethodId, ')
           ..write('description: $description, ')
           ..write('amount: $amount, ')
           ..write('notes: $notes, ')
@@ -6007,6 +5953,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final PurchaseDao purchaseDao = PurchaseDao(this as AppDatabase);
   late final SaleDao saleDao = SaleDao(this as AppDatabase);
+  late final ExpenseDao expenseDao = ExpenseDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6832,7 +6779,6 @@ typedef $$ExpensesTableCreateCompanionBuilder =
     ExpensesCompanion Function({
       Value<int> id,
       Value<int?> cashRegisterId,
-      required int paymentMethodId,
       required String description,
       Value<double> amount,
       Value<String?> notes,
@@ -6845,7 +6791,6 @@ typedef $$ExpensesTableUpdateCompanionBuilder =
     ExpensesCompanion Function({
       Value<int> id,
       Value<int?> cashRegisterId,
-      Value<int> paymentMethodId,
       Value<String> description,
       Value<double> amount,
       Value<String?> notes,
@@ -6871,11 +6816,6 @@ class $$ExpensesTableFilterComposer
 
   ColumnFilters<int> get cashRegisterId => $composableBuilder(
     column: $table.cashRegisterId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get paymentMethodId => $composableBuilder(
-    column: $table.paymentMethodId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6935,11 +6875,6 @@ class $$ExpensesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get paymentMethodId => $composableBuilder(
-    column: $table.paymentMethodId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get description => $composableBuilder(
     column: $table.description,
     builder: (column) => ColumnOrderings(column),
@@ -6990,11 +6925,6 @@ class $$ExpensesTableAnnotationComposer
 
   GeneratedColumn<int> get cashRegisterId => $composableBuilder(
     column: $table.cashRegisterId,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get paymentMethodId => $composableBuilder(
-    column: $table.paymentMethodId,
     builder: (column) => column,
   );
 
@@ -7054,7 +6984,6 @@ class $$ExpensesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
-                Value<int> paymentMethodId = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<double> amount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -7065,7 +6994,6 @@ class $$ExpensesTableTableManager
               }) => ExpensesCompanion(
                 id: id,
                 cashRegisterId: cashRegisterId,
-                paymentMethodId: paymentMethodId,
                 description: description,
                 amount: amount,
                 notes: notes,
@@ -7078,7 +7006,6 @@ class $$ExpensesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
-                required int paymentMethodId,
                 required String description,
                 Value<double> amount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -7089,7 +7016,6 @@ class $$ExpensesTableTableManager
               }) => ExpensesCompanion.insert(
                 id: id,
                 cashRegisterId: cashRegisterId,
-                paymentMethodId: paymentMethodId,
                 description: description,
                 amount: amount,
                 notes: notes,

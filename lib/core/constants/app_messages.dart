@@ -37,6 +37,12 @@ class AppMessages {
     'messageLoadingPurchase': 'Cargando compras',
   };
 
+  static const _expenseMessages = {
+    'messageLoadingExpenses': 'Cargando gastos',
+    'messageNewExpenseScreen': 'Crear Nuevo Gasto',
+    'messageEditExpenseScreen': 'Editando gasto',
+  };
+
   static const appMessages = {'emptyList': 'No hay información.'};
 
   static String getPaymentMethodMessage(String key) {
@@ -65,5 +71,9 @@ class AppMessages {
 
   static String getPurchaseMessage(String key) {
     return _purchaseMessages[key] ?? 'mensaje no parametrizado';
+  }
+
+  static String getExpenseMessage(String key) {
+    return _expenseMessages[key] ?? 'mensaje no parametrizado';
   }
 }

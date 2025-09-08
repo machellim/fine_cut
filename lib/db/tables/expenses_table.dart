@@ -11,11 +11,6 @@ class Expenses extends Table {
       .named('cash_register_id')
       .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
 
-  // Reference to payment method used
-  IntColumn get paymentMethodId => integer()
-      .named('payment_method_id')
-      .customConstraint('REFERENCES payment_methods(id) ON DELETE SET NULL')();
-
   // Expense description (e.g., "Electricity bill", "Transport")
   TextColumn get description =>
       text().withLength(min: 1, max: 1000).named('description')();
@@ -23,10 +18,6 @@ class Expenses extends Table {
   // Amount spent
   RealColumn get amount =>
       real().named('amount').withDefault(const Constant(0.0))();
-
-  // Optional notes
-  TextColumn get notes =>
-      text().nullable().named('notes').withLength(min: 0, max: 1000)();
 
   // Status: active/inactive (soft delete)
   TextColumn get status => text()
