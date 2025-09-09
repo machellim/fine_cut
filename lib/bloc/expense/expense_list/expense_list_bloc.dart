@@ -19,7 +19,7 @@ class ExpenseListBloc extends Bloc<ExpenseListEvent, ExpenseListState> {
         );
         emit(ExpensesListLoadSuccess(purchases, event.eventSource));
       } catch (e) {
-        emit(ExpensesListLoadFailure(message: 'Error al cargar las compras.'));
+        emit(ExpensesListLoadFailure(message: 'Error al cargar los gastos.'));
       }
     });
   }

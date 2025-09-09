@@ -10,7 +10,8 @@ import 'package:fine_cut/screens/cash_register/cash_register_list.dart';
 import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
 import 'package:fine_cut/screens/cash_register/view_edit_cash_register.dart';
-import 'package:fine_cut/screens/expeses/new_expense.dart';
+import 'package:fine_cut/screens/expenses/new_expense.dart';
+import 'package:fine_cut/screens/incomes/new_income.dart';
 import 'package:fine_cut/screens/purchases/new_purchase.dart';
 import 'package:fine_cut/screens/reports/parent_product_sales_list.dart';
 import 'package:fine_cut/screens/sales/new_sale.dart';
@@ -58,6 +59,9 @@ final Map<String, WidgetBuilder> appRoutes = {
   },
   'new-expense': (BuildContext context) {
     return NewExpenseScreen();
+  },
+  'new-income': (BuildContext context) {
+    return NewIncomeScreen();
   },
 };
 

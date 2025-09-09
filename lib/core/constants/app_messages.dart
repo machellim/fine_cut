@@ -43,6 +43,12 @@ class AppMessages {
     'messageEditExpenseScreen': 'Editando gasto',
   };
 
+  static const _incomeMessages = {
+    'messageLoadingIncomes': 'Cargando ingresos',
+    'messageNewIncomeScreen': 'Crear Nuevo Ingreso',
+    'messageEditIncomeScreen': 'Editando ingreso',
+  };
+
   static const appMessages = {'emptyList': 'No hay información.'};
 
   static String getPaymentMethodMessage(String key) {
@@ -75,5 +81,9 @@ class AppMessages {
 
   static String getExpenseMessage(String key) {
     return _expenseMessages[key] ?? 'mensaje no parametrizado';
+  }
+
+  static String getIncomeMessage(String key) {
+    return _incomeMessages[key] ?? 'mensaje no parametrizado';
   }
 }

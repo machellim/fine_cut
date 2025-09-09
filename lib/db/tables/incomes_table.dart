@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 
 class Incomes extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -12,7 +13,19 @@ class Incomes extends Table {
   // Amount of income
   RealColumn get amount => real()();
 
-  TextColumn get description => text().nullable()();
+  TextColumn get description =>
+      text().withLength(min: 1, max: 1000).named('description')();
+
+  // Status: active/deleted (soft delete)
+  TextColumn get status => text()
+      .named('status')
+      .withLength(min: 1, max: 50)
+      .map(const EnumNameConverter(RecordStatus.values))
+      .withDefault(Constant(RecordStatus.active.name))();
+
+  // Date of the income
+  DateTimeColumn get incomeDate =>
+      dateTime().named('income_date').withDefault(currentDateAndTime)();
 
   // Creation date, defaults to current date and time
   DateTimeColumn get createdAt =>

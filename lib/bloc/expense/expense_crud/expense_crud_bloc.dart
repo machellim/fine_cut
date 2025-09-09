@@ -18,12 +18,12 @@ class ExpenseCrudBloc extends Bloc<ExpenseCrudEvent, ExpenseCrudState> {
           event.recordAction,
         );
 
-        if (expenseId < 0) {
+        if (expenseId < 1) {
           if (event.recordAction == RecordAction.create) {
             emit(ExpenseCreationFailure(message: 'La compra no fue creada.'));
           } else {
             emit(
-              ExpenseCreationFailure(message: 'La compra no fue actualizada.'),
+              ExpenseUpdateFailure(message: 'La compra no fue actualizada.'),
             );
           }
         } else {

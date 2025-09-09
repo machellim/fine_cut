@@ -1733,19 +1733,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0.0),
   );
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
-  @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-    'notes',
-    aliasedName,
-    true,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 0,
-      maxTextLength: 1000,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
   @override
   late final GeneratedColumnWithTypeConverter<RecordStatus, String> status =
       GeneratedColumn<String>(
@@ -1801,7 +1788,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
     cashRegisterId,
     description,
     amount,
-    notes,
     status,
     expenseDate,
     createdAt,
@@ -1846,12 +1832,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
       context.handle(
         _amountMeta,
         amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
-      );
-    }
-    if (data.containsKey('notes')) {
-      context.handle(
-        _notesMeta,
-        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
     if (data.containsKey('expense_date')) {
@@ -1900,10 +1880,6 @@ class $ExpensesTable extends Expenses with TableInfo<$ExpensesTable, Expense> {
         DriftSqlType.double,
         data['${effectivePrefix}amount'],
       )!,
-      notes: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}notes'],
-      ),
       status: $ExpensesTable.$converterstatus.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -1939,7 +1915,6 @@ class Expense extends DataClass implements Insertable<Expense> {
   final int? cashRegisterId;
   final String description;
   final double amount;
-  final String? notes;
   final RecordStatus status;
   final DateTime expenseDate;
   final DateTime createdAt;
@@ -1949,7 +1924,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     this.cashRegisterId,
     required this.description,
     required this.amount,
-    this.notes,
     required this.status,
     required this.expenseDate,
     required this.createdAt,
@@ -1964,9 +1938,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     }
     map['description'] = Variable<String>(description);
     map['amount'] = Variable<double>(amount);
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
     {
       map['status'] = Variable<String>(
         $ExpensesTable.$converterstatus.toSql(status),
@@ -1988,9 +1959,6 @@ class Expense extends DataClass implements Insertable<Expense> {
           : Value(cashRegisterId),
       description: Value(description),
       amount: Value(amount),
-      notes: notes == null && nullToAbsent
-          ? const Value.absent()
-          : Value(notes),
       status: Value(status),
       expenseDate: Value(expenseDate),
       createdAt: Value(createdAt),
@@ -2010,7 +1978,6 @@ class Expense extends DataClass implements Insertable<Expense> {
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
       description: serializer.fromJson<String>(json['description']),
       amount: serializer.fromJson<double>(json['amount']),
-      notes: serializer.fromJson<String?>(json['notes']),
       status: $ExpensesTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
       ),
@@ -2027,7 +1994,6 @@ class Expense extends DataClass implements Insertable<Expense> {
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
       'description': serializer.toJson<String>(description),
       'amount': serializer.toJson<double>(amount),
-      'notes': serializer.toJson<String?>(notes),
       'status': serializer.toJson<String>(
         $ExpensesTable.$converterstatus.toJson(status),
       ),
@@ -2042,7 +2008,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     Value<int?> cashRegisterId = const Value.absent(),
     String? description,
     double? amount,
-    Value<String?> notes = const Value.absent(),
     RecordStatus? status,
     DateTime? expenseDate,
     DateTime? createdAt,
@@ -2054,7 +2019,6 @@ class Expense extends DataClass implements Insertable<Expense> {
         : this.cashRegisterId,
     description: description ?? this.description,
     amount: amount ?? this.amount,
-    notes: notes.present ? notes.value : this.notes,
     status: status ?? this.status,
     expenseDate: expenseDate ?? this.expenseDate,
     createdAt: createdAt ?? this.createdAt,
@@ -2070,7 +2034,6 @@ class Expense extends DataClass implements Insertable<Expense> {
           ? data.description.value
           : this.description,
       amount: data.amount.present ? data.amount.value : this.amount,
-      notes: data.notes.present ? data.notes.value : this.notes,
       status: data.status.present ? data.status.value : this.status,
       expenseDate: data.expenseDate.present
           ? data.expenseDate.value
@@ -2087,7 +2050,6 @@ class Expense extends DataClass implements Insertable<Expense> {
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('description: $description, ')
           ..write('amount: $amount, ')
-          ..write('notes: $notes, ')
           ..write('status: $status, ')
           ..write('expenseDate: $expenseDate, ')
           ..write('createdAt: $createdAt, ')
@@ -2102,7 +2064,6 @@ class Expense extends DataClass implements Insertable<Expense> {
     cashRegisterId,
     description,
     amount,
-    notes,
     status,
     expenseDate,
     createdAt,
@@ -2116,7 +2077,6 @@ class Expense extends DataClass implements Insertable<Expense> {
           other.cashRegisterId == this.cashRegisterId &&
           other.description == this.description &&
           other.amount == this.amount &&
-          other.notes == this.notes &&
           other.status == this.status &&
           other.expenseDate == this.expenseDate &&
           other.createdAt == this.createdAt &&
@@ -2128,7 +2088,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
   final Value<int?> cashRegisterId;
   final Value<String> description;
   final Value<double> amount;
-  final Value<String?> notes;
   final Value<RecordStatus> status;
   final Value<DateTime> expenseDate;
   final Value<DateTime> createdAt;
@@ -2138,7 +2097,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     this.cashRegisterId = const Value.absent(),
     this.description = const Value.absent(),
     this.amount = const Value.absent(),
-    this.notes = const Value.absent(),
     this.status = const Value.absent(),
     this.expenseDate = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2149,7 +2107,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     this.cashRegisterId = const Value.absent(),
     required String description,
     this.amount = const Value.absent(),
-    this.notes = const Value.absent(),
     this.status = const Value.absent(),
     this.expenseDate = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -2160,7 +2117,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Expression<int>? cashRegisterId,
     Expression<String>? description,
     Expression<double>? amount,
-    Expression<String>? notes,
     Expression<String>? status,
     Expression<DateTime>? expenseDate,
     Expression<DateTime>? createdAt,
@@ -2171,7 +2127,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
       if (description != null) 'description': description,
       if (amount != null) 'amount': amount,
-      if (notes != null) 'notes': notes,
       if (status != null) 'status': status,
       if (expenseDate != null) 'expense_date': expenseDate,
       if (createdAt != null) 'created_at': createdAt,
@@ -2184,7 +2139,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     Value<int?>? cashRegisterId,
     Value<String>? description,
     Value<double>? amount,
-    Value<String?>? notes,
     Value<RecordStatus>? status,
     Value<DateTime>? expenseDate,
     Value<DateTime>? createdAt,
@@ -2195,7 +2149,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
       description: description ?? this.description,
       amount: amount ?? this.amount,
-      notes: notes ?? this.notes,
       status: status ?? this.status,
       expenseDate: expenseDate ?? this.expenseDate,
       createdAt: createdAt ?? this.createdAt,
@@ -2217,9 +2170,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
     }
     if (amount.present) {
       map['amount'] = Variable<double>(amount.value);
-    }
-    if (notes.present) {
-      map['notes'] = Variable<String>(notes.value);
     }
     if (status.present) {
       map['status'] = Variable<String>(
@@ -2245,7 +2195,6 @@ class ExpensesCompanion extends UpdateCompanion<Expense> {
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('description: $description, ')
           ..write('amount: $amount, ')
-          ..write('notes: $notes, ')
           ..write('status: $status, ')
           ..write('expenseDate: $expenseDate, ')
           ..write('createdAt: $createdAt, ')
@@ -4330,9 +4279,39 @@ class $IncomesTable extends Incomes with TableInfo<$IncomesTable, Income> {
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
     'description',
     aliasedName,
-    true,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 1000,
+    ),
     type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<RecordStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 50,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(RecordStatus.active.name),
+      ).withConverter<RecordStatus>($IncomesTable.$converterstatus);
+  static const VerificationMeta _incomeDateMeta = const VerificationMeta(
+    'incomeDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> incomeDate = GeneratedColumn<DateTime>(
+    'income_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
@@ -4363,6 +4342,8 @@ class $IncomesTable extends Incomes with TableInfo<$IncomesTable, Income> {
     cashRegisterId,
     amount,
     description,
+    status,
+    incomeDate,
     createdAt,
     updatedAt,
   ];
@@ -4406,6 +4387,14 @@ class $IncomesTable extends Incomes with TableInfo<$IncomesTable, Income> {
           _descriptionMeta,
         ),
       );
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('income_date')) {
+      context.handle(
+        _incomeDateMeta,
+        incomeDate.isAcceptableOrUnknown(data['income_date']!, _incomeDateMeta),
+      );
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -4443,7 +4432,17 @@ class $IncomesTable extends Incomes with TableInfo<$IncomesTable, Income> {
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}description'],
+      )!,
+      status: $IncomesTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
       ),
+      incomeDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}income_date'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -4459,20 +4458,27 @@ class $IncomesTable extends Incomes with TableInfo<$IncomesTable, Income> {
   $IncomesTable createAlias(String alias) {
     return $IncomesTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<RecordStatus, String, String> $converterstatus =
+      const EnumNameConverter(RecordStatus.values);
 }
 
 class Income extends DataClass implements Insertable<Income> {
   final int id;
   final int? cashRegisterId;
   final double amount;
-  final String? description;
+  final String description;
+  final RecordStatus status;
+  final DateTime incomeDate;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const Income({
     required this.id,
     this.cashRegisterId,
     required this.amount,
-    this.description,
+    required this.description,
+    required this.status,
+    required this.incomeDate,
     required this.createdAt,
     this.updatedAt,
   });
@@ -4484,9 +4490,13 @@ class Income extends DataClass implements Insertable<Income> {
       map['cash_register_id'] = Variable<int>(cashRegisterId);
     }
     map['amount'] = Variable<double>(amount);
-    if (!nullToAbsent || description != null) {
-      map['description'] = Variable<String>(description);
+    map['description'] = Variable<String>(description);
+    {
+      map['status'] = Variable<String>(
+        $IncomesTable.$converterstatus.toSql(status),
+      );
     }
+    map['income_date'] = Variable<DateTime>(incomeDate);
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -4501,9 +4511,9 @@ class Income extends DataClass implements Insertable<Income> {
           ? const Value.absent()
           : Value(cashRegisterId),
       amount: Value(amount),
-      description: description == null && nullToAbsent
-          ? const Value.absent()
-          : Value(description),
+      description: Value(description),
+      status: Value(status),
+      incomeDate: Value(incomeDate),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -4520,7 +4530,11 @@ class Income extends DataClass implements Insertable<Income> {
       id: serializer.fromJson<int>(json['id']),
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
       amount: serializer.fromJson<double>(json['amount']),
-      description: serializer.fromJson<String?>(json['description']),
+      description: serializer.fromJson<String>(json['description']),
+      status: $IncomesTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
+      incomeDate: serializer.fromJson<DateTime>(json['incomeDate']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
@@ -4532,7 +4546,11 @@ class Income extends DataClass implements Insertable<Income> {
       'id': serializer.toJson<int>(id),
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
       'amount': serializer.toJson<double>(amount),
-      'description': serializer.toJson<String?>(description),
+      'description': serializer.toJson<String>(description),
+      'status': serializer.toJson<String>(
+        $IncomesTable.$converterstatus.toJson(status),
+      ),
+      'incomeDate': serializer.toJson<DateTime>(incomeDate),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
@@ -4542,7 +4560,9 @@ class Income extends DataClass implements Insertable<Income> {
     int? id,
     Value<int?> cashRegisterId = const Value.absent(),
     double? amount,
-    Value<String?> description = const Value.absent(),
+    String? description,
+    RecordStatus? status,
+    DateTime? incomeDate,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => Income(
@@ -4551,7 +4571,9 @@ class Income extends DataClass implements Insertable<Income> {
         ? cashRegisterId.value
         : this.cashRegisterId,
     amount: amount ?? this.amount,
-    description: description.present ? description.value : this.description,
+    description: description ?? this.description,
+    status: status ?? this.status,
+    incomeDate: incomeDate ?? this.incomeDate,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
@@ -4565,6 +4587,10 @@ class Income extends DataClass implements Insertable<Income> {
       description: data.description.present
           ? data.description.value
           : this.description,
+      status: data.status.present ? data.status.value : this.status,
+      incomeDate: data.incomeDate.present
+          ? data.incomeDate.value
+          : this.incomeDate,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -4577,6 +4603,8 @@ class Income extends DataClass implements Insertable<Income> {
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('amount: $amount, ')
           ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('incomeDate: $incomeDate, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -4589,6 +4617,8 @@ class Income extends DataClass implements Insertable<Income> {
     cashRegisterId,
     amount,
     description,
+    status,
+    incomeDate,
     createdAt,
     updatedAt,
   );
@@ -4600,6 +4630,8 @@ class Income extends DataClass implements Insertable<Income> {
           other.cashRegisterId == this.cashRegisterId &&
           other.amount == this.amount &&
           other.description == this.description &&
+          other.status == this.status &&
+          other.incomeDate == this.incomeDate &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -4608,7 +4640,9 @@ class IncomesCompanion extends UpdateCompanion<Income> {
   final Value<int> id;
   final Value<int?> cashRegisterId;
   final Value<double> amount;
-  final Value<String?> description;
+  final Value<String> description;
+  final Value<RecordStatus> status;
+  final Value<DateTime> incomeDate;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const IncomesCompanion({
@@ -4616,6 +4650,8 @@ class IncomesCompanion extends UpdateCompanion<Income> {
     this.cashRegisterId = const Value.absent(),
     this.amount = const Value.absent(),
     this.description = const Value.absent(),
+    this.status = const Value.absent(),
+    this.incomeDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -4623,15 +4659,20 @@ class IncomesCompanion extends UpdateCompanion<Income> {
     this.id = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
     required double amount,
-    this.description = const Value.absent(),
+    required String description,
+    this.status = const Value.absent(),
+    this.incomeDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
-  }) : amount = Value(amount);
+  }) : amount = Value(amount),
+       description = Value(description);
   static Insertable<Income> custom({
     Expression<int>? id,
     Expression<int>? cashRegisterId,
     Expression<double>? amount,
     Expression<String>? description,
+    Expression<String>? status,
+    Expression<DateTime>? incomeDate,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -4640,6 +4681,8 @@ class IncomesCompanion extends UpdateCompanion<Income> {
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
       if (amount != null) 'amount': amount,
       if (description != null) 'description': description,
+      if (status != null) 'status': status,
+      if (incomeDate != null) 'income_date': incomeDate,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -4649,7 +4692,9 @@ class IncomesCompanion extends UpdateCompanion<Income> {
     Value<int>? id,
     Value<int?>? cashRegisterId,
     Value<double>? amount,
-    Value<String?>? description,
+    Value<String>? description,
+    Value<RecordStatus>? status,
+    Value<DateTime>? incomeDate,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -4658,6 +4703,8 @@ class IncomesCompanion extends UpdateCompanion<Income> {
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
       amount: amount ?? this.amount,
       description: description ?? this.description,
+      status: status ?? this.status,
+      incomeDate: incomeDate ?? this.incomeDate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -4678,6 +4725,14 @@ class IncomesCompanion extends UpdateCompanion<Income> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $IncomesTable.$converterstatus.toSql(status.value),
+      );
+    }
+    if (incomeDate.present) {
+      map['income_date'] = Variable<DateTime>(incomeDate.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -4694,6 +4749,8 @@ class IncomesCompanion extends UpdateCompanion<Income> {
           ..write('cashRegisterId: $cashRegisterId, ')
           ..write('amount: $amount, ')
           ..write('description: $description, ')
+          ..write('status: $status, ')
+          ..write('incomeDate: $incomeDate, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -5954,6 +6011,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final PurchaseDao purchaseDao = PurchaseDao(this as AppDatabase);
   late final SaleDao saleDao = SaleDao(this as AppDatabase);
   late final ExpenseDao expenseDao = ExpenseDao(this as AppDatabase);
+  late final IncomeDao incomeDao = IncomeDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6781,7 +6839,6 @@ typedef $$ExpensesTableCreateCompanionBuilder =
       Value<int?> cashRegisterId,
       required String description,
       Value<double> amount,
-      Value<String?> notes,
       Value<RecordStatus> status,
       Value<DateTime> expenseDate,
       Value<DateTime> createdAt,
@@ -6793,7 +6850,6 @@ typedef $$ExpensesTableUpdateCompanionBuilder =
       Value<int?> cashRegisterId,
       Value<String> description,
       Value<double> amount,
-      Value<String?> notes,
       Value<RecordStatus> status,
       Value<DateTime> expenseDate,
       Value<DateTime> createdAt,
@@ -6826,11 +6882,6 @@ class $$ExpensesTableFilterComposer
 
   ColumnFilters<double> get amount => $composableBuilder(
     column: $table.amount,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get notes => $composableBuilder(
-    column: $table.notes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6885,11 +6936,6 @@ class $$ExpensesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
@@ -6935,9 +6981,6 @@ class $$ExpensesTableAnnotationComposer
 
   GeneratedColumn<double> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
-
-  GeneratedColumn<String> get notes =>
-      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
@@ -6986,7 +7029,6 @@ class $$ExpensesTableTableManager
                 Value<int?> cashRegisterId = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<double> amount = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> expenseDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -6996,7 +7038,6 @@ class $$ExpensesTableTableManager
                 cashRegisterId: cashRegisterId,
                 description: description,
                 amount: amount,
-                notes: notes,
                 status: status,
                 expenseDate: expenseDate,
                 createdAt: createdAt,
@@ -7008,7 +7049,6 @@ class $$ExpensesTableTableManager
                 Value<int?> cashRegisterId = const Value.absent(),
                 required String description,
                 Value<double> amount = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> expenseDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -7018,7 +7058,6 @@ class $$ExpensesTableTableManager
                 cashRegisterId: cashRegisterId,
                 description: description,
                 amount: amount,
-                notes: notes,
                 status: status,
                 expenseDate: expenseDate,
                 createdAt: createdAt,
@@ -7989,7 +8028,9 @@ typedef $$IncomesTableCreateCompanionBuilder =
       Value<int> id,
       Value<int?> cashRegisterId,
       required double amount,
-      Value<String?> description,
+      required String description,
+      Value<RecordStatus> status,
+      Value<DateTime> incomeDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -7998,7 +8039,9 @@ typedef $$IncomesTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int?> cashRegisterId,
       Value<double> amount,
-      Value<String?> description,
+      Value<String> description,
+      Value<RecordStatus> status,
+      Value<DateTime> incomeDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -8029,6 +8072,17 @@ class $$IncomesTableFilterComposer
 
   ColumnFilters<String> get description => $composableBuilder(
     column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<RecordStatus, RecordStatus, String>
+  get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get incomeDate => $composableBuilder(
+    column: $table.incomeDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8072,6 +8126,16 @@ class $$IncomesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get incomeDate => $composableBuilder(
+    column: $table.incomeDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -8105,6 +8169,14 @@ class $$IncomesTableAnnotationComposer
 
   GeneratedColumn<String> get description => $composableBuilder(
     column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get incomeDate => $composableBuilder(
+    column: $table.incomeDate,
     builder: (column) => column,
   );
 
@@ -8146,7 +8218,9 @@ class $$IncomesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
                 Value<double> amount = const Value.absent(),
-                Value<String?> description = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
+                Value<DateTime> incomeDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => IncomesCompanion(
@@ -8154,6 +8228,8 @@ class $$IncomesTableTableManager
                 cashRegisterId: cashRegisterId,
                 amount: amount,
                 description: description,
+                status: status,
+                incomeDate: incomeDate,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -8162,7 +8238,9 @@ class $$IncomesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
                 required double amount,
-                Value<String?> description = const Value.absent(),
+                required String description,
+                Value<RecordStatus> status = const Value.absent(),
+                Value<DateTime> incomeDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => IncomesCompanion.insert(
@@ -8170,6 +8248,8 @@ class $$IncomesTableTableManager
                 cashRegisterId: cashRegisterId,
                 amount: amount,
                 description: description,
+                status: status,
+                incomeDate: incomeDate,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),

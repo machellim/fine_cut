@@ -19,7 +19,7 @@ class Expenses extends Table {
   RealColumn get amount =>
       real().named('amount').withDefault(const Constant(0.0))();
 
-  // Status: active/inactive (soft delete)
+  // Status: active/deleted (soft delete)
   TextColumn get status => text()
       .named('status')
       .withLength(min: 1, max: 50)

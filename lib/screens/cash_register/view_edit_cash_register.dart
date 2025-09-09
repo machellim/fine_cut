@@ -2,6 +2,8 @@ import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_
 import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
 import 'package:fine_cut/bloc/expense/expense_crud/expense_crud_bloc.dart';
 import 'package:fine_cut/bloc/expense/expense_list/expense_list_bloc.dart';
+import 'package:fine_cut/bloc/income/income_crud/income_crud_bloc.dart';
+import 'package:fine_cut/bloc/income/income_list/income_list_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
@@ -85,7 +87,7 @@ class _ViewEditCashRegisterScreenState
     });
   }
 
-  // ===== banner sale ========
+  // ===== banner expense ========
   BannerState _bannerExpenseState = BannerState.initial();
   void _showTopBannerExpense(
     String message, {
@@ -105,6 +107,28 @@ class _ViewEditCashRegisterScreenState
       _bannerExpenseState = _bannerExpenseState.copyWith(show: false);
     });
   }
+
+  // ===== banner expense ========
+  BannerState _bannerIncomeState = BannerState.initial();
+  void _showTopBannerIncome(
+    String message, {
+    AppBannerType type = AppBannerType.success,
+  }) {
+    setState(() {
+      _bannerIncomeState = _bannerIncomeState.copyWith(
+        show: true,
+        message: message,
+        type: type,
+      );
+    });
+  }
+
+  void _closeBannerIncome() {
+    setState(() {
+      _bannerIncomeState = _bannerIncomeState.copyWith(show: false);
+    });
+  }
+  //===============================
 
   void _loadAvailableBalance() {
     context.read<AvailableBalanceBloc>().add(
@@ -132,6 +156,11 @@ class _ViewEditCashRegisterScreenState
     // Load Expenses
     context.read<ExpenseListBloc>().add(
       LoadExpensesListEvent(AppEventSource.list, widget.cashRegister.id),
+    );
+
+    // Load Incomes
+    context.read<IncomeListBloc>().add(
+      LoadIncomesListEvent(AppEventSource.list, widget.cashRegister.id),
     );
   }
 
@@ -306,6 +335,7 @@ class _ViewEditCashRegisterScreenState
                     } else {}
                   },
                   children: [
+                    // Sales List
                     ExpansionPanelRadio(
                       value: 0,
                       headerBuilder: (context, isExpanded) =>
@@ -522,6 +552,8 @@ class _ViewEditCashRegisterScreenState
                         ),
                       ),
                     ),
+
+                    // Purchases List
                     ExpansionPanelRadio(
                       value: 1,
                       headerBuilder: (context, isExpanded) =>
@@ -723,6 +755,7 @@ class _ViewEditCashRegisterScreenState
                       ),
                     ),
 
+                    // Expeses List
                     ExpansionPanelRadio(
                       value: 2,
                       headerBuilder: (context, isExpanded) =>
@@ -861,7 +894,7 @@ class _ViewEditCashRegisterScreenState
                                         },
                                       );
                                     }
-                                  } else if (state is PurchaseListLoadFailure) {
+                                  } else if (state is ExpensesListLoadFailure) {
                                     return const Center(
                                       child: Text('Error al cargar compras'),
                                     );
@@ -878,15 +911,162 @@ class _ViewEditCashRegisterScreenState
                       ),
                     ),
 
+                    // Incomes List
                     ExpansionPanelRadio(
                       value: 3,
                       headerBuilder: (context, isExpanded) =>
                           const ListTile(title: AppTitle(text: 'Ingresos')),
-                      body: const Padding(
+
+                      body: Padding(
                         padding: AppConstants.gridPadding,
-                        child: Text('Contenido de ingresos'),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            AppButton(
+                              title: 'Agregar Ingreso',
+                              onPressed: () async {
+                                _closeBannerIncome();
+                                Navigator.pushNamed(
+                                  context,
+                                  'new-income',
+                                  arguments: {
+                                    'cashRegisterId': cashRegister.id,
+                                  },
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            if (_bannerIncomeState.show)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: AppTopBanner(
+                                  message: _bannerIncomeState.message,
+                                  type: _bannerIncomeState.type,
+                                  onClose: _closeBannerIncome,
+                                ),
+                              ),
+                            MultiBlocListener(
+                              listeners: [
+                                // Listener del bloc de creación/edición/eliminación
+                                BlocListener<IncomeCrudBloc, IncomeCrudState>(
+                                  listener: (context, state) {
+                                    if (state is IncomeDeletionSuccess) {
+                                      _loadAvailableBalance();
+                                      context.read<IncomeListBloc>().add(
+                                        LoadIncomesListEvent(
+                                          AppEventSource.list,
+                                          widget.cashRegister.id,
+                                        ),
+                                      );
+                                    }
+                                    if (state is IncomeDeletionFailure) {
+                                      _showTopBannerIncome(
+                                        'Error al eliminar ingreso',
+                                        type: AppBannerType.error,
+                                      );
+                                    }
+                                    if (state is IncomeCreationSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                    if (state is IncomeUpdateSuccess) {
+                                      _loadAvailableBalance();
+                                    }
+                                  },
+                                ),
+
+                                // Listener de la lista
+                                BlocListener<IncomeListBloc, IncomeListState>(
+                                  listener: (context, state) {
+                                    if (state is IncomesListLoadSuccess) {
+                                      if (state.eventSource ==
+                                          AppEventSource.create) {
+                                        _showTopBannerIncome(
+                                          'Ingreso creado con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.update) {
+                                        _showTopBannerIncome(
+                                          'Ingreso actualizado con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.delete) {
+                                        _showTopBannerIncome(
+                                          'Ingreso eliminado con éxito',
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                              child: BlocBuilder<IncomeListBloc, IncomeListState>(
+                                builder: (context, state) {
+                                  if (state is IncomesListLoading) {
+                                    return AppLoadingScreen(
+                                      message: AppMessages.getIncomeMessage(
+                                        'messageLoadingIncomes',
+                                      ),
+                                    );
+                                  } else if (state is IncomesListLoadSuccess) {
+                                    if (state.incomes.isEmpty) {
+                                      return AppSimpleCenterText(
+                                        message: 'No hay información.',
+                                      );
+                                    } else {
+                                      return ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: state.incomes.length,
+                                        itemBuilder: (context, index) {
+                                          final income = state.incomes[index];
+                                          return AppListItem(
+                                            title: Text(
+                                              income.description,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            price: income.amount,
+                                            onEdit: () async {
+                                              _closeBannerIncome();
+
+                                              Navigator.pushNamed(
+                                                context,
+                                                'new-income',
+                                                arguments: {
+                                                  'income': income,
+                                                  'cashRegisterId':
+                                                      cashRegister.id,
+                                                },
+                                              );
+                                            },
+                                            onDelete: () {
+                                              _showDeleteConfirmationIncome(
+                                                context,
+                                                income.id,
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    }
+                                  } else if (state is IncomesListLoadFailure) {
+                                    return const Center(
+                                      child: Text('Error al cargar compras'),
+                                    );
+                                  } else {
+                                    return const Center(
+                                      child: Text('Estado desconocido'),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+
                     ExpansionPanelRadio(
                       value: 4,
                       headerBuilder: (context, isExpanded) =>
@@ -961,6 +1141,25 @@ class _ViewEditCashRegisterScreenState
           onConfirm: () {
             // Acción de confirmar
             context.read<ExpenseCrudBloc>().add(DeleteExpenseEvent(expenseId));
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationIncome(BuildContext context, int expenseId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppAlertDialog(
+          title: '¿Seguro que deseas eliminar este ingreso?',
+          content: 'Esta acción no se puede deshacer.',
+          onCancel: () {
+            // close dialog
+          },
+          onConfirm: () {
+            // Acción de confirmar
+            context.read<IncomeCrudBloc>().add(DeleteIncomeEvent(expenseId));
           },
         );
       },
