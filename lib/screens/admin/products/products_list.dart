@@ -96,7 +96,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                           children: [
                             AppListItem(
                               title: Text(productName),
-                              description: Text(
+                              /*description: Text(
                                 "Stock: $productStock",
                                 style: TextStyle(
                                   color: productStock <= 0
@@ -104,7 +104,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                       : Colors
                                             .green, // Cambia el color dependiendo del valor
                                 ),
-                              ),
+                              ),*/
                               onEdit: () async {
                                 final product = state.products[index];
 
