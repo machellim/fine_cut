@@ -150,6 +150,36 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     return query.read(totalPurchasesExp) ?? 0.0;
   }
 
+  Future<double> getTotalExpensesByCashRegisterId(int cashRegisterId) async {
+    final totalExpensesExp = db.expenses.amount.sum();
+
+    final query =
+        await (selectOnly(db.expenses)
+              ..addColumns([totalExpensesExp])
+              ..where(
+                db.expenses.cashRegisterId.equals(cashRegisterId) &
+                    db.expenses.status.equals(AppActiveStatus.active.name),
+              ))
+            .getSingle();
+
+    return query.read(totalExpensesExp) ?? 0.0;
+  }
+
+  Future<double> getTotalIncomesByCashRegisterId(int cashRegisterId) async {
+    final totalIncomesExp = db.incomes.amount.sum();
+
+    final query =
+        await (selectOnly(db.incomes)
+              ..addColumns([totalIncomesExp])
+              ..where(
+                db.incomes.cashRegisterId.equals(cashRegisterId) &
+                    db.incomes.status.equals(AppActiveStatus.active.name),
+              ))
+            .getSingle();
+
+    return query.read(totalIncomesExp) ?? 0.0;
+  }
+
   Future<double> getAvailableBalanceByCashRegisterId(int cashRegisterId) async {
     final cashRegister = await (select(
       cashRegisters,
@@ -159,8 +189,17 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     final totalPurchases = await getTotalPurchasesByCashRegisterId(
       cashRegisterId,
     );
+    final totalExpenses = await getTotalExpensesByCashRegisterId(
+      cashRegisterId,
+    );
+    final totalIncomes = await getTotalIncomesByCashRegisterId(cashRegisterId);
+
     // available balance
-    return cashRegister.openingAmount + totalSales - totalPurchases;
+    return cashRegister.openingAmount +
+        totalSales +
+        totalIncomes -
+        totalPurchases -
+        totalExpenses;
   }
 
   Future<void> closeCashRegister({required int cashRegisterId}) async {
