@@ -62,42 +62,43 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     required RecordAction action,
     double? openingAmount,
     String? notes,
-    int? cashRegisterId, // necesario si action == update
+    int? cashRegisterId, // required if action == update
   }) async {
     // Parse the input date
     final dateFormat = DateFormat("dd-MM-yyyy");
     final parsedDate = dateFormat.parse(registerDateString);
 
-    // Truncate the time to keep only the date
+    // Keep only Y-M-D (ignore time)
     final dateOnly = DateTime(
       parsedDate.year,
       parsedDate.month,
       parsedDate.day,
     );
 
-    // 1️⃣ Get the last registered cash register (if any)
-    final lastRegister =
-        await (select(cashRegisters)
-              ..orderBy([
-                (tbl) => OrderingTerm(
-                  expression: tbl.registerDate,
-                  mode: OrderingMode.desc,
-                ),
-              ])
-              ..limit(1))
-            .getSingleOrNull();
-
-    // 2️⃣ Validate that the input date is not earlier than the last existing register
-    if (lastRegister != null && dateOnly.isBefore(lastRegister.registerDate)) {
-      return CashRegisterResult.failure(
-        CashRegisterError.earlierThanLast,
-        cashRegister: lastRegister,
-        message: 'No se puede modificar.',
-      );
-    }
-
     if (action == RecordAction.create) {
-      // 3️⃣ Check if there is an open cash register
+      // Get the last register (any)
+      final lastRegister =
+          await (select(cashRegisters)
+                ..orderBy([
+                  (tbl) => OrderingTerm(
+                    expression: tbl.registerDate,
+                    mode: OrderingMode.desc,
+                  ),
+                ])
+                ..limit(1))
+              .getSingleOrNull();
+
+      // For CREATE: new date must not be earlier than the last existing date
+      if (lastRegister != null &&
+          dateOnly.isBefore(lastRegister.registerDate)) {
+        return CashRegisterResult.failure(
+          CashRegisterError.earlierThanLast,
+          cashRegister: lastRegister,
+          message: 'La fecha ingresada es menor a la última registrada.',
+        );
+      }
+
+      // Only one open cash register allowed
       final openRegister =
           await (select(cashRegisters)..where(
                 (tbl) => tbl.status.equals(CashRegisterStatus.open.name),
@@ -113,7 +114,7 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
         );
       }
 
-      // 4️⃣ Check if a cash register already exists for the same date
+      // Prevent same-date duplication
       final existing = await (select(
         cashRegisters,
       )..where((tbl) => tbl.registerDate.equals(dateOnly))).getSingleOrNull();
@@ -127,61 +128,97 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
         );
       }
 
-      // 5️⃣ Create the new cash register
+      // Create
+      if (openingAmount == null) {
+        throw ArgumentError('openingAmount must be provided for create');
+      }
+
       final companion = CashRegistersCompanion.insert(
         registerDate: Value(dateOnly),
-        openingAmount: Value(openingAmount!),
+        openingAmount: Value(openingAmount),
         status: Value(CashRegisterStatus.open),
         notes: Value(notes),
       );
 
       final newRegister = await into(cashRegisters).insertReturning(companion);
-
       return CashRegisterResult.success(newRegister);
-    } else if (action == RecordAction.update) {
-      if (cashRegisterId == null) {
-        throw ArgumentError('cashRegisterId must be provided for update');
-      }
-
-      // Check if another cash register already exists with this date
-      final existing =
-          await (select(cashRegisters)..where(
-                (tbl) =>
-                    tbl.registerDate.equals(dateOnly) &
-                    tbl.id.isNotIn([cashRegisterId]),
-              ))
-              .getSingleOrNull();
-
-      if (existing != null) {
-        return CashRegisterResult.failure(
-          CashRegisterError.sameDate,
-          cashRegister: existing,
-          message:
-              'Ya existe una caja en la fecha ${AppUtils.formatDate(existing.registerDate)}',
-        );
-      }
-
-      // Update only the registerDate
-      final companion = CashRegistersCompanion(registerDate: Value(dateOnly));
-
-      final updated =
-          await (update(cashRegisters)
-                ..where((tbl) => tbl.id.equals(cashRegisterId)))
-              .writeReturning(companion);
-
-      if (updated.isEmpty) {
-        return CashRegisterResult.failure(
-          CashRegisterError.notFound,
-          cashRegister: null,
-          message: 'No se actualizó ninguna caja.',
-        );
-      }
-
-      return CashRegisterResult.success(updated[0]);
     }
 
-    // Default fallback
-    throw UnimplementedError('Action $action not handled');
+    // UPDATE branch
+    if (cashRegisterId == null) {
+      throw ArgumentError('cashRegisterId must be provided for update');
+    }
+
+    // Make sure the target register exists (optional but safer)
+    final target = await (select(
+      cashRegisters,
+    )..where((tbl) => tbl.id.equals(cashRegisterId))).getSingleOrNull();
+    if (target == null) {
+      return CashRegisterResult.failure(
+        CashRegisterError.notFound,
+        cashRegister: null,
+        message: 'La caja a actualizar no existe.',
+      );
+    }
+
+    // Find the last register date among OTHER records (exclude current id)
+    final lastOtherRegister =
+        await (select(cashRegisters)
+              ..where((tbl) => tbl.id.isNotIn([cashRegisterId]))
+              ..orderBy([
+                (tbl) => OrderingTerm(
+                  expression: tbl.registerDate,
+                  mode: OrderingMode.desc,
+                ),
+              ])
+              ..limit(1))
+            .getSingleOrNull();
+
+    // For UPDATE: new date must not be earlier than the max date of OTHER records
+    if (lastOtherRegister != null &&
+        dateOnly.isBefore(lastOtherRegister.registerDate)) {
+      return CashRegisterResult.failure(
+        CashRegisterError.earlierThanLast,
+        cashRegister: lastOtherRegister,
+        message:
+            'La fecha ingresada es menor a la última de otros registros (${AppUtils.formatDate(lastOtherRegister.registerDate)}).',
+      );
+    }
+
+    // Prevent same-date duplication with OTHER records
+    final existingSameDateOther =
+        await (select(cashRegisters)..where(
+              (tbl) =>
+                  tbl.registerDate.equals(dateOnly) &
+                  tbl.id.isNotIn([cashRegisterId]),
+            ))
+            .getSingleOrNull();
+
+    if (existingSameDateOther != null) {
+      return CashRegisterResult.failure(
+        CashRegisterError.sameDate,
+        cashRegister: existingSameDateOther,
+        message:
+            'Ya existe una caja en la fecha ${AppUtils.formatDate(existingSameDateOther.registerDate)}.',
+      );
+    }
+
+    // Update only the registerDate
+    final companion = CashRegistersCompanion(registerDate: Value(dateOnly));
+
+    final updated = await (update(
+      cashRegisters,
+    )..where((tbl) => tbl.id.equals(cashRegisterId))).writeReturning(companion);
+
+    if (updated.isEmpty) {
+      return CashRegisterResult.failure(
+        CashRegisterError.notFound,
+        cashRegister: null,
+        message: 'No se actualizó ninguna caja.',
+      );
+    }
+
+    return CashRegisterResult.success(updated[0]);
   }
 
   Future<CashRegister?> getLastCashRegisterByStatus(CashRegisterStatus status) {

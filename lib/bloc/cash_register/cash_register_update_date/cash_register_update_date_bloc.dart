@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/dao/cash_register_dao.dart';
+import 'package:fine_cut/db/database.dart';
 
 part 'cash_register_update_date_event.dart';
 part 'cash_register_update_date_state.dart';
@@ -11,6 +12,10 @@ class CashRegisterUpdateDateBloc
   final CashRegisterDao cashRegisterDao;
   CashRegisterUpdateDateBloc({required this.cashRegisterDao})
     : super(CashRegisterUpdateDateInitial()) {
+    on<ResetUpdateCashRegisterDateEvent>((event, emit) {
+      emit(CashRegisterUpdateDateInitial());
+    });
+
     on<UpdateCashRegisterDateEvent>((event, emit) async {
       try {
         emit(UpdateCashRegisterDateLoading());
@@ -23,9 +28,7 @@ class CashRegisterUpdateDateBloc
             );
         if (cashRegisterResult.isSuccess) {
           emit(
-            UpdateCashRegisterDateLoadSuccess(
-              cashRegisterResult.cashRegister!.registerDate,
-            ),
+            UpdateCashRegisterDateLoadSuccess(cashRegisterResult.cashRegister!),
           );
         } else {
           emit(

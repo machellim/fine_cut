@@ -35,7 +35,12 @@ import 'package:fine_cut/widgets/app_bar_custom.dart';
 
 class ViewEditCashRegisterScreen extends StatefulWidget {
   final CashRegister cashRegister;
-  const ViewEditCashRegisterScreen({super.key, required this.cashRegister});
+  final bool readOnly;
+  const ViewEditCashRegisterScreen({
+    super.key,
+    required this.cashRegister,
+    this.readOnly = false,
+  });
 
   @override
   State<ViewEditCashRegisterScreen> createState() =>
@@ -44,7 +49,8 @@ class ViewEditCashRegisterScreen extends StatefulWidget {
 
 class _ViewEditCashRegisterScreenState
     extends State<ViewEditCashRegisterScreen> {
-  bool isNew = true;
+  late CashRegister _cashRegister;
+  late bool _readOnly;
 
   // ===== banner purchase ========
   BannerState _bannerPurchaseState = BannerState.initial();
@@ -154,7 +160,7 @@ class _ViewEditCashRegisterScreenState
 
   void _loadAvailableBalance() {
     context.read<AvailableBalanceBloc>().add(
-      LoadAvailableBalanceEvent(widget.cashRegister.id),
+      LoadAvailableBalanceEvent(_cashRegister.id),
     );
   }
 
@@ -162,76 +168,89 @@ class _ViewEditCashRegisterScreenState
   void initState() {
     super.initState();
 
+    //
+    _cashRegister = widget.cashRegister;
+    _readOnly = widget.readOnly;
+
+    // restart state
+    context.read<CashRegisterUpdateDateBloc>().add(
+      ResetUpdateCashRegisterDateEvent(),
+    );
+
     // load available balance
     _loadAvailableBalance();
 
     // load Purchases
     context.read<PurchaseListBloc>().add(
-      LoadPurchasesListEvent(AppEventSource.list, widget.cashRegister.id),
+      LoadPurchasesListEvent(AppEventSource.list, _cashRegister.id),
     );
 
     // load Purchases
     context.read<SaleListBloc>().add(
-      LoadSalesListEvent(AppEventSource.list, widget.cashRegister.id),
+      LoadSalesListEvent(AppEventSource.list, _cashRegister.id),
     );
 
     // Load Expenses
     context.read<ExpenseListBloc>().add(
-      LoadExpensesListEvent(AppEventSource.list, widget.cashRegister.id),
+      LoadExpensesListEvent(AppEventSource.list, _cashRegister.id),
     );
 
     // Load Incomes
     context.read<IncomeListBloc>().add(
-      LoadIncomesListEvent(AppEventSource.list, widget.cashRegister.id),
+      LoadIncomesListEvent(AppEventSource.list, _cashRegister.id),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     //final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    final cashRegister = widget.cashRegister;
-    final registerDate = AppUtils.formatDate(cashRegister.registerDate);
+    final registerDate = AppUtils.formatDate(_cashRegister.registerDate);
 
     return AppScaffold(
       appBar: AppBarCustom(
-        title: isNew ? 'Ventas' : 'Editar Caja',
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'close-cash-register') {
-                _showConfirmationCloseCashRegister(context, cashRegister.id);
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'close-cash-register',
-                child: Row(
-                  children: <Widget>[
-                    Icon(Icons.lock),
-                    SizedBox(width: 8),
-                    Text('Cerrar Caja'),
+        title: 'Ventas',
+        actions: !_readOnly
+            ? [
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'close-cash-register') {
+                      _showConfirmationCloseCashRegister(
+                        context,
+                        _cashRegister.id,
+                      );
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'close-cash-register',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.lock),
+                          SizedBox(width: 8),
+                          Text('Cerrar Caja'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'update-cash-register-date',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(Icons.calendar_today),
+                          SizedBox(width: 8),
+                          Text('Actualizar Fecha'),
+                        ],
+                      ),
+                      onTap: () {
+                        _showUpdateCashRegisterDateDialog(
+                          context,
+                          _cashRegister,
+                        );
+                      },
+                    ),
                   ],
                 ),
-              ),
-              PopupMenuItem(
-                value: 'update-cash-register-date',
-                child: Row(
-                  children: <Widget>[
-                    Icon(Icons.calendar_today),
-                    SizedBox(width: 8),
-                    Text('Actualizar Fecha'),
-                  ],
-                ),
-                onTap: () {
-                  _showUpdateCashRegisterDateDialog(
-                    context,
-                    widget.cashRegister,
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
+              ]
+            : null,
       ),
       drawer: AppDrawer(appContext: context),
       body: SingleChildScrollView(
@@ -314,15 +333,12 @@ class _ViewEditCashRegisterScreenState
                                 }
                               },
                               builder: (context, state) {
-                                String dateToShow = registerDate;
                                 if (state is UpdateCashRegisterDateLoading) {
                                   return Text('Actualizando . .');
                                 }
                                 if (state
                                     is UpdateCashRegisterDateLoadSuccess) {
-                                  dateToShow = AppUtils.formatDate(
-                                    state.registerDate,
-                                  );
+                                  _cashRegister = state.cashRegister;
                                 }
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -333,7 +349,11 @@ class _ViewEditCashRegisterScreenState
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text(dateToShow),
+                                    Text(
+                                      AppUtils.formatDate(
+                                        _cashRegister.registerDate,
+                                      ),
+                                    ),
                                   ],
                                 );
                               },
@@ -358,7 +378,7 @@ class _ViewEditCashRegisterScreenState
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              '\$ ${AppUtils.formatDouble(cashRegister.openingAmount)}',
+                              '\$ ${AppUtils.formatDouble(_cashRegister.openingAmount)}',
                             ),
                           ],
                         ),
@@ -428,27 +448,28 @@ class _ViewEditCashRegisterScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            AppButton(
-                              title: 'Agregar Venta',
-                              onPressed: () async {
-                                _closeBannerSale();
+                            if (!_readOnly)
+                              AppButton(
+                                title: 'Agregar Venta',
+                                onPressed: () async {
+                                  _closeBannerSale();
 
-                                final repoPaymentMethod = context
-                                    .read<PaymentMethodListBloc>();
-                                final paymentMethod = await repoPaymentMethod
-                                    .paymentMethodDao
-                                    .getPaymentMethodByName('Efectivo');
-                                Navigator.pushNamed(
-                                  context,
-                                  'new-sale',
-                                  arguments: {
-                                    'defaultSelectedPaymentMethod':
-                                        paymentMethod,
-                                    'cashRegisterId': cashRegister.id,
-                                  },
-                                );
-                              },
-                            ),
+                                  final repoPaymentMethod = context
+                                      .read<PaymentMethodListBloc>();
+                                  final paymentMethod = await repoPaymentMethod
+                                      .paymentMethodDao
+                                      .getPaymentMethodByName('Efectivo');
+                                  Navigator.pushNamed(
+                                    context,
+                                    'new-sale',
+                                    arguments: {
+                                      'defaultSelectedPaymentMethod':
+                                          paymentMethod,
+                                      'cashRegisterId': _cashRegister.id,
+                                    },
+                                  );
+                                },
+                              ),
                             const SizedBox(height: 16),
                             if (_bannerSaleState.show)
                               Padding(
@@ -468,7 +489,7 @@ class _ViewEditCashRegisterScreenState
                                       context.read<SaleListBloc>().add(
                                         LoadSalesListEvent(
                                           AppEventSource.list,
-                                          widget.cashRegister.id,
+                                          _cashRegister.id,
                                         ),
                                       );
                                     }
@@ -551,68 +572,79 @@ class _ViewEditCashRegisterScreenState
                                                   ),
                                                 ),
                                                 price: sale.totalPrice,
-                                                onEdit: () async {
-                                                  _closeBannerSale();
-                                                  // get selected product
-                                                  final repoProduct = context
-                                                      .read<ProductsListBloc>();
-                                                  final selectedProduct =
-                                                      await repoProduct
-                                                          .productDao
-                                                          .getById(
-                                                            sale.productId,
-                                                          );
+                                                onEdit: !_readOnly
+                                                    ? () async {
+                                                        _closeBannerSale();
+                                                        // get selected product
+                                                        final repoProduct =
+                                                            context
+                                                                .read<
+                                                                  ProductsListBloc
+                                                                >();
+                                                        final selectedProduct =
+                                                            await repoProduct
+                                                                .productDao
+                                                                .getById(
+                                                                  sale.productId,
+                                                                );
 
-                                                  // get selected payment form
-                                                  final repoPaymentMethod =
-                                                      context
-                                                          .read<
-                                                            PaymentMethodListBloc
-                                                          >();
-                                                  final selectedPaymentMethod =
-                                                      await repoPaymentMethod
-                                                          .paymentMethodDao
-                                                          .getById(
-                                                            sale.paymentMethodId,
-                                                          );
+                                                        // get selected payment form
+                                                        final repoPaymentMethod =
+                                                            context
+                                                                .read<
+                                                                  PaymentMethodListBloc
+                                                                >();
+                                                        final selectedPaymentMethod =
+                                                            await repoPaymentMethod
+                                                                .paymentMethodDao
+                                                                .getById(
+                                                                  sale.paymentMethodId,
+                                                                );
 
-                                                  // check if the sale is from subproduct
-                                                  Purchase? selectedPurchase;
-                                                  if (sale.purchaseId != null) {
-                                                    final repoPurchase = context
-                                                        .read<
-                                                          PurchaseListBloc
-                                                        >();
-                                                    selectedPurchase =
-                                                        await repoPurchase
-                                                            .purchaseDao
-                                                            .getById(
-                                                              sale.purchaseId!,
-                                                            );
-                                                  }
+                                                        // check if the sale is from subproduct
+                                                        Purchase?
+                                                        selectedPurchase;
+                                                        if (sale.purchaseId !=
+                                                            null) {
+                                                          final repoPurchase =
+                                                              context
+                                                                  .read<
+                                                                    PurchaseListBloc
+                                                                  >();
+                                                          selectedPurchase =
+                                                              await repoPurchase
+                                                                  .purchaseDao
+                                                                  .getById(
+                                                                    sale.purchaseId!,
+                                                                  );
+                                                        }
 
-                                                  Navigator.pushNamed(
-                                                    context,
-                                                    'new-sale',
-                                                    arguments: {
-                                                      'selectedProduct':
-                                                          selectedProduct,
-                                                      'selectedPaymentMethod':
-                                                          selectedPaymentMethod,
-                                                      'sale': sale,
-                                                      'selectedPurchase':
-                                                          selectedPurchase,
-                                                      'cashRegisterId':
-                                                          cashRegister.id,
-                                                    },
-                                                  );
-                                                },
-                                                onDelete: () {
-                                                  _showDeleteConfirmationSale(
-                                                    context,
-                                                    sale.id,
-                                                  );
-                                                },
+                                                        Navigator.pushNamed(
+                                                          context,
+                                                          'new-sale',
+                                                          arguments: {
+                                                            'selectedProduct':
+                                                                selectedProduct,
+                                                            'selectedPaymentMethod':
+                                                                selectedPaymentMethod,
+                                                            'sale': sale,
+                                                            'selectedPurchase':
+                                                                selectedPurchase,
+                                                            'cashRegisterId':
+                                                                _cashRegister
+                                                                    .id,
+                                                          },
+                                                        );
+                                                      }
+                                                    : null,
+                                                onDelete: !_readOnly
+                                                    ? () {
+                                                        _showDeleteConfirmationSale(
+                                                          context,
+                                                          sale.id,
+                                                        );
+                                                      }
+                                                    : null,
                                               ),
                                             ],
                                           );
@@ -647,27 +679,28 @@ class _ViewEditCashRegisterScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            AppButton(
-                              title: 'Agregar Compra',
-                              onPressed: () async {
-                                _closeBannerPurchase();
-                                final repoPaymentMethod = context
-                                    .read<PaymentMethodListBloc>();
-                                final paymentMethod = await repoPaymentMethod
-                                    .paymentMethodDao
-                                    .getPaymentMethodByName('Efectivo');
+                            if (!_readOnly)
+                              AppButton(
+                                title: 'Agregar Compra',
+                                onPressed: () async {
+                                  _closeBannerPurchase();
+                                  final repoPaymentMethod = context
+                                      .read<PaymentMethodListBloc>();
+                                  final paymentMethod = await repoPaymentMethod
+                                      .paymentMethodDao
+                                      .getPaymentMethodByName('Efectivo');
 
-                                Navigator.pushNamed(
-                                  context,
-                                  'new-purchase',
-                                  arguments: {
-                                    'defaultSelectedPaymentMethod':
-                                        paymentMethod,
-                                    'cashRegisterId': cashRegister.id,
-                                  },
-                                );
-                              },
-                            ),
+                                  Navigator.pushNamed(
+                                    context,
+                                    'new-purchase',
+                                    arguments: {
+                                      'defaultSelectedPaymentMethod':
+                                          paymentMethod,
+                                      'cashRegisterId': _cashRegister.id,
+                                    },
+                                  );
+                                },
+                              ),
                             const SizedBox(height: 16),
                             if (_bannerPurchaseState.show)
                               Padding(
@@ -691,7 +724,7 @@ class _ViewEditCashRegisterScreenState
                                       context.read<PurchaseListBloc>().add(
                                         LoadPurchasesListEvent(
                                           AppEventSource.list,
-                                          widget.cashRegister.id,
+                                          _cashRegister.id,
                                         ),
                                       );
                                     }
@@ -773,50 +806,59 @@ class _ViewEditCashRegisterScreenState
                                               ),
                                             ),
                                             price: purchase.totalCost,
-                                            onEdit: () async {
-                                              _closeBannerPurchase();
-                                              // get selected product
-                                              final repoProduct = context
-                                                  .read<ProductsListBloc>();
-                                              final selectedProduct =
-                                                  await repoProduct.productDao
-                                                      .getById(
-                                                        purchase.productId,
-                                                      );
+                                            onEdit: !_readOnly
+                                                ? () async {
+                                                    _closeBannerPurchase();
+                                                    // get selected product
+                                                    final repoProduct = context
+                                                        .read<
+                                                          ProductsListBloc
+                                                        >();
+                                                    final selectedProduct =
+                                                        await repoProduct
+                                                            .productDao
+                                                            .getById(
+                                                              purchase
+                                                                  .productId,
+                                                            );
 
-                                              // get selected payment form
-                                              final repoPaymentMethod = context
-                                                  .read<
-                                                    PaymentMethodListBloc
-                                                  >();
-                                              final selectedPaymentMethod =
-                                                  await repoPaymentMethod
-                                                      .paymentMethodDao
-                                                      .getById(
-                                                        purchase
-                                                            .paymentMethodId,
-                                                      );
+                                                    // get selected payment form
+                                                    final repoPaymentMethod =
+                                                        context
+                                                            .read<
+                                                              PaymentMethodListBloc
+                                                            >();
+                                                    final selectedPaymentMethod =
+                                                        await repoPaymentMethod
+                                                            .paymentMethodDao
+                                                            .getById(
+                                                              purchase
+                                                                  .paymentMethodId,
+                                                            );
 
-                                              Navigator.pushNamed(
-                                                context,
-                                                'new-purchase',
-                                                arguments: {
-                                                  'selectedProduct':
-                                                      selectedProduct,
-                                                  'selectedPaymentMethod':
-                                                      selectedPaymentMethod,
-                                                  'purchase': purchase,
-                                                  'cashRegisterId':
-                                                      cashRegister.id,
-                                                },
-                                              );
-                                            },
-                                            onDelete: () {
-                                              _showDeleteConfirmationPurchase(
-                                                context,
-                                                purchase.id,
-                                              );
-                                            },
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      'new-purchase',
+                                                      arguments: {
+                                                        'selectedProduct':
+                                                            selectedProduct,
+                                                        'selectedPaymentMethod':
+                                                            selectedPaymentMethod,
+                                                        'purchase': purchase,
+                                                        'cashRegisterId':
+                                                            _cashRegister.id,
+                                                      },
+                                                    );
+                                                  }
+                                                : null,
+                                            onDelete: !_readOnly
+                                                ? () {
+                                                    _showDeleteConfirmationPurchase(
+                                                      context,
+                                                      purchase.id,
+                                                    );
+                                                  }
+                                                : null,
                                           );
                                         },
                                       );
@@ -849,19 +891,20 @@ class _ViewEditCashRegisterScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            AppButton(
-                              title: 'Agregar Gasto',
-                              onPressed: () async {
-                                _closeBannerExpense();
-                                Navigator.pushNamed(
-                                  context,
-                                  'new-expense',
-                                  arguments: {
-                                    'cashRegisterId': cashRegister.id,
-                                  },
-                                );
-                              },
-                            ),
+                            if (!_readOnly)
+                              AppButton(
+                                title: 'Agregar Gasto',
+                                onPressed: () async {
+                                  _closeBannerExpense();
+                                  Navigator.pushNamed(
+                                    context,
+                                    'new-expense',
+                                    arguments: {
+                                      'cashRegisterId': _cashRegister.id,
+                                    },
+                                  );
+                                },
+                              ),
                             const SizedBox(height: 16),
                             if (_bannerExpenseState.show)
                               Padding(
@@ -882,7 +925,7 @@ class _ViewEditCashRegisterScreenState
                                       context.read<ExpenseListBloc>().add(
                                         LoadExpensesListEvent(
                                           AppEventSource.list,
-                                          widget.cashRegister.id,
+                                          _cashRegister.id,
                                         ),
                                       );
                                     }
@@ -954,25 +997,29 @@ class _ViewEditCashRegisterScreenState
                                               ),
                                             ),
                                             price: expense.amount,
-                                            onEdit: () async {
-                                              _closeBannerExpense();
+                                            onEdit: !_readOnly
+                                                ? () async {
+                                                    _closeBannerExpense();
 
-                                              Navigator.pushNamed(
-                                                context,
-                                                'new-expense',
-                                                arguments: {
-                                                  'expense': expense,
-                                                  'cashRegisterId':
-                                                      cashRegister.id,
-                                                },
-                                              );
-                                            },
-                                            onDelete: () {
-                                              _showDeleteConfirmationExpense(
-                                                context,
-                                                expense.id,
-                                              );
-                                            },
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      'new-expense',
+                                                      arguments: {
+                                                        'expense': expense,
+                                                        'cashRegisterId':
+                                                            _cashRegister.id,
+                                                      },
+                                                    );
+                                                  }
+                                                : null,
+                                            onDelete: !_readOnly
+                                                ? () {
+                                                    _showDeleteConfirmationExpense(
+                                                      context,
+                                                      expense.id,
+                                                    );
+                                                  }
+                                                : null,
                                           );
                                         },
                                       );
@@ -1005,19 +1052,20 @@ class _ViewEditCashRegisterScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            AppButton(
-                              title: 'Agregar Ingreso',
-                              onPressed: () async {
-                                _closeBannerIncome();
-                                Navigator.pushNamed(
-                                  context,
-                                  'new-income',
-                                  arguments: {
-                                    'cashRegisterId': cashRegister.id,
-                                  },
-                                );
-                              },
-                            ),
+                            if (!_readOnly)
+                              AppButton(
+                                title: 'Agregar Ingreso',
+                                onPressed: () async {
+                                  _closeBannerIncome();
+                                  Navigator.pushNamed(
+                                    context,
+                                    'new-income',
+                                    arguments: {
+                                      'cashRegisterId': _cashRegister.id,
+                                    },
+                                  );
+                                },
+                              ),
                             const SizedBox(height: 16),
                             if (_bannerIncomeState.show)
                               Padding(
@@ -1038,7 +1086,7 @@ class _ViewEditCashRegisterScreenState
                                       context.read<IncomeListBloc>().add(
                                         LoadIncomesListEvent(
                                           AppEventSource.list,
-                                          widget.cashRegister.id,
+                                          _cashRegister.id,
                                         ),
                                       );
                                     }
@@ -1110,25 +1158,29 @@ class _ViewEditCashRegisterScreenState
                                               ),
                                             ),
                                             price: income.amount,
-                                            onEdit: () async {
-                                              _closeBannerIncome();
+                                            onEdit: !_readOnly
+                                                ? () async {
+                                                    _closeBannerIncome();
 
-                                              Navigator.pushNamed(
-                                                context,
-                                                'new-income',
-                                                arguments: {
-                                                  'income': income,
-                                                  'cashRegisterId':
-                                                      cashRegister.id,
-                                                },
-                                              );
-                                            },
-                                            onDelete: () {
-                                              _showDeleteConfirmationIncome(
-                                                context,
-                                                income.id,
-                                              );
-                                            },
+                                                    Navigator.pushNamed(
+                                                      context,
+                                                      'new-income',
+                                                      arguments: {
+                                                        'income': income,
+                                                        'cashRegisterId':
+                                                            _cashRegister.id,
+                                                      },
+                                                    );
+                                                  }
+                                                : null,
+                                            onDelete: !_readOnly
+                                                ? () {
+                                                    _showDeleteConfirmationIncome(
+                                                      context,
+                                                      income.id,
+                                                    );
+                                                  }
+                                                : null,
                                           );
                                         },
                                       );
@@ -1283,50 +1335,58 @@ class _ViewEditCashRegisterScreenState
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Actualizar Fecha de Caja'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Date selector
-                TextButton.icon(
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text(AppUtils.formatDate(selectedDate)),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Actualizar Fecha de Caja'),
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Date selector
+                    TextButton.icon(
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(AppUtils.formatDate(selectedDate)),
+                      onPressed: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 365),
+                          ),
+                        );
+                        if (picked != null) {
+                          setState(() {
+                            selectedDate = picked;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar'),
+                ),
+                ElevatedButton(
                   onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    context.read<CashRegisterUpdateDateBloc>().add(
+                      UpdateCashRegisterDateEvent(
+                        cashRegister.id,
+                        AppUtils.formatDate(selectedDate),
+                      ),
                     );
-                    if (picked != null) {
-                      selectedDate = picked;
-                    }
+                    Navigator.pop(context);
                   },
+                  child: const Text('Actualizar'),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                context.read<CashRegisterUpdateDateBloc>().add(
-                  UpdateCashRegisterDateEvent(
-                    cashRegister.id,
-                    AppUtils.formatDate(selectedDate),
-                  ),
-                );
-                Navigator.pop(context);
-              },
-              child: const Text('Actualizar'),
-            ),
-          ],
+            );
+          },
         );
       },
     );

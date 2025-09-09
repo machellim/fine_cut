@@ -72,10 +72,12 @@ final Map<String, WidgetBuilder> appRoutes = {
 Route<dynamic>? generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case 'view-edit-cash-register':
-      final cashRegister = settings.arguments as CashRegister;
+      final args = settings.arguments as Map<String, dynamic>;
       return MaterialPageRoute(
-        builder: (context) =>
-            ViewEditCashRegisterScreen(cashRegister: cashRegister),
+        builder: (context) => ViewEditCashRegisterScreen(
+          cashRegister: args['cashRegister'] as CashRegister,
+          readOnly: args['readOnly'] as bool? ?? false,
+        ),
       );
     default:
       return null; // o una ruta por defecto

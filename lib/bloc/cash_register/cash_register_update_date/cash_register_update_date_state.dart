@@ -13,9 +13,9 @@ final class CashRegisterUpdateDateInitial extends CashRegisterUpdateDateState {}
 class UpdateCashRegisterDateLoading extends CashRegisterUpdateDateState {}
 
 class UpdateCashRegisterDateLoadSuccess extends CashRegisterUpdateDateState {
-  final DateTime registerDate;
+  final CashRegister cashRegister;
 
-  const UpdateCashRegisterDateLoadSuccess(this.registerDate);
+  const UpdateCashRegisterDateLoadSuccess(this.cashRegister);
 }
 
 class UpdateCashRegisterDateLoadFailure extends CashRegisterUpdateDateState {

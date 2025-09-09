@@ -8,6 +8,7 @@ import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:fine_cut/widgets/app_number_field.dart';
@@ -99,6 +100,7 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AppScaffold(
       appBar: AppBar(
         title: Text(
@@ -173,6 +175,36 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
                                 ),
                               );
                             },
+                            itemBuilder:
+                                (context, item, isDisabled, isSelected) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    color: isSelected
+                                        ? theme.colorScheme.primary.withAlpha(
+                                            (0.2 * 255).round(),
+                                          )
+                                        : null, // resaltar el item seleccionado
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            item.name,
+                                            style: theme.textTheme.bodyMedium,
+                                          ),
+                                        ),
+
+                                        if (item.hasSubProducts)
+                                          AppBadgeStatus(
+                                            text: 'Primario',
+                                            type: BadgeType.success,
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
                           ),
                         ),
                         const SizedBox(height: 30.0),

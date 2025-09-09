@@ -133,7 +133,7 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                               Navigator.pushNamed(
                                 context,
                                 'view-edit-cash-register',
-                                arguments: cashRegister,
+                                arguments: {'cashRegister': cashRegister},
                               );
                             }
                           },

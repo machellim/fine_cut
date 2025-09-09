@@ -78,7 +78,7 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
                         Navigator.pushNamed(
                           context,
                           'view-edit-cash-register',
-                          arguments: state.cashRegister,
+                          arguments: {'cashRegister': state.cashRegister},
                         ),
                       },
                   },
@@ -180,7 +180,28 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
                                       ),
                                     ],
                                   )
-                                : null,
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.remove_red_eye),
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                        tooltip: 'Ver',
+                                        onPressed: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            'view-edit-cash-register',
+                                            arguments: {
+                                              'cashRegister': cashRegister,
+                                              'readOnly': true,
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
                           ),
                           Divider(
                             color: Colors.grey, // Color de la línea

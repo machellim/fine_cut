@@ -7,6 +7,9 @@ sealed class CashRegisterUpdateDateEvent extends Equatable {
   List<Object> get props => [];
 }
 
+// event to reset state
+class ResetUpdateCashRegisterDateEvent extends CashRegisterUpdateDateEvent {}
+
 // Event to update cash register date
 class UpdateCashRegisterDateEvent extends CashRegisterUpdateDateEvent {
   final int cashRegisterId;
