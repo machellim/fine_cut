@@ -11,8 +11,8 @@ class SaleParentProductBloc
   final SaleDao saleDao;
   SaleParentProductBloc({required this.saleDao})
     : super(SaleParentProductInitial()) {
-    on<SaleParentProductEvent>((event, emit) {
-      // TODO: implement event handler
+    on<ResetGetParentProductEvent>((event, emit) {
+      emit(SaleParentProductInitial());
     });
 
     on<GetParentProductEvent>((event, emit) async {
@@ -22,7 +22,11 @@ class SaleParentProductBloc
         final purchases = await saleDao.getPurchasesBySubproductId(
           subproduct.id,
         );
-        if (purchases.isNotEmpty) {
+        // check if productId is subproduct
+        final bool isSubproduct = await saleDao.existsAsSubproduct(
+          subproduct.id,
+        );
+        if (isSubproduct) {
           emit(GetParentProductSuccess(purchases, subproduct.id));
         } else {
           emit(SaleParentProductInitial());

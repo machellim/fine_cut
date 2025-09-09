@@ -7,6 +7,9 @@ sealed class SaleParentProductEvent extends Equatable {
   List<Object> get props => [];
 }
 
+// event to reset state
+class ResetGetParentProductEvent extends SaleParentProductEvent {}
+
 // Event to get parent product
 class GetParentProductEvent extends SaleParentProductEvent {
   final Product product;

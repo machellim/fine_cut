@@ -55,6 +55,10 @@ class NewSaleScreenState extends State<NewSaleScreen> {
   void initState() {
     super.initState();
 
+    // restart state
+    context.read<SaleCrudBloc>().add(ResetSaleEvent());
+    context.read<SaleParentProductBloc>().add(ResetGetParentProductEvent());
+
     Future.microtask(() {
       if (!mounted) return;
       final args = ModalRoute.of(context)?.settings.arguments as Map;

@@ -7,6 +7,9 @@ sealed class SaleCrudEvent extends Equatable {
   List<Object> get props => [];
 }
 
+// event to reset state
+class ResetSaleEvent extends SaleCrudEvent {}
+
 // create or update sale
 class CreateSaleEvent extends SaleCrudEvent {
   final RecordAction recordAction;

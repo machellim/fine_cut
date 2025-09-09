@@ -99,4 +99,12 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
   Future<List<Sale>> getSalesByPurchaseId(int purchaseId) {
     return (select(sales)..where((s) => s.purchaseId.equals(purchaseId))).get();
   }
+
+  Future<bool> existsAsSubproduct(int productId) async {
+    final query = select(db.productSubproducts)
+      ..where((tbl) => tbl.subproductId.equals(productId));
+
+    final result = await query.getSingleOrNull();
+    return result != null;
+  }
 }

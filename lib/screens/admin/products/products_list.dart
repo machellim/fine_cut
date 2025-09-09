@@ -157,7 +157,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
         onPressed: () async {
           await Navigator.pushNamed(context, 'new-product');
         },
-        tooltip: 'Agregar Categoría',
+        tooltip: 'Agregar Producto',
         icon: Icons.add,
       ),
     );
