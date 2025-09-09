@@ -1,18 +1,10 @@
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_event.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_state.dart';
 import 'package:fine_cut/bloc/purchase/parent_product_stock/parent_product_stock_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
-import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
-import 'package:fine_cut/widgets/app_circular_progress_text.dart';
-import 'package:fine_cut/widgets/app_description_list_item.dart';
-import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
-import 'package:fine_cut/widgets/app_title_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -39,10 +31,7 @@ class _ParentProductStockListScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarCustom(title: "Stock de Producto Principal"),
-      body: BlocConsumer<ParentProductStockBloc, ParentProductStockState>(
-        listener: (context, state) => {
-          if (state is ParentProductStockListLoadSuccess) {},
-        },
+      body: BlocBuilder<ParentProductStockBloc, ParentProductStockState>(
         builder: (context, state) {
           if (state is ParentProductStockListLoading) {
             return AppLoadingScreen(

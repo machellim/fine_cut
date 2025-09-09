@@ -46,6 +46,7 @@ class _NewCategoryScreenState extends State<NewCategoryScreen> {
     context.read<CategoryBloc>().add(ResetCategoryEvent());
 
     Future.microtask(() {
+      if (!mounted) return;
       final args = ModalRoute.of(context)?.settings.arguments as Category?;
 
       if (args != null) {

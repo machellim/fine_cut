@@ -1,11 +1,7 @@
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_event.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_state.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
-import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_description_list_item.dart';
 import 'package:fine_cut/widgets/app_floating_action_button.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
@@ -30,7 +26,6 @@ class _CategoriesListScreenState extends State<CategoriesListScreen> {
   @override
   void initState() {
     super.initState();
-    // Disparar el evento para cargar las categorías cuando se abre la pantalla
     context.read<CategoriesListBloc>().add(
       LoadCategoriesListEvent(AppEventSource.list),
     );
