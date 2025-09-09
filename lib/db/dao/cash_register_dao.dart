@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/enums/enums.dart';
+import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/models/cash_register_result.dart';
 import 'package:intl/intl.dart';
 import '../database.dart';
@@ -56,10 +57,12 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  Future<CashRegisterResult> createCashRegister({
+  Future<CashRegisterResult> createOrUpdateCashRegister({
     required String registerDateString,
-    required double openingAmount,
+    required RecordAction action,
+    double? openingAmount,
     String? notes,
+    int? cashRegisterId, // necesario si action == update
   }) async {
     // Parse the input date
     final dateFormat = DateFormat("dd-MM-yyyy");
@@ -87,44 +90,98 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     // 2️⃣ Validate that the input date is not earlier than the last existing register
     if (lastRegister != null && dateOnly.isBefore(lastRegister.registerDate)) {
       return CashRegisterResult.failure(
-        CashRegisterError.earlierThanLast, // new error to define
-        lastRegister,
+        CashRegisterError.earlierThanLast,
+        cashRegister: lastRegister,
+        message: 'No se puede modificar.',
       );
     }
 
-    // 3️⃣ Check if there is an open cash register
-    final openRegister =
-        await (select(cashRegisters)
-              ..where((tbl) => tbl.status.equals(CashRegisterStatus.open.name)))
-            .getSingleOrNull();
+    if (action == RecordAction.create) {
+      // 3️⃣ Check if there is an open cash register
+      final openRegister =
+          await (select(cashRegisters)..where(
+                (tbl) => tbl.status.equals(CashRegisterStatus.open.name),
+              ))
+              .getSingleOrNull();
 
-    if (openRegister != null) {
-      return CashRegisterResult.failure(
-        CashRegisterError.alreadyOpen,
-        openRegister,
+      if (openRegister != null) {
+        return CashRegisterResult.failure(
+          CashRegisterError.alreadyOpen,
+          cashRegister: openRegister,
+          message:
+              'Ya existe una caja abierta en la fecha ${AppUtils.formatDate(openRegister.registerDate)}',
+        );
+      }
+
+      // 4️⃣ Check if a cash register already exists for the same date
+      final existing = await (select(
+        cashRegisters,
+      )..where((tbl) => tbl.registerDate.equals(dateOnly))).getSingleOrNull();
+
+      if (existing != null) {
+        return CashRegisterResult.failure(
+          CashRegisterError.sameDate,
+          cashRegister: existing,
+          message:
+              'Ya existe una caja en la fecha ${AppUtils.formatDate(existing.registerDate)}',
+        );
+      }
+
+      // 5️⃣ Create the new cash register
+      final companion = CashRegistersCompanion.insert(
+        registerDate: Value(dateOnly),
+        openingAmount: Value(openingAmount!),
+        status: Value(CashRegisterStatus.open),
+        notes: Value(notes),
       );
+
+      final newRegister = await into(cashRegisters).insertReturning(companion);
+
+      return CashRegisterResult.success(newRegister);
+    } else if (action == RecordAction.update) {
+      if (cashRegisterId == null) {
+        throw ArgumentError('cashRegisterId must be provided for update');
+      }
+
+      // Check if another cash register already exists with this date
+      final existing =
+          await (select(cashRegisters)..where(
+                (tbl) =>
+                    tbl.registerDate.equals(dateOnly) &
+                    tbl.id.isNotIn([cashRegisterId]),
+              ))
+              .getSingleOrNull();
+
+      if (existing != null) {
+        return CashRegisterResult.failure(
+          CashRegisterError.sameDate,
+          cashRegister: existing,
+          message:
+              'Ya existe una caja en la fecha ${AppUtils.formatDate(existing.registerDate)}',
+        );
+      }
+
+      // Update only the registerDate
+      final companion = CashRegistersCompanion(registerDate: Value(dateOnly));
+
+      final updated =
+          await (update(cashRegisters)
+                ..where((tbl) => tbl.id.equals(cashRegisterId)))
+              .writeReturning(companion);
+
+      if (updated.isEmpty) {
+        return CashRegisterResult.failure(
+          CashRegisterError.notFound,
+          cashRegister: null,
+          message: 'No se actualizó ninguna caja.',
+        );
+      }
+
+      return CashRegisterResult.success(updated[0]);
     }
 
-    // 4️⃣ Check if a cash register already exists for the same date
-    final existing = await (select(
-      cashRegisters,
-    )..where((tbl) => tbl.registerDate.equals(dateOnly))).getSingleOrNull();
-
-    if (existing != null) {
-      return CashRegisterResult.failure(CashRegisterError.sameDate, existing);
-    }
-
-    // 5️⃣ Create the new cash register
-    final companion = CashRegistersCompanion.insert(
-      registerDate: Value(dateOnly),
-      openingAmount: Value(openingAmount),
-      status: Value(CashRegisterStatus.open),
-      notes: Value(notes),
-    );
-
-    final newRegister = await into(cashRegisters).insertReturning(companion);
-
-    return CashRegisterResult.success(newRegister);
+    // Default fallback
+    throw UnimplementedError('Action $action not handled');
   }
 
   Future<CashRegister?> getLastCashRegisterByStatus(CashRegisterStatus status) {

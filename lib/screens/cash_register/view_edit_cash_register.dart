@@ -1,5 +1,6 @@
 import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
+import 'package:fine_cut/bloc/cash_register/cash_register_update_date/cash_register_update_date_bloc.dart';
 import 'package:fine_cut/bloc/expense/expense_crud/expense_crud_bloc.dart';
 import 'package:fine_cut/bloc/expense/expense_list/expense_list_bloc.dart';
 import 'package:fine_cut/bloc/income/income_crud/income_crud_bloc.dart';
@@ -128,6 +129,27 @@ class _ViewEditCashRegisterScreenState
       _bannerIncomeState = _bannerIncomeState.copyWith(show: false);
     });
   }
+
+  // ===== banner cash register update date ========
+  BannerState _bannerUpdateDateState = BannerState.initial();
+  void _showTopBannerUpdateDate(
+    String message, {
+    AppBannerType type = AppBannerType.success,
+  }) {
+    setState(() {
+      _bannerUpdateDateState = _bannerUpdateDateState.copyWith(
+        show: true,
+        message: message,
+        type: type,
+      );
+    });
+  }
+
+  void _closeBannerUpdateDate() {
+    setState(() {
+      _bannerUpdateDateState = _bannerUpdateDateState.copyWith(show: false);
+    });
+  }
   //===============================
 
   void _loadAvailableBalance() {
@@ -191,6 +213,22 @@ class _ViewEditCashRegisterScreenState
                   ],
                 ),
               ),
+              PopupMenuItem(
+                value: 'update-cash-register-date',
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.calendar_today),
+                    SizedBox(width: 8),
+                    Text('Actualizar Fecha'),
+                  ],
+                ),
+                onTap: () {
+                  _showUpdateCashRegisterDateDialog(
+                    context,
+                    widget.cashRegister,
+                  );
+                },
+              ),
             ],
           ),
         ],
@@ -233,6 +271,15 @@ class _ViewEditCashRegisterScreenState
                     messageType: MessageType.error,
                   ),
                 const SizedBox(height: 20),
+                if (_bannerUpdateDateState.show)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: AppTopBanner(
+                      message: _bannerUpdateDateState.message,
+                      type: _bannerUpdateDateState.type,
+                      onClose: _closeBannerUpdateDate,
+                    ),
+                  ),
                 Row(
                   children: [
                     Expanded(
@@ -245,16 +292,52 @@ class _ViewEditCashRegisterScreenState
                           ).colorScheme.primary.withAlpha((0.1 * 255).toInt()),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Fecha Caja:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                        child:
+                            BlocConsumer<
+                              CashRegisterUpdateDateBloc,
+                              CashRegisterUpdateDateState
+                            >(
+                              listener: (context, state) {
+                                if (state
+                                    is UpdateCashRegisterDateLoadSuccess) {
+                                  _showTopBannerUpdateDate(
+                                    'Fecha actualizada correctamente.',
+                                    type: AppBannerType.success,
+                                  );
+                                }
+                                if (state
+                                    is UpdateCashRegisterDateLoadFailure) {
+                                  _showTopBannerUpdateDate(
+                                    state.message,
+                                    type: AppBannerType.error,
+                                  );
+                                }
+                              },
+                              builder: (context, state) {
+                                String dateToShow = registerDate;
+                                if (state is UpdateCashRegisterDateLoading) {
+                                  return Text('Actualizando . .');
+                                }
+                                if (state
+                                    is UpdateCashRegisterDateLoadSuccess) {
+                                  dateToShow = AppUtils.formatDate(
+                                    state.registerDate,
+                                  );
+                                }
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Fecha Caja:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(dateToShow),
+                                  ],
+                                );
+                              },
                             ),
-                            Text(registerDate),
-                          ],
-                        ),
                       ),
                     ),
                     Expanded(
@@ -304,7 +387,7 @@ class _ViewEditCashRegisterScreenState
                             >(
                               builder: (context, state) {
                                 if (state is AvailableBalanceLoading) {
-                                  return Text('Loading . .');
+                                  return Text('Actualizando . .');
                                 } else if (state
                                     is AvailableBalanceLoadSuccess) {
                                   return Text(
@@ -1185,6 +1268,65 @@ class _ViewEditCashRegisterScreenState
               CloseCashRegisterEvent(cashRegisterId),
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showUpdateCashRegisterDateDialog(
+    BuildContext context,
+    CashRegister cashRegister,
+  ) {
+    final formKey = GlobalKey<FormState>();
+    DateTime selectedDate = cashRegister.registerDate;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Actualizar Fecha de Caja'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Date selector
+                TextButton.icon(
+                  icon: const Icon(Icons.calendar_today),
+                  label: Text(AppUtils.formatDate(selectedDate)),
+                  onPressed: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (picked != null) {
+                      selectedDate = picked;
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                context.read<CashRegisterUpdateDateBloc>().add(
+                  UpdateCashRegisterDateEvent(
+                    cashRegister.id,
+                    AppUtils.formatDate(selectedDate),
+                  ),
+                );
+                Navigator.pop(context);
+              },
+              child: const Text('Actualizar'),
+            ),
+          ],
         );
       },
     );

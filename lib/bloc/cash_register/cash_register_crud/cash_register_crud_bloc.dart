@@ -17,11 +17,13 @@ class CashRegisterCrudBloc
       emit(CreateCashRegisterLoading());
       //await Future.delayed(Duration(seconds: 3));
       try {
-        final cashRegisterResult = await cashRegisterDao.createCashRegister(
-          registerDateString: event.registerDate,
-          openingAmount: event.openingAmount,
-          notes: event.notes,
-        );
+        final cashRegisterResult = await cashRegisterDao
+            .createOrUpdateCashRegister(
+              registerDateString: event.registerDate,
+              openingAmount: event.openingAmount,
+              notes: event.notes,
+              action: RecordAction.create,
+            );
         if (!cashRegisterResult.isSuccess) {
           final cashRegister = cashRegisterResult.cashRegister!;
 

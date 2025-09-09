@@ -9,6 +9,8 @@ enum CashRegisterError {
   sameDate,
 
   earlierThanLast,
+
+  notFound,
 }
 
 enum RecordStatus { active, deleted }
