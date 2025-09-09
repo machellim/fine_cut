@@ -19,6 +19,7 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: padding,
       child: ElevatedButton(
@@ -29,23 +30,30 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.0),
           ),
           elevation: 5.0,
-          minimumSize: const Size(200.0, 50.0),
+          minimumSize: const Size(double.infinity, 50.0), // full width
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: colorScheme.onPrimary,
-                fontSize: fontSize,
-                fontWeight: FontWeight.normal,
+            // Flexible para que el texto se ajuste y no genere overflow
+            Flexible(
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: colorScheme.onPrimary,
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.normal,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             if (isLoading)
               Padding(
-                padding: const EdgeInsets.only(left: 4),
+                padding: const EdgeInsets.only(left: 8),
                 child: SizedBox(
                   width: 18,
                   height: 18,

@@ -118,7 +118,7 @@ class _ParentProductSalesListScreenState
                               ),
                               TextSpan(
                                 text:
-                                    '\$${purchase.totalCost.toStringAsFixed(2)}',
+                                    '\$${AppUtils.formatDouble(purchase.totalCost)}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
@@ -188,11 +188,14 @@ class _ParentProductSalesListScreenState
                                         }
 
                                         // Total ventas para esta purchase
-                                        final totalVentas = sales.fold<double>(
+                                        final totalSales = sales.fold<double>(
                                           0.0,
                                           (prev, sale) =>
                                               prev + (sale.totalPrice ?? 0),
                                         );
+
+                                        final difference =
+                                            totalSales - purchase.totalCost;
 
                                         return Column(
                                           crossAxisAlignment:
@@ -218,11 +221,41 @@ class _ParentProductSalesListScreenState
                                                       ),
                                                       TextSpan(
                                                         text:
-                                                            '\$${AppUtils.formatDouble(totalVentas)}',
+                                                            '\$${AppUtils.formatDouble(totalSales)}',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           color: primaryColor,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                RichText(
+                                                  text: TextSpan(
+                                                    style: theme
+                                                        .textTheme
+                                                        .bodyMedium,
+                                                    children: [
+                                                      const TextSpan(
+                                                        text: 'Ganancia: ',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            '\$ ${AppUtils.formatDouble(difference)}',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: difference < 0
+                                                              ? Colors
+                                                                    .redAccent // negative → red
+                                                              : theme
+                                                                    .colorScheme
+                                                                    .primary, // positive → adapts to dark/light mode
                                                         ),
                                                       ),
                                                     ],

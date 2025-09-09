@@ -61,7 +61,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
     super.initState();
 
     // restart state
-    //context.read<ProductCrudBloc>().add(ResetProductCrudEvent());
+    context.read<ProductCrudBloc>().add(ResetProductCrudEvent());
 
     productCompanion = productCompanion.copyWith(
       hasSubProducts: drift.Value(
@@ -70,6 +70,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
     );
 
     Future.microtask(() {
+      if (!mounted) return;
       final args = ModalRoute.of(context)?.settings.arguments as Map?;
       if (args != null) {
         final product = args['product'] as Product;
@@ -221,12 +222,10 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     },
                   ),
 
-                  // Después del AppBoolSwitch
                   if (productCompanion.hasSubProducts.value) ...[
                     const SizedBox(height: 20),
                     DropdownSearch<Product>.multiSelection(
                       items: (filter, loadProps) async {
-                        // Aquí iría la lógica de búsqueda de productos, por ahora mock
                         final repo = context.read<ProductsListBloc>();
                         return await repo.productDao.searchProducts(filter);
                       },
@@ -251,6 +250,14 @@ class _NewProductScreenState extends State<NewProductScreen> {
                         }
                         return null;
                       },*/
+                      decoratorProps: DropDownDecoratorProps(
+                        decoration: InputDecoration(
+                          labelText: 'Seleccione subproductos',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
                       popupProps: PopupPropsMultiSelection.menu(
                         showSearchBox: true,
                         constraints: const BoxConstraints(maxHeight: 250),

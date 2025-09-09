@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fine_cut/db/dao/cash_register_dao.dart';
-import 'package:fine_cut/db/database.dart';
 
 part 'cash_register_data_event.dart';
 part 'cash_register_data_state.dart';
@@ -11,10 +10,6 @@ class CashRegisterDataBloc
   final CashRegisterDao cashRegisterDao;
   CashRegisterDataBloc({required this.cashRegisterDao})
     : super(CashRegisterInitial()) {
-    on<CashRegisterDataEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<LoadDataCashRegisterEvent>((event, emit) async {
       emit(DataCashRegisterLoading());
       //await Future.delayed(Duration(seconds: 3));

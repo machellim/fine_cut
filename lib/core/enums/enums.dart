@@ -7,6 +7,8 @@ enum CashRegisterError {
   alreadyOpen,
   // cash register already existed on the same date
   sameDate,
+
+  earlierThanLast,
 }
 
 enum RecordStatus { active, deleted }

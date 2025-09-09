@@ -65,6 +65,22 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  /*Future<List<Purchase>> getPurchasesWithSubproducts() async {
+    final query =
+        select(purchases).join([
+            innerJoin(
+              db.products,
+              db.products.id.equalsExp(purchases.productId),
+            ),
+          ])
+          ..where(db.products.hasSubProducts.equals(true))
+          ..limit(AppConstants.listResultsLimit);
+
+    final results = await query.map((row) => row.readTable(purchases)).get();
+
+    return results;
+  }*/
+
   Future<List<Purchase>> getPurchasesWithSubproducts() async {
     final query =
         select(purchases).join([
@@ -74,6 +90,12 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
             ),
           ])
           ..where(db.products.hasSubProducts.equals(true))
+          ..orderBy([
+            OrderingTerm(
+              expression: purchases.createdAt,
+              mode: OrderingMode.desc,
+            ),
+          ])
           ..limit(AppConstants.listResultsLimit);
 
     final results = await query.map((row) => row.readTable(purchases)).get();

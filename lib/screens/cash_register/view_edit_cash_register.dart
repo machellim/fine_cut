@@ -1093,7 +1093,7 @@ class _ViewEditCashRegisterScreenState
       context: context,
       builder: (BuildContext context) {
         return AppAlertDialog(
-          title: '¿Seguro que deseas eliminar esta compra?',
+          title: '¿Seguro que desea eliminar esta compra?',
           content: 'Esta acción no se puede deshacer.',
           onCancel: () {
             // close dialog
@@ -1114,7 +1114,7 @@ class _ViewEditCashRegisterScreenState
       context: context,
       builder: (BuildContext context) {
         return AppAlertDialog(
-          title: '¿Seguro que deseas eliminar esta venta?',
+          title: '¿Seguro que desea eliminar esta venta?',
           content: 'Esta acción no se puede deshacer.',
           onCancel: () {
             // close dialog
@@ -1133,7 +1133,7 @@ class _ViewEditCashRegisterScreenState
       context: context,
       builder: (BuildContext context) {
         return AppAlertDialog(
-          title: '¿Seguro que deseas eliminar este gasto?',
+          title: '¿Seguro que desea eliminar este gasto?',
           content: 'Esta acción no se puede deshacer.',
           onCancel: () {
             // close dialog
@@ -1152,7 +1152,7 @@ class _ViewEditCashRegisterScreenState
       context: context,
       builder: (BuildContext context) {
         return AppAlertDialog(
-          title: '¿Seguro que deseas eliminar este ingreso?',
+          title: '¿Seguro que desea eliminar este ingreso?',
           content: 'Esta acción no se puede deshacer.',
           onCancel: () {
             // close dialog
@@ -1174,7 +1174,7 @@ class _ViewEditCashRegisterScreenState
       context: context,
       builder: (BuildContext context) {
         return AppAlertDialog(
-          title: '¿Seguro que deseas cerrar esta caja?',
+          title: '¿Seguro que desea cerrar esta caja?',
           content: 'Esta acción no se puede deshacer.',
           onCancel: () {
             // close dialog

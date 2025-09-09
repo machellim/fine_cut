@@ -2,10 +2,12 @@ import 'package:fine_cut/bloc/category/search_categories/search_categories_bloc.
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
+import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_floating_action_button.dart';
 import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
+import 'package:fine_cut/widgets/app_title_list_item.dart';
 import 'package:fine_cut/widgets/app_top_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -90,12 +92,25 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                     child: ListView.builder(
                       itemCount: state.products.length,
                       itemBuilder: (context, index) {
-                        final productName = state.products[index].name;
-                        final productStock = state.products[index].stock;
+                        final product = state.products[index];
+                        final productName = product.name;
                         return Column(
                           children: [
                             AppListItem(
-                              title: Text(productName),
+                              title: Row(
+                                children: [
+                                  AppTitleListItem(
+                                    text: productName,
+                                    status: product.status.name,
+                                  ),
+                                  SizedBox(width: 4),
+                                  if (product.hasSubProducts)
+                                    AppBadgeStatus(
+                                      text: 'Primario',
+                                      type: BadgeType.success,
+                                    ),
+                                ],
+                              ),
                               /*description: Text(
                                 "Stock: $productStock",
                                 style: TextStyle(
@@ -106,17 +121,16 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                 ),
                               ),*/
                               onEdit: () async {
-                                final product = state.products[index];
-
                                 // Obtener la categoría completa antes de abrir la pantalla
                                 final repoCategory = context
                                     .read<SearchCategoriesBloc>();
+                                final repoProduct = context
+                                    .read<ProductsListBloc>();
+
                                 final category = await repoCategory.categoryDao
                                     .getById(product.categoryId);
 
                                 // suproducts
-                                final repoProduct = context
-                                    .read<ProductsListBloc>();
                                 final subproducts = await repoProduct.productDao
                                     .getSubproductsByProduct(product);
 

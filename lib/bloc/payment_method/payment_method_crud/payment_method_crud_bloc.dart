@@ -18,7 +18,7 @@ class PaymentMethodCrudBloc
     on<CreatePaymentMethodEvent>((event, emit) async {
       try {
         emit(PaymentMethodCreationInProgress());
-
+        await Future.delayed(Duration(seconds: 2));
         if (event.action == 'create') {
           final paymentMethod = await paymentMethodDao.createPaymentMethod(
             name: event.paymentMethod.name.value,

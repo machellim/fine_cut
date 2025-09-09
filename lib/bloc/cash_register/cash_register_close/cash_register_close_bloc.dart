@@ -17,7 +17,7 @@ class CashRegisterCloseBloc
     on<CloseCashRegisterEvent>((event, emit) async {
       try {
         emit(CloseCashRegisterLoading());
-        await Future.delayed(Duration(seconds: 2));
+        await Future.delayed(Duration(seconds: 1));
         await cashRegisterDao.closeCashRegister(
           cashRegisterId: event.cashRegisterId,
         );

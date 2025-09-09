@@ -17,7 +17,7 @@ class ProductCrudBloc extends Bloc<ProductCrudEvent, ProductCrudState> {
     on<CreateProductCrudEvent>((event, emit) async {
       try {
         emit(ProductCrudCreationInProgress());
-
+        //await Future.delayed(Duration(seconds: 2));
         if (event.recordAction == RecordAction.create) {
           final product = await productDao.createProduct(
             categoryId: event.product.categoryId.value,

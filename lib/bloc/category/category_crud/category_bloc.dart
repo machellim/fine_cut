@@ -16,7 +16,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     on<CreateCategoryEvent>((event, emit) async {
       try {
         emit(CategoryCreationInProgress());
-
+        // await Future.delayed(Duration(seconds: 2));
         if (event.action == 'create') {
           final category = await categoryDao.createCategory(
             name: event.category.name.value,

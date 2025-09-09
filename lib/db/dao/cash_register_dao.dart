@@ -61,18 +61,38 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     required double openingAmount,
     String? notes,
   }) async {
-    // Parsear la fecha
+    // Parse the input date
     final dateFormat = DateFormat("dd-MM-yyyy");
     final parsedDate = dateFormat.parse(registerDateString);
 
-    // Truncar hora para guardar solo la fecha
+    // Truncate the time to keep only the date
     final dateOnly = DateTime(
       parsedDate.year,
       parsedDate.month,
       parsedDate.day,
     );
 
-    // 1️⃣ Check if there is an open cash register
+    // 1️⃣ Get the last registered cash register (if any)
+    final lastRegister =
+        await (select(cashRegisters)
+              ..orderBy([
+                (tbl) => OrderingTerm(
+                  expression: tbl.registerDate,
+                  mode: OrderingMode.desc,
+                ),
+              ])
+              ..limit(1))
+            .getSingleOrNull();
+
+    // 2️⃣ Validate that the input date is not earlier than the last existing register
+    if (lastRegister != null && dateOnly.isBefore(lastRegister.registerDate)) {
+      return CashRegisterResult.failure(
+        CashRegisterError.earlierThanLast, // new error to define
+        lastRegister,
+      );
+    }
+
+    // 3️⃣ Check if there is an open cash register
     final openRegister =
         await (select(cashRegisters)
               ..where((tbl) => tbl.status.equals(CashRegisterStatus.open.name)))
@@ -85,17 +105,16 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
       );
     }
 
-    // 2️⃣ Check if a cash register already exists for the specified date
+    // 4️⃣ Check if a cash register already exists for the same date
     final existing = await (select(
       cashRegisters,
     )..where((tbl) => tbl.registerDate.equals(dateOnly))).getSingleOrNull();
 
     if (existing != null) {
-      // Retornar error con la caja existente
       return CashRegisterResult.failure(CashRegisterError.sameDate, existing);
     }
 
-    // 3️⃣ Create new cash register
+    // 5️⃣ Create the new cash register
     final companion = CashRegistersCompanion.insert(
       registerDate: Value(dateOnly),
       openingAmount: Value(openingAmount),

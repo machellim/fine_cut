@@ -1,8 +1,4 @@
 import 'package:drift/drift.dart' as drift;
-import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_bloc.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_event.dart';
-import 'package:fine_cut/bloc/category/category_crud/category_state.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_crud/payment_method_crud_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
@@ -51,6 +47,7 @@ class _NewPaymentMethodScreenState extends State<NewPaymentMethodScreen> {
     context.read<PaymentMethodCrudBloc>().add(ResetPaymentMethodCrudEvent());
 
     Future.microtask(() {
+      if (!mounted) return;
       final args = ModalRoute.of(context)?.settings.arguments as PaymentMethod?;
 
       if (args != null) {

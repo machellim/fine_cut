@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' as drift;
 import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
@@ -8,7 +7,6 @@ import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_date_field.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
-import 'package:intl/intl.dart';
 
 import 'package:fine_cut/widgets/app_scaffold.dart';
 import 'package:fine_cut/widgets/app_textfield.dart';
@@ -96,7 +94,9 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                           ),
                           lastDate: DateTime.now(),
                           onDateSelected: (date) {
-                            print("Fecha seleccionada: $date");
+                            _registerDateController.text = AppUtils.formatDate(
+                              date,
+                            );
                           },
                         ),
                         const SizedBox(height: 20),

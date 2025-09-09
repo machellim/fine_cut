@@ -96,6 +96,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                           children: [
                             // Encabezado
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.point_of_sale,
@@ -104,7 +105,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  "Caja Anterior",
+                                  "Última Caja",
                                   style: theme.textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,

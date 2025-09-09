@@ -160,7 +160,7 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
         onPressed: () async {
           await Navigator.pushNamed(context, 'new-payment-method');
         },
-        tooltip: 'Agregar Categoría',
+        tooltip: 'Agregar Forma de Pago',
         icon: Icons.add,
       ),
     );
