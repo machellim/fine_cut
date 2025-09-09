@@ -80,4 +80,17 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
 
     return results;
   }
+
+  Future<List<Purchase>> getParentProductStockList() {
+    return (select(purchases)
+          ..limit(AppConstants.listResultsLimit)
+          ..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+        .get();
+  }
+
+  Future<int> updateSoldOutStatus(int purchaseId, bool isSoldOut) {
+    return (update(purchases)..where((tbl) => tbl.id.equals(purchaseId))).write(
+      PurchasesCompanion(isSoldOut: Value(isSoldOut)),
+    );
+  }
 }

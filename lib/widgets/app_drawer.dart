@@ -164,6 +164,17 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, 'payment-method-list');
             },
           ),
+          ListTile(
+            leading: Icon(
+              Icons.numbers,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Stock Producto Entero', style: textStyle),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, 'parent-product-stock');
+            },
+          ),
 
           // Sección Reportes
           Divider(),

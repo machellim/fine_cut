@@ -1,5 +1,6 @@
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
+import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,40 +81,14 @@ class _ParentProductSalesListScreenState
                           ),
                         ),
                         if (purchase.isSoldOut)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'Agotado',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                          AppBadgeStatus(
+                            text: 'Agotado',
+                            type: BadgeType.warning,
                           )
                         else
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'Disponible',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                          AppBadgeStatus(
+                            text: 'Disponible',
+                            type: BadgeType.success,
                           ),
                       ],
                     ),

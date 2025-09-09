@@ -18,6 +18,7 @@ import 'package:fine_cut/bloc/payment_method/payment_method_crud/payment_method_
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
+import 'package:fine_cut/bloc/purchase/parent_product_stock/parent_product_stock_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
 import 'package:fine_cut/bloc/reports/parent_product_purchases_list/parent_product_purchases_list_bloc.dart';
@@ -174,6 +175,10 @@ class AppInitializer extends StatelessWidget {
                 ),
                 BlocProvider<IncomeListBloc>(
                   create: (_) => IncomeListBloc(incomeDao: incomeDao),
+                ),
+                BlocProvider<ParentProductStockBloc>(
+                  create: (_) =>
+                      ParentProductStockBloc(purchaseDao: purchaseDao),
                 ),
               ],
               child: FineCutApp(database: database),
