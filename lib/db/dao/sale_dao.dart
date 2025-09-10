@@ -77,19 +77,24 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
     int subproductId, {
     String? filter,
   }) async {
-    final query =
-        select(db.purchases).join([
-            innerJoin(
-              db.productSubproducts,
-              db.productSubproducts.productId.equalsExp(db.purchases.productId),
-            ),
-          ])
-          ..where(db.productSubproducts.subproductId.equals(subproductId))
-          ..where(db.purchases.isSoldOut.equals(false));
+    final query = select(db.purchases).join([
+      innerJoin(
+        db.productSubproducts,
+        db.productSubproducts.productId.equalsExp(db.purchases.productId),
+      ),
+    ]);
+
+    query.where(db.productSubproducts.subproductId.equals(subproductId));
+    query.where(db.purchases.isSoldOut.equals(false));
 
     if (filter != null && filter.isNotEmpty) {
       query.where(db.purchases.aliasProductName.like('%$filter%'));
     }
+
+    // Order by createdAt DESC
+    query.orderBy([
+      OrderingTerm(expression: db.purchases.createdAt, mode: OrderingMode.desc),
+    ]);
 
     final results = await query.map((row) => row.readTable(db.purchases)).get();
 

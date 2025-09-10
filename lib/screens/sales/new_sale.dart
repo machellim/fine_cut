@@ -75,7 +75,6 @@ class NewSaleScreenState extends State<NewSaleScreen> {
           GetParentProductEvent(selectedProduct!),
         );
       }
-      // remove purchaseId if it is not a subproduct
 
       if (sale != null) {
         saleCompanion = saleCompanion.copyWith(
@@ -83,6 +82,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
           productId: drift.Value(sale.productId),
           quantity: drift.Value(sale.quantity),
           totalPrice: drift.Value(sale.totalPrice),
+          //purchaseId: drift.Value(sale.purchaseId),
         );
         _saleQuantityController.text = sale.quantity.toString();
         _saleTotalPriceController.text = sale.totalPrice.toString();
@@ -234,9 +234,8 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                           SaleParentProductState
                         >(
                           listener: (context, state) => {
-                            if (state is SaleParentProductInitial)
+                            if (state is SaleParentProductInitial && isNewSale)
                               {
-                                print('*****'),
                                 saleCompanion = saleCompanion.copyWith(
                                   purchaseId: drift.Value(null),
                                 ),
@@ -286,7 +285,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                                     decoratorProps: DropDownDecoratorProps(
                                       decoration: InputDecoration(
                                         labelText:
-                                            '🛍️ Eliga un producto principal',
+                                            '🛍️ Elija un producto principal',
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                             8.0,
