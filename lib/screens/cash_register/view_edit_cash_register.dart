@@ -19,6 +19,7 @@ import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/models/banner_state.dart';
 import 'package:fine_cut/screens/home_wrapper.dart';
 import 'package:fine_cut/widgets/app_alert_dialog.dart';
+import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
 import 'package:fine_cut/widgets/app_drawer.dart';
@@ -203,12 +204,29 @@ class _ViewEditCashRegisterScreenState
 
   @override
   Widget build(BuildContext context) {
-    //final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
-    final registerDate = AppUtils.formatDate(_cashRegister.registerDate);
+    final cashRegisterStatus = _cashRegister.status == CashRegisterStatus.open
+        ? 'Abierta'
+        : 'Cerrada';
 
     return AppScaffold(
-      appBar: AppBarCustom(
-        title: 'Ventas',
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _readOnly ? 'Visualización Caja' : 'Caja Actual',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(width: 8),
+            AppBadgeStatus(
+              text: cashRegisterStatus, // "Abierta" o "Cerrada"
+              type: cashRegisterStatus == 'Abierta'
+                  ? BadgeType.success
+                  : BadgeType.error,
+            ),
+          ],
+        ),
+        centerTitle: true,
         actions: !_readOnly
             ? [
                 PopupMenuButton<String>(
@@ -221,16 +239,17 @@ class _ViewEditCashRegisterScreenState
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'close-cash-register',
-                      child: Row(
-                        children: <Widget>[
-                          Icon(Icons.lock),
-                          SizedBox(width: 8),
-                          Text('Cerrar Caja'),
-                        ],
+                    if (_cashRegister.status == CashRegisterStatus.open)
+                      const PopupMenuItem(
+                        value: 'close-cash-register',
+                        child: Row(
+                          children: <Widget>[
+                            Icon(Icons.lock),
+                            SizedBox(width: 8),
+                            Text('Cerrar Caja'),
+                          ],
+                        ),
                       ),
-                    ),
                     PopupMenuItem(
                       value: 'update-cash-register-date',
                       child: Row(
