@@ -82,7 +82,6 @@ class NewSaleScreenState extends State<NewSaleScreen> {
           productId: drift.Value(sale.productId),
           quantity: drift.Value(sale.quantity),
           totalPrice: drift.Value(sale.totalPrice),
-          //purchaseId: drift.Value(sale.purchaseId),
         );
         _saleQuantityController.text = sale.quantity.toString();
         _saleTotalPriceController.text = sale.totalPrice.toString();
@@ -234,7 +233,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                           SaleParentProductState
                         >(
                           listener: (context, state) => {
-                            if (state is SaleParentProductInitial && isNewSale)
+                            if (state is SaleParentProductInitial)
                               {
                                 saleCompanion = saleCompanion.copyWith(
                                   purchaseId: drift.Value(null),
@@ -268,14 +267,14 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                                     compareFn: (item1, item2) =>
                                         item1.id == item2.id,
                                     onChanged: (selPurchase) {
-                                      if (selPurchase != null) {
-                                        saleCompanion = saleCompanion.copyWith(
-                                          purchaseId: drift.Value(
-                                            selPurchase.id,
-                                          ),
-                                        );
-                                        selectedPurchase = selPurchase;
-                                      }
+                                      //if (selPurchase != null) {
+                                      saleCompanion = saleCompanion.copyWith(
+                                        purchaseId: drift.Value(
+                                          selPurchase?.id,
+                                        ),
+                                      );
+                                      selectedPurchase = selPurchase;
+                                      //}
                                     },
                                     validator: (value) =>
                                         (value == null ||
