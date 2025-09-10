@@ -19,7 +19,7 @@ class CashRegisters extends Table {
   RealColumn get closingAmount => real().nullable().named('closing_amount')();
 
   // Total sales amount (can be calculated from Sales table)
-  RealColumn get totalSales =>
+  RealColumn get totalIncome =>
       real().named('total_sales').withDefault(const Constant(0.0))();
 
   // Total expenses for the day (can be calculated from Expenses table)

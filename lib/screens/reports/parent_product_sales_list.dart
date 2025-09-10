@@ -188,14 +188,14 @@ class _ParentProductSalesListScreenState
                                         }
 
                                         // Total ventas para esta purchase
-                                        final totalSales = sales.fold<double>(
+                                        final totalIncome = sales.fold<double>(
                                           0.0,
                                           (prev, sale) =>
                                               prev + (sale.totalPrice ?? 0),
                                         );
 
                                         final difference =
-                                            totalSales - purchase.totalCost;
+                                            totalIncome - purchase.totalCost;
 
                                         return Column(
                                           crossAxisAlignment:
@@ -221,7 +221,7 @@ class _ParentProductSalesListScreenState
                                                       ),
                                                       TextSpan(
                                                         text:
-                                                            '\$${AppUtils.formatDouble(totalSales)}',
+                                                            '\$${AppUtils.formatDouble(totalIncome)}',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,

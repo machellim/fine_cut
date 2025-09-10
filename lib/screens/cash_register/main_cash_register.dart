@@ -182,8 +182,9 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                             ),
                             const SizedBox(height: 32),
 
-                            // Total ventas
+                            // Total Income
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.shopping_cart,
@@ -191,20 +192,68 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                   size: 22,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  "Total Ventas: \$ ${cashRegister.totalSales}",
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
+
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Total Ingresos:",
+                                      style: theme.textTheme.bodyLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.white70,
+                                          ),
+                                    ),
+                                    Text(
+                                      " \$ ${cashRegister.totalIncome}",
+                                      style: theme.textTheme.bodyLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                             const SizedBox(height: 32),
 
+                            // Total Expenses
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.money_off,
+                                  color: Colors.white70,
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 8),
+
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Total Egresos:",
+                                      style: theme.textTheme.bodyLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.white70,
+                                          ),
+                                    ),
+                                    Text(
+                                      " \$ ${cashRegister.totalExpenses}",
+                                      style: theme.textTheme.bodyLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
                             // Notas
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.note_alt,

@@ -684,11 +684,11 @@ class $CashRegistersTable extends CashRegisters
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _totalSalesMeta = const VerificationMeta(
-    'totalSales',
+  static const VerificationMeta _totalIncomeMeta = const VerificationMeta(
+    'totalIncome',
   );
   @override
-  late final GeneratedColumn<double> totalSales = GeneratedColumn<double>(
+  late final GeneratedColumn<double> totalIncome = GeneratedColumn<double>(
     'total_sales',
     aliasedName,
     false,
@@ -764,7 +764,7 @@ class $CashRegistersTable extends CashRegisters
     registerDate,
     openingAmount,
     closingAmount,
-    totalSales,
+    totalIncome,
     totalExpenses,
     status,
     notes,
@@ -815,8 +815,11 @@ class $CashRegistersTable extends CashRegisters
     }
     if (data.containsKey('total_sales')) {
       context.handle(
-        _totalSalesMeta,
-        totalSales.isAcceptableOrUnknown(data['total_sales']!, _totalSalesMeta),
+        _totalIncomeMeta,
+        totalIncome.isAcceptableOrUnknown(
+          data['total_sales']!,
+          _totalIncomeMeta,
+        ),
       );
     }
     if (data.containsKey('total_expenses')) {
@@ -871,7 +874,7 @@ class $CashRegistersTable extends CashRegisters
         DriftSqlType.double,
         data['${effectivePrefix}closing_amount'],
       ),
-      totalSales: attachedDatabase.typeMapping.read(
+      totalIncome: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}total_sales'],
       )!,
@@ -914,7 +917,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
   final DateTime registerDate;
   final double openingAmount;
   final double? closingAmount;
-  final double totalSales;
+  final double totalIncome;
   final double totalExpenses;
   final CashRegisterStatus status;
   final String? notes;
@@ -925,7 +928,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
     required this.registerDate,
     required this.openingAmount,
     this.closingAmount,
-    required this.totalSales,
+    required this.totalIncome,
     required this.totalExpenses,
     required this.status,
     this.notes,
@@ -941,7 +944,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
     if (!nullToAbsent || closingAmount != null) {
       map['closing_amount'] = Variable<double>(closingAmount);
     }
-    map['total_sales'] = Variable<double>(totalSales);
+    map['total_sales'] = Variable<double>(totalIncome);
     map['total_expenses'] = Variable<double>(totalExpenses);
     {
       map['status'] = Variable<String>(
@@ -966,7 +969,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
       closingAmount: closingAmount == null && nullToAbsent
           ? const Value.absent()
           : Value(closingAmount),
-      totalSales: Value(totalSales),
+      totalIncome: Value(totalIncome),
       totalExpenses: Value(totalExpenses),
       status: Value(status),
       notes: notes == null && nullToAbsent
@@ -989,7 +992,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
       registerDate: serializer.fromJson<DateTime>(json['registerDate']),
       openingAmount: serializer.fromJson<double>(json['openingAmount']),
       closingAmount: serializer.fromJson<double?>(json['closingAmount']),
-      totalSales: serializer.fromJson<double>(json['totalSales']),
+      totalIncome: serializer.fromJson<double>(json['totalIncome']),
       totalExpenses: serializer.fromJson<double>(json['totalExpenses']),
       status: $CashRegistersTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
@@ -1007,7 +1010,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
       'registerDate': serializer.toJson<DateTime>(registerDate),
       'openingAmount': serializer.toJson<double>(openingAmount),
       'closingAmount': serializer.toJson<double?>(closingAmount),
-      'totalSales': serializer.toJson<double>(totalSales),
+      'totalIncome': serializer.toJson<double>(totalIncome),
       'totalExpenses': serializer.toJson<double>(totalExpenses),
       'status': serializer.toJson<String>(
         $CashRegistersTable.$converterstatus.toJson(status),
@@ -1023,7 +1026,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
     DateTime? registerDate,
     double? openingAmount,
     Value<double?> closingAmount = const Value.absent(),
-    double? totalSales,
+    double? totalIncome,
     double? totalExpenses,
     CashRegisterStatus? status,
     Value<String?> notes = const Value.absent(),
@@ -1036,7 +1039,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
     closingAmount: closingAmount.present
         ? closingAmount.value
         : this.closingAmount,
-    totalSales: totalSales ?? this.totalSales,
+    totalIncome: totalIncome ?? this.totalIncome,
     totalExpenses: totalExpenses ?? this.totalExpenses,
     status: status ?? this.status,
     notes: notes.present ? notes.value : this.notes,
@@ -1055,9 +1058,9 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
       closingAmount: data.closingAmount.present
           ? data.closingAmount.value
           : this.closingAmount,
-      totalSales: data.totalSales.present
-          ? data.totalSales.value
-          : this.totalSales,
+      totalIncome: data.totalIncome.present
+          ? data.totalIncome.value
+          : this.totalIncome,
       totalExpenses: data.totalExpenses.present
           ? data.totalExpenses.value
           : this.totalExpenses,
@@ -1075,7 +1078,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
           ..write('registerDate: $registerDate, ')
           ..write('openingAmount: $openingAmount, ')
           ..write('closingAmount: $closingAmount, ')
-          ..write('totalSales: $totalSales, ')
+          ..write('totalIncome: $totalIncome, ')
           ..write('totalExpenses: $totalExpenses, ')
           ..write('status: $status, ')
           ..write('notes: $notes, ')
@@ -1091,7 +1094,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
     registerDate,
     openingAmount,
     closingAmount,
-    totalSales,
+    totalIncome,
     totalExpenses,
     status,
     notes,
@@ -1106,7 +1109,7 @@ class CashRegister extends DataClass implements Insertable<CashRegister> {
           other.registerDate == this.registerDate &&
           other.openingAmount == this.openingAmount &&
           other.closingAmount == this.closingAmount &&
-          other.totalSales == this.totalSales &&
+          other.totalIncome == this.totalIncome &&
           other.totalExpenses == this.totalExpenses &&
           other.status == this.status &&
           other.notes == this.notes &&
@@ -1119,7 +1122,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
   final Value<DateTime> registerDate;
   final Value<double> openingAmount;
   final Value<double?> closingAmount;
-  final Value<double> totalSales;
+  final Value<double> totalIncome;
   final Value<double> totalExpenses;
   final Value<CashRegisterStatus> status;
   final Value<String?> notes;
@@ -1130,7 +1133,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
     this.registerDate = const Value.absent(),
     this.openingAmount = const Value.absent(),
     this.closingAmount = const Value.absent(),
-    this.totalSales = const Value.absent(),
+    this.totalIncome = const Value.absent(),
     this.totalExpenses = const Value.absent(),
     this.status = const Value.absent(),
     this.notes = const Value.absent(),
@@ -1142,7 +1145,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
     this.registerDate = const Value.absent(),
     this.openingAmount = const Value.absent(),
     this.closingAmount = const Value.absent(),
-    this.totalSales = const Value.absent(),
+    this.totalIncome = const Value.absent(),
     this.totalExpenses = const Value.absent(),
     this.status = const Value.absent(),
     this.notes = const Value.absent(),
@@ -1154,7 +1157,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
     Expression<DateTime>? registerDate,
     Expression<double>? openingAmount,
     Expression<double>? closingAmount,
-    Expression<double>? totalSales,
+    Expression<double>? totalIncome,
     Expression<double>? totalExpenses,
     Expression<String>? status,
     Expression<String>? notes,
@@ -1166,7 +1169,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
       if (registerDate != null) 'register_date': registerDate,
       if (openingAmount != null) 'opening_amount': openingAmount,
       if (closingAmount != null) 'closing_amount': closingAmount,
-      if (totalSales != null) 'total_sales': totalSales,
+      if (totalIncome != null) 'total_sales': totalIncome,
       if (totalExpenses != null) 'total_expenses': totalExpenses,
       if (status != null) 'status': status,
       if (notes != null) 'notes': notes,
@@ -1180,7 +1183,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
     Value<DateTime>? registerDate,
     Value<double>? openingAmount,
     Value<double?>? closingAmount,
-    Value<double>? totalSales,
+    Value<double>? totalIncome,
     Value<double>? totalExpenses,
     Value<CashRegisterStatus>? status,
     Value<String?>? notes,
@@ -1192,7 +1195,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
       registerDate: registerDate ?? this.registerDate,
       openingAmount: openingAmount ?? this.openingAmount,
       closingAmount: closingAmount ?? this.closingAmount,
-      totalSales: totalSales ?? this.totalSales,
+      totalIncome: totalIncome ?? this.totalIncome,
       totalExpenses: totalExpenses ?? this.totalExpenses,
       status: status ?? this.status,
       notes: notes ?? this.notes,
@@ -1216,8 +1219,8 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
     if (closingAmount.present) {
       map['closing_amount'] = Variable<double>(closingAmount.value);
     }
-    if (totalSales.present) {
-      map['total_sales'] = Variable<double>(totalSales.value);
+    if (totalIncome.present) {
+      map['total_sales'] = Variable<double>(totalIncome.value);
     }
     if (totalExpenses.present) {
       map['total_expenses'] = Variable<double>(totalExpenses.value);
@@ -1246,7 +1249,7 @@ class CashRegistersCompanion extends UpdateCompanion<CashRegister> {
           ..write('registerDate: $registerDate, ')
           ..write('openingAmount: $openingAmount, ')
           ..write('closingAmount: $closingAmount, ')
-          ..write('totalSales: $totalSales, ')
+          ..write('totalIncome: $totalIncome, ')
           ..write('totalExpenses: $totalExpenses, ')
           ..write('status: $status, ')
           ..write('notes: $notes, ')
@@ -6329,7 +6332,7 @@ typedef $$CashRegistersTableCreateCompanionBuilder =
       Value<DateTime> registerDate,
       Value<double> openingAmount,
       Value<double?> closingAmount,
-      Value<double> totalSales,
+      Value<double> totalIncome,
       Value<double> totalExpenses,
       Value<CashRegisterStatus> status,
       Value<String?> notes,
@@ -6342,7 +6345,7 @@ typedef $$CashRegistersTableUpdateCompanionBuilder =
       Value<DateTime> registerDate,
       Value<double> openingAmount,
       Value<double?> closingAmount,
-      Value<double> totalSales,
+      Value<double> totalIncome,
       Value<double> totalExpenses,
       Value<CashRegisterStatus> status,
       Value<String?> notes,
@@ -6379,8 +6382,8 @@ class $$CashRegistersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get totalSales => $composableBuilder(
-    column: $table.totalSales,
+  ColumnFilters<double> get totalIncome => $composableBuilder(
+    column: $table.totalIncome,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6440,8 +6443,8 @@ class $$CashRegistersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get totalSales => $composableBuilder(
-    column: $table.totalSales,
+  ColumnOrderings<double> get totalIncome => $composableBuilder(
+    column: $table.totalIncome,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6498,8 +6501,8 @@ class $$CashRegistersTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<double> get totalSales => $composableBuilder(
-    column: $table.totalSales,
+  GeneratedColumn<double> get totalIncome => $composableBuilder(
+    column: $table.totalIncome,
     builder: (column) => column,
   );
 
@@ -6556,7 +6559,7 @@ class $$CashRegistersTableTableManager
                 Value<DateTime> registerDate = const Value.absent(),
                 Value<double> openingAmount = const Value.absent(),
                 Value<double?> closingAmount = const Value.absent(),
-                Value<double> totalSales = const Value.absent(),
+                Value<double> totalIncome = const Value.absent(),
                 Value<double> totalExpenses = const Value.absent(),
                 Value<CashRegisterStatus> status = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -6567,7 +6570,7 @@ class $$CashRegistersTableTableManager
                 registerDate: registerDate,
                 openingAmount: openingAmount,
                 closingAmount: closingAmount,
-                totalSales: totalSales,
+                totalIncome: totalIncome,
                 totalExpenses: totalExpenses,
                 status: status,
                 notes: notes,
@@ -6580,7 +6583,7 @@ class $$CashRegistersTableTableManager
                 Value<DateTime> registerDate = const Value.absent(),
                 Value<double> openingAmount = const Value.absent(),
                 Value<double?> closingAmount = const Value.absent(),
-                Value<double> totalSales = const Value.absent(),
+                Value<double> totalIncome = const Value.absent(),
                 Value<double> totalExpenses = const Value.absent(),
                 Value<CashRegisterStatus> status = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
@@ -6591,7 +6594,7 @@ class $$CashRegistersTableTableManager
                 registerDate: registerDate,
                 openingAmount: openingAmount,
                 closingAmount: closingAmount,
-                totalSales: totalSales,
+                totalIncome: totalIncome,
                 totalExpenses: totalExpenses,
                 status: status,
                 notes: notes,
