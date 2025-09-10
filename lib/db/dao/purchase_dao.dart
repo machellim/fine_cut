@@ -89,7 +89,10 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
               db.products.id.equalsExp(purchases.productId),
             ),
           ])
-          ..where(db.products.hasSubProducts.equals(true))
+          ..where(
+            db.products.hasSubProducts.equals(true) &
+                purchases.status.equals('active'),
+          )
           ..orderBy([
             OrderingTerm(
               expression: purchases.createdAt,

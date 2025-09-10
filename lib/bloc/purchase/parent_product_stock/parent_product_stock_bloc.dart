@@ -15,7 +15,7 @@ class ParentProductStockBloc
       try {
         emit(ParentProductStockListLoading());
         // await Future.delayed(Duration(seconds: 3));
-        final parentProducts = await purchaseDao.getParentProductStockList();
+        final parentProducts = await purchaseDao.getPurchasesWithSubproducts();
         emit(ParentProductStockListLoadSuccess(parentProducts));
       } catch (e) {
         emit(
@@ -33,7 +33,7 @@ class ParentProductStockBloc
           event.purchaseId,
           event.isSoldOut,
         );
-        final parentProducts = await purchaseDao.getParentProductStockList();
+        final parentProducts = await purchaseDao.getPurchasesWithSubproducts();
         emit(ParentProductStockListLoadSuccess(parentProducts));
       } catch (e) {
         emit(

@@ -187,7 +187,7 @@ class AppDrawer extends StatelessWidget {
               Icons.numbers,
               color: Theme.of(context).colorScheme.primary,
             ),
-            title: Text('Stock Producto Entero', style: textStyle),
+            title: Text('Stock Productos Principales', style: textStyle),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, 'parent-product-stock');
