@@ -29,6 +29,7 @@ import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:fine_cut/widgets/app_simple_center_text.dart';
 import 'package:fine_cut/widgets/app_title.dart';
 import 'package:fine_cut/widgets/app_top_banner.dart';
+import 'package:fine_cut/widgets/app_total_footer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
@@ -569,104 +570,119 @@ class _ViewEditCashRegisterScreenState
                                             true, // importante para que funcione dentro de Column
                                         physics:
                                             const NeverScrollableScrollPhysics(), // evita scroll interno
-                                        itemCount: state
-                                            .sales
-                                            .length, // número de elementos
+                                        itemCount:
+                                            state.sales.length +
+                                            1, // sum + 1 to show extra total row
                                         itemBuilder: (context, index) {
-                                          final sale = state.sales[index];
-                                          return Column(
-                                            children: [
-                                              AppListItem(
-                                                title: Text(
-                                                  sale.aliasProductName,
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
+                                          if (index < state.sales.length) {
+                                            final sale = state.sales[index];
+                                            return Column(
+                                              children: [
+                                                AppListItem(
+                                                  title: Text(
+                                                    sale.aliasProductName,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                    ),
                                                   ),
-                                                ),
-                                                description: Text(
-                                                  'Cantidad: ${sale.quantity}',
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 14,
+                                                  description: Text(
+                                                    'Cantidad: ${sale.quantity}',
+                                                    style: const TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: 14,
+                                                    ),
                                                   ),
-                                                ),
-                                                price: sale.totalPrice,
-                                                onEdit: !_readOnly
-                                                    ? () async {
-                                                        _closeBannerSale();
-                                                        // get selected product
-                                                        final repoProduct =
-                                                            context
-                                                                .read<
-                                                                  ProductsListBloc
-                                                                >();
-                                                        final selectedProduct =
-                                                            await repoProduct
-                                                                .productDao
-                                                                .getById(
-                                                                  sale.productId,
-                                                                );
-
-                                                        // get selected payment form
-                                                        final repoPaymentMethod =
-                                                            context
-                                                                .read<
-                                                                  PaymentMethodListBloc
-                                                                >();
-                                                        final selectedPaymentMethod =
-                                                            await repoPaymentMethod
-                                                                .paymentMethodDao
-                                                                .getById(
-                                                                  sale.paymentMethodId,
-                                                                );
-
-                                                        // check if the sale is from subproduct
-                                                        Purchase?
-                                                        selectedPurchase;
-                                                        if (sale.purchaseId !=
-                                                            null) {
-                                                          final repoPurchase =
+                                                  price: sale.totalPrice,
+                                                  onEdit: !_readOnly
+                                                      ? () async {
+                                                          _closeBannerSale();
+                                                          // get selected product
+                                                          final repoProduct =
                                                               context
                                                                   .read<
-                                                                    PurchaseListBloc
+                                                                    ProductsListBloc
                                                                   >();
-                                                          selectedPurchase =
-                                                              await repoPurchase
-                                                                  .purchaseDao
+                                                          final selectedProduct =
+                                                              await repoProduct
+                                                                  .productDao
                                                                   .getById(
-                                                                    sale.purchaseId!,
+                                                                    sale.productId,
                                                                   );
-                                                        }
 
-                                                        Navigator.pushNamed(
-                                                          context,
-                                                          'new-sale',
-                                                          arguments: {
-                                                            'selectedProduct':
-                                                                selectedProduct,
-                                                            'selectedPaymentMethod':
-                                                                selectedPaymentMethod,
-                                                            'sale': sale,
-                                                            'selectedPurchase':
-                                                                selectedPurchase,
-                                                            'cashRegisterId':
-                                                                _cashRegister
-                                                                    .id,
-                                                          },
-                                                        );
-                                                      }
-                                                    : null,
-                                                onDelete: !_readOnly
-                                                    ? () {
-                                                        _showDeleteConfirmationSale(
-                                                          context,
-                                                          sale.id,
-                                                        );
-                                                      }
-                                                    : null,
-                                              ),
-                                            ],
-                                          );
+                                                          // get selected payment form
+                                                          final repoPaymentMethod =
+                                                              context
+                                                                  .read<
+                                                                    PaymentMethodListBloc
+                                                                  >();
+                                                          final selectedPaymentMethod =
+                                                              await repoPaymentMethod
+                                                                  .paymentMethodDao
+                                                                  .getById(
+                                                                    sale.paymentMethodId,
+                                                                  );
+
+                                                          // check if the sale is from subproduct
+                                                          Purchase?
+                                                          selectedPurchase;
+                                                          if (sale.purchaseId !=
+                                                              null) {
+                                                            final repoPurchase =
+                                                                context
+                                                                    .read<
+                                                                      PurchaseListBloc
+                                                                    >();
+                                                            selectedPurchase =
+                                                                await repoPurchase
+                                                                    .purchaseDao
+                                                                    .getById(
+                                                                      sale.purchaseId!,
+                                                                    );
+                                                          }
+
+                                                          Navigator.pushNamed(
+                                                            context,
+                                                            'new-sale',
+                                                            arguments: {
+                                                              'selectedProduct':
+                                                                  selectedProduct,
+                                                              'selectedPaymentMethod':
+                                                                  selectedPaymentMethod,
+                                                              'sale': sale,
+                                                              'selectedPurchase':
+                                                                  selectedPurchase,
+                                                              'cashRegisterId':
+                                                                  _cashRegister
+                                                                      .id,
+                                                            },
+                                                          );
+                                                        }
+                                                      : null,
+                                                  onDelete: !_readOnly
+                                                      ? () {
+                                                          _showDeleteConfirmationSale(
+                                                            context,
+                                                            sale.id,
+                                                          );
+                                                        }
+                                                      : null,
+                                                ),
+                                              ],
+                                            );
+                                          } else {
+                                            // 👇 Este es el último ítem (el total)
+                                            final total = state.sales
+                                                .fold<double>(
+                                                  0,
+                                                  (sum, sale) =>
+                                                      sum + sale.totalPrice,
+                                                );
+
+                                            return AppTotalFooter(
+                                              total: total,
+                                              label: 'Total',
+                                            );
+                                          }
                                         },
                                       );
                                     }

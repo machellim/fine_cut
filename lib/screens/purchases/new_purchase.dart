@@ -140,6 +140,9 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
                               purchaseCompanion = purchaseCompanion.copyWith(
                                 productId: drift.Value(selProduct.id),
                               );
+                              purchaseCompanion = purchaseCompanion.copyWith(
+                                aliasProductName: drift.Value(selProduct.name),
+                              );
                               selectedProduct = selProduct;
                             }
                           },
