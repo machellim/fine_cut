@@ -1,3 +1,5 @@
+import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/screens/home_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -113,6 +115,22 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, 'cash-register-list');
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.point_of_sale,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Crear Nueva Caja', style: textStyle),
+            onTap: () {
+              final database = RepositoryProvider.of<AppDatabase>(context);
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => HomeWrapper(database: database),
+                ),
+                (route) => false, // elimina todas las rutas anteriores
+              );
             },
           ),
 
