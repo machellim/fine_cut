@@ -320,6 +320,9 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
       cashRegisterId,
     );
     final totalSales = await getTotalSalesByCashRegisterId(cashRegisterId);
+    final totalExpenses = await getTotalExpensesByCashRegisterId(
+      cashRegisterId,
+    );
     await (update(
       cashRegisters,
     )..where((t) => t.id.equals(cashRegisterId))).write(
@@ -327,6 +330,7 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
         closingAmount: Value(closingAmount),
         status: Value(CashRegisterStatus.closed),
         totalSales: Value(totalSales),
+        totalExpenses: Value(totalExpenses),
       ),
     );
   }

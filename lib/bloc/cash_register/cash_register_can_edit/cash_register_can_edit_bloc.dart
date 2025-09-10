@@ -23,13 +23,20 @@ class CashRegisterCanEditBloc
         final cashRegister = event.cashRegister;
         final isEditable = await cashRegisterDao.isLastCreated(cashRegister);
         if (isEditable) {
+          CashRegister updatedCashRegister = cashRegister;
           if (event.isReopen &&
               cashRegister.status == CashRegisterStatus.closed) {
-            await cashRegisterDao.openCashRegister(
+            final reopened = await cashRegisterDao.openCashRegister(
               cashRegisterId: cashRegister.id,
             );
+
+            if (reopened != null) {
+              updatedCashRegister = reopened;
+            }
           }
-          emit(CashRegisterEditCheckLoadSuccess(cashRegister: cashRegister));
+          emit(
+            CashRegisterEditCheckLoadSuccess(cashRegister: updatedCashRegister),
+          );
         } else {
           emit(
             CashRegisterEditCheckLoadFailure(
