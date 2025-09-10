@@ -261,12 +261,11 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                   size: 22,
                                 ),
                                 const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    cashRegister.notes ?? '',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white,
-                                    ),
+
+                                Text(
+                                  cashRegister.notes ?? '',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
