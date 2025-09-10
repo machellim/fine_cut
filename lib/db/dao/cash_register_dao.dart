@@ -331,6 +331,21 @@ class CashRegisterDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  Future<CashRegister?> openCashRegister({required int cashRegisterId}) async {
+    final updated =
+        await (update(cashRegisters)..where(
+              (t) =>
+                  t.id.equals(cashRegisterId) &
+                  t.status.equals(CashRegisterStatus.closed.name),
+            ))
+            .writeReturning(
+              CashRegistersCompanion(status: Value(CashRegisterStatus.open)),
+            );
+
+    // Si no se actualizó nada, retorna null
+    return updated.isNotEmpty ? updated.first : null;
+  }
+
   Future<bool> isLastCreated(CashRegister cashRegister) async {
     final lastRegister =
         await (select(cashRegisters)

@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/dao/cash_register_dao.dart';
 import 'package:fine_cut/db/database.dart';
 
@@ -19,13 +20,16 @@ class CashRegisterCanEditBloc
       try {
         emit(CashRegisterEditCheckLoading());
         //await Future.delayed(Duration(seconds: 1));
-        final isEditable = await cashRegisterDao.isLastCreated(
-          event.cashRegister,
-        );
+        final cashRegister = event.cashRegister;
+        final isEditable = await cashRegisterDao.isLastCreated(cashRegister);
         if (isEditable) {
-          emit(
-            CashRegisterEditCheckLoadSuccess(cashRegister: event.cashRegister),
-          );
+          if (event.isReopen &&
+              cashRegister.status == CashRegisterStatus.closed) {
+            await cashRegisterDao.openCashRegister(
+              cashRegisterId: cashRegister.id,
+            );
+          }
+          emit(CashRegisterEditCheckLoadSuccess(cashRegister: cashRegister));
         } else {
           emit(
             CashRegisterEditCheckLoadFailure(

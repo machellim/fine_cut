@@ -13,9 +13,10 @@ class ResetCashRegisterCanEditEvent extends CashRegisterCanEditEvent {}
 // Event to get available balance
 class CashRegisterEditCheckEvent extends CashRegisterCanEditEvent {
   final CashRegister cashRegister;
+  final bool isReopen;
 
-  const CashRegisterEditCheckEvent(this.cashRegister);
+  const CashRegisterEditCheckEvent(this.cashRegister, {this.isReopen = false});
 
   @override
-  List<Object> get props => [cashRegister];
+  List<Object> get props => [cashRegister, isReopen];
 }

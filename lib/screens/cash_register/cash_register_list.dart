@@ -7,6 +7,8 @@ import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
+import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/widgets/app_alert_dialog.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
@@ -50,9 +52,7 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
     return AppScaffold(
       appBar: AppBarCustom(title: 'Historial de Cajas'),
       body: BlocConsumer<CashRegisterListBloc, CashRegisterListState>(
-        listener: (context, state) {
-          // TODO: implement listener
-        },
+        listener: (context, state) {},
         builder: (context, state) {
           if (state is CashRegisterListLoading) {
             return AppLoadingScreen(
@@ -169,13 +169,21 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
                                         ).colorScheme.primary,
                                         tooltip: 'Editar',
                                         onPressed: () {
-                                          context
-                                              .read<CashRegisterCanEditBloc>()
-                                              .add(
-                                                CashRegisterEditCheckEvent(
-                                                  cashRegister,
-                                                ),
-                                              );
+                                          if (cashRegister.status ==
+                                              CashRegisterStatus.closed) {
+                                            _showConfirmationReopenCashRegister(
+                                              context,
+                                              cashRegister,
+                                            );
+                                          } else {
+                                            context
+                                                .read<CashRegisterCanEditBloc>()
+                                                .add(
+                                                  CashRegisterEditCheckEvent(
+                                                    cashRegister,
+                                                  ),
+                                                );
+                                          }
                                         },
                                       ),
                                     ],
@@ -223,6 +231,32 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
           }
         },
       ),
+    );
+  }
+
+  void _showConfirmationReopenCashRegister(
+    BuildContext context,
+    CashRegister cashRegister,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppAlertDialog(
+          title: '¿Reabrir caja?',
+          content:
+              'Está a punto de reabrir esta caja cerrada.\n\n'
+              'Podrá seguir registrando movimientos en ella.',
+          onCancel: () {
+            //Navigator.pop(context);
+          },
+          onConfirm: () {
+            context.read<CashRegisterCanEditBloc>().add(
+              CashRegisterEditCheckEvent(cashRegister, isReopen: true),
+            );
+            //Navigator.pop(context);
+          },
+        );
+      },
     );
   }
 }
