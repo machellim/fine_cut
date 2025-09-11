@@ -157,6 +157,7 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                                 productId: drift.Value(selProduct.id),
                               );
                               selectedProduct = selProduct;
+                              selectedPurchase = null;
 
                               context.read<SaleParentProductBloc>().add(
                                 GetParentProductEvent(selectedProduct!),
