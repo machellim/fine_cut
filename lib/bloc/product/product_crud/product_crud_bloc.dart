@@ -62,7 +62,6 @@ class ProductCrudBloc extends Bloc<ProductCrudEvent, ProductCrudState> {
           }
         }
       } catch (e) {
-        print(e);
         emit(ProductCrudCreationFailure(message: 'Error al crear producto.'));
       }
     });

@@ -41,7 +41,6 @@ class SaleCrudBloc extends Bloc<SaleCrudEvent, SaleCrudState> {
           }
         }
       } catch (e) {
-        print(e);
         emit(SaleCreationFailure(message: 'Exception: Error al crear venta'));
       }
     });

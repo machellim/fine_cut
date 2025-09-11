@@ -45,7 +45,6 @@ class PurchaseCrudBloc extends Bloc<PurchaseCrudEvent, PurchaseCrudState> {
           }
         }
       } catch (e, stackTrace) {
-        print(e);
         emit(
           PurchaseCreationFailure(message: 'Exception: Error al crear compra'),
         );
