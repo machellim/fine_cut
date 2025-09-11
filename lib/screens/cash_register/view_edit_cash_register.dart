@@ -33,7 +33,6 @@ import 'package:fine_cut/widgets/app_total_footer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
-import 'package:fine_cut/widgets/app_bar_custom.dart';
 
 class ViewEditCashRegisterScreen extends StatefulWidget {
   final CashRegister cashRegister;

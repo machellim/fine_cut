@@ -30,13 +30,9 @@ import 'package:fine_cut/bloc/sale/sale_parent_product/sale_parent_product_bloc.
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
-import 'package:fine_cut/screens/cash_register/new_cash_register.dart';
-import 'package:fine_cut/screens/cash_register/view_edit_cash_register.dart';
 import 'package:fine_cut/screens/home_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:fine_cut/screens/cash_register/main_cash_register.dart';
 
 void main() {
   // Bloc.observer = AppBlocObserver();

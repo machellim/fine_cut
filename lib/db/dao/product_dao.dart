@@ -161,6 +161,22 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
         .get();
   }
 
+  Future<List<Product>> searchSubProducts(String query) {
+    final trimmedQuery = query.trim();
+
+    // Filter products in the database with status = active
+    return (select(products)
+          ..where(
+            (c) =>
+                c.name.lower().like('%${trimmedQuery.toLowerCase()}%') &
+                (c.status.equals(AppActiveStatus.active.name) &
+                    c.hasSubProducts.equals(false)),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.name)])
+          ..limit(AppConstants.searchResultsLimit))
+        .get();
+  }
+
   Future<List<Product>> getSubproductsByProduct(Product product) {
     final query = (select(db.products).join([
       innerJoin(

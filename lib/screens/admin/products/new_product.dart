@@ -227,7 +227,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     DropdownSearch<Product>.multiSelection(
                       items: (filter, loadProps) async {
                         final repo = context.read<ProductsListBloc>();
-                        return await repo.productDao.searchProducts(filter);
+                        return await repo.productDao.searchSubProducts(filter);
                       },
                       selectedItems: [...selectedProducts],
                       itemAsString: (item) => item.name,

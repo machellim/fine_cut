@@ -68,7 +68,8 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
             ),
           ])
           ..where(db.productSubproducts.subproductId.equals(subproductId))
-          ..where(db.purchases.isSoldOut.equals(false));
+          ..where(db.purchases.isSoldOut.equals(false))
+          ..limit(AppConstants.listResultsLimit);
     final results = await query.map((row) => row.readTable(db.purchases)).get();
     return results;
   }
@@ -102,7 +103,10 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
   }
 
   Future<List<Sale>> getSalesByPurchaseId(int purchaseId) {
-    return (select(sales)..where((s) => s.purchaseId.equals(purchaseId))).get();
+    return (select(sales)
+          ..where((s) => s.purchaseId.equals(purchaseId))
+          ..orderBy([(s) => OrderingTerm.desc(s.saleDate)]))
+        .get();
   }
 
   Future<bool> existsAsSubproduct(int productId) async {

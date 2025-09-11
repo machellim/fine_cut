@@ -297,6 +297,15 @@ class _ParentProductSalesListScreenState
                                                     Icons.local_offer_outlined,
                                                     color: primaryColor,
                                                   ),
+                                                  trailing: Text(
+                                                    AppUtils.formatDateTime(
+                                                      sale.saleDate,
+                                                    ),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey[600],
+                                                    ),
+                                                  ),
                                                 );
                                               },
                                             ),
