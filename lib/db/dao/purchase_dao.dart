@@ -59,8 +59,21 @@ class PurchaseDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  Future<int> softDeletePurchase(int id) {
-    return (update(purchases)..where((t) => t.id.equals(id))).write(
+  // function to update purchase as deleted if it has not refreneces from sales
+  Future<int> softDeletePurchaseIfNoSales(int purchaseId) async {
+    // Check if there is at least one sale referencing this purchase
+    final saleExists =
+        await (select(db.sales)
+              ..where((s) => s.purchaseId.equals(purchaseId))
+              ..limit(1))
+            .getSingleOrNull(); // safe now, max 1 record
+
+    if (saleExists != null) {
+      return 0; // Cannot delete, purchase has related sales
+    }
+
+    // No sales found → perform soft delete
+    return (update(purchases)..where((p) => p.id.equals(purchaseId))).write(
       PurchasesCompanion(status: Value(RecordStatus.deleted)),
     );
   }

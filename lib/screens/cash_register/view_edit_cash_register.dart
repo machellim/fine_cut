@@ -764,7 +764,7 @@ class _ViewEditCashRegisterScreenState
                                     }
                                     if (state is PurchaseDeletionFailure) {
                                       _showTopBannerPurchase(
-                                        'Error al eliminar compra',
+                                        state.message,
                                         type: AppBannerType.error,
                                       );
                                     }

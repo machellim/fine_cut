@@ -55,7 +55,7 @@ class PurchaseCrudBloc extends Bloc<PurchaseCrudEvent, PurchaseCrudState> {
     on<DeletePurchaseEvent>((event, emit) async {
       try {
         emit(PurchaseDeletionInProgress());
-        final rowsUpdated = await purchaseDao.softDeletePurchase(
+        final rowsUpdated = await purchaseDao.softDeletePurchaseIfNoSales(
           event.purchaseId,
         );
         //final rowsUpdated = 0;
@@ -64,7 +64,12 @@ class PurchaseCrudBloc extends Bloc<PurchaseCrudEvent, PurchaseCrudState> {
             PurchaseDeletionSuccess(message: 'Compra eliminada correctamente.'),
           );
         } else {
-          emit(PurchaseDeletionFailure(message: 'No se encontró la compra.'));
+          emit(
+            PurchaseDeletionFailure(
+              message:
+                  'No se puede eliminar la compra porque tiene ventas asociadas.',
+            ),
+          );
         }
       } catch (e) {
         emit(PurchaseDeletionFailure(message: 'Error al eliminar compra.'));
