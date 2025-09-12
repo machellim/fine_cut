@@ -67,10 +67,10 @@ class AppInitializer extends StatelessWidget {
           final database = snapshot.data!;
 
           // to create db if not exists in the directory
-          database.allTables.forEach((TableInfo table) async {
+          /*database.allTables.forEach((TableInfo table) async {
             final count = await database.select(table).get();
             print('${table.actualTableName}');
-          });
+          });*/
 
           // daos
           final paymentMethodDao = database.paymentMethodDao;

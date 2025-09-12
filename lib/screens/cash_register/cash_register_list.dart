@@ -1,26 +1,17 @@
-import 'package:drift/drift.dart' as drift;
 import 'package:fine_cut/bloc/cash_register/cash_register_can_edit/cash_register_can_edit_bloc.dart';
-import 'package:fine_cut/bloc/cash_register/cash_register_crud/cash_register_crud_bloc.dart';
-import 'package:fine_cut/bloc/cash_register/cash_register_data/cash_register_data_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_list/cash_register_list_bloc.dart';
-import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/widgets/app_alert_dialog.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
-import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_circular_progress_text.dart';
-import 'package:fine_cut/widgets/app_list_item.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
-import 'package:fine_cut/widgets/app_title_list_item.dart';
 import 'package:fine_cut/widgets/app_top_banner.dart';
-import 'package:intl/intl.dart';
 
 import 'package:fine_cut/widgets/app_scaffold.dart';
-import 'package:fine_cut/widgets/app_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -75,9 +66,10 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
                   listener: (context, state) => {
                     if (state is CashRegisterEditCheckLoadSuccess)
                       {
-                        Navigator.pushNamed(
+                        Navigator.pushNamedAndRemoveUntil(
                           context,
                           'view-edit-cash-register',
+                          (route) => false,
                           arguments: {'cashRegister': state.cashRegister},
                         ),
                       },
