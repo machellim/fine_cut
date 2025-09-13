@@ -42,25 +42,6 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     required String name,
     required bool hasSubProducts,
     String? description,
-    bool? trackStock,
-  }) async {
-    if (await _isNameTaken(name)) return null;
-
-    final companion = ProductsCompanion.insert(
-      categoryId: categoryId,
-      name: name,
-      hasSubProducts: Value(hasSubProducts),
-      description: Value(description),
-      trackStock: Value(trackStock ?? true),
-    );
-    return await into(products).insertReturning(companion);
-  }*/
-
-  Future<Product?> createProduct({
-    required int categoryId,
-    required String name,
-    required bool hasSubProducts,
-    String? description,
     double? salePrice,
     bool? trackStock,
     List<ProductSubproductsCompanion> subproducts = const [],
@@ -97,9 +78,51 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
 
       return product;
     });
+  }*/
+
+  Future<Product?> createProduct({
+    required ProductsCompanion productCompanion,
+    List<ProductSubproductsCompanion> subproducts = const [],
+  }) async {
+    // Check if the name is already taken
+    if (await _isNameTaken(productCompanion.name.value)) return null;
+
+    return await transaction(() async {
+      if (productCompanion.hasSubProducts.value) {
+        productCompanion = productCompanion.copyWith(trackStock: Value(false));
+        // Update subproducts trackStock
+        await batch((batch) {
+          batch.update(
+            db.products,
+            ProductsCompanion(trackStock: Value(false)),
+            where: (tbl) => tbl.id.isIn(
+              subproducts.map((sp) => sp.subproductId.value).toList(),
+            ),
+          );
+        });
+      }
+      // Insert main product
+      final product = await into(products).insertReturning(productCompanion);
+
+      // Insert subproducts if any
+      if (productCompanion.hasSubProducts.value && subproducts.isNotEmpty) {
+        final subproductCompanions = subproducts.map((sp) {
+          return ProductSubproductsCompanion.insert(
+            productId: product.id,
+            subproductId: sp.subproductId.value,
+          );
+        }).toList();
+
+        await batch((batch) {
+          batch.insertAll(db.productSubproducts, subproductCompanions);
+        });
+      }
+
+      return product;
+    });
   }
 
-  Future<Product?> updateProduct({
+  /*Future<Product?> updateProduct({
     required int id,
     required int categoryId,
     required String name,
@@ -148,6 +171,84 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
         products,
       )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
     });
+  }*/
+
+  Future<Product?> updateProduct({
+    required ProductsCompanion productCompanion,
+    List<ProductSubproductsCompanion> subproducts = const [],
+  }) async {
+    // Check if the name is already taken (excluding current product ID)
+    if (await _isNameTaken(
+      productCompanion.name.value,
+      excludeId: productCompanion.id.value,
+    )) {
+      return null;
+    }
+
+    return await transaction(() async {
+      // Update trackStock
+      if (productCompanion.hasSubProducts.value) {
+        productCompanion = productCompanion.copyWith(trackStock: Value(false));
+      } else if (!productCompanion.hasSubProducts.value) {
+        bool isSubproduct = await isProductInSubproducts(
+          productCompanion.id.value,
+        );
+        if (!isSubproduct) {
+          productCompanion = productCompanion.copyWith(trackStock: Value(true));
+        }
+      }
+      // Update product
+      await (update(products)
+            ..where((tbl) => tbl.id.equals(productCompanion.id.value)))
+          .write(productCompanion);
+
+      await (delete(
+        db.productSubproducts,
+      )..where((tbl) => tbl.productId.equals(productCompanion.id.value))).go();
+
+      // If product supports subproducts, insert new ones
+      if (productCompanion.hasSubProducts.value && subproducts.isNotEmpty) {
+        await batch((batch) {
+          batch.insertAll(
+            db.productSubproducts,
+            subproducts
+                .map(
+                  (c) =>
+                      c.copyWith(productId: Value(productCompanion.id.value)),
+                )
+                .toList(),
+          );
+        });
+      }
+
+      // Update subproducts trackStock
+      if (productCompanion.hasSubProducts.value) {
+        await batch((batch) {
+          batch.update(
+            db.products,
+            ProductsCompanion(trackStock: Value(false)),
+            where: (tbl) => tbl.id.isIn(
+              subproducts.map((sp) => sp.subproductId.value).toList(),
+            ),
+          );
+        });
+      } else if (!productCompanion.hasSubProducts.value) {
+        await batch((batch) {
+          batch.update(
+            db.products,
+            ProductsCompanion(trackStock: Value(true)),
+            where: (tbl) => tbl.id.isIn(
+              subproducts.map((sp) => sp.subproductId.value).toList(),
+            ),
+          );
+        });
+      }
+
+      // Return updated product
+      return await (select(products)
+            ..where((tbl) => tbl.id.equals(productCompanion.id.value)))
+          .getSingleOrNull();
+    });
   }
 
   Future<List<Product>> searchProducts(String query) {
@@ -181,6 +282,24 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
         .get();
   }
 
+  Future<List<Product>> searchSubproductsFilter(String query) {
+    final trimmedQuery = query.trim();
+
+    // Filter products in the database with status = active
+    return (select(products)
+          ..where(
+            (c) =>
+                c.name.lower().like('%${trimmedQuery.toLowerCase()}%') &
+                (c.status.equals(AppActiveStatus.active.name) &
+                    (c.hasSubProducts.equals(false) &
+                            c.trackStock.equals(false))
+                        .not()),
+          )
+          ..orderBy([(t) => OrderingTerm.asc(t.name)])
+          ..limit(AppConstants.searchResultsLimit))
+        .get();
+  }
+
   Future<List<Product>> getSubproductsByProduct(Product product) {
     final query = (select(db.products).join([
       innerJoin(
@@ -190,5 +309,32 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     ])..where(db.productSubproducts.productId.equals(product.id)));
 
     return query.map((row) => row.readTable(db.products)).get();
+  }
+
+  Future<void> updateStockProduct({
+    required int productId,
+    required double
+    quantityChange, // positive to increase, negative to decrease
+  }) async {
+    // Get the current stock of the product
+    final product = await (select(
+      products,
+    )..where((tbl) => tbl.id.equals(productId))).getSingle();
+
+    // Calculate the new stock after applying the change
+    final newStock = product.stock + quantityChange;
+
+    // Update the product's stock in the database
+    await (update(products)..where((tbl) => tbl.id.equals(productId))).write(
+      ProductsCompanion(stock: Value(newStock)),
+    );
+  }
+
+  // function to check id a product exist in db.productSubproducts
+  Future<bool> isProductInSubproducts(int productId) async {
+    final product = await (select(
+      db.productSubproducts,
+    )..where((tbl) => tbl.subproductId.equals(productId))).getSingleOrNull();
+    return product != null;
   }
 }

@@ -76,13 +76,13 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
   );
   static const VerificationMeta _stockMeta = const VerificationMeta('stock');
   @override
-  late final GeneratedColumn<int> stock = GeneratedColumn<int>(
+  late final GeneratedColumn<double> stock = GeneratedColumn<double>(
     'stock',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: DriftSqlType.double,
     requiredDuringInsert: false,
-    defaultValue: const Constant(0),
+    defaultValue: const Constant(0.0),
   );
   static const VerificationMeta _trackStockMeta = const VerificationMeta(
     'trackStock',
@@ -274,7 +274,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         data['${effectivePrefix}sale_price'],
       )!,
       stock: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.double,
         data['${effectivePrefix}stock'],
       )!,
       trackStock: attachedDatabase.typeMapping.read(
@@ -317,7 +317,7 @@ class Product extends DataClass implements Insertable<Product> {
   final String name;
   final String? description;
   final double salePrice;
-  final int stock;
+  final double stock;
   final bool trackStock;
   final bool hasSubProducts;
   final AppActiveStatus status;
@@ -346,7 +346,7 @@ class Product extends DataClass implements Insertable<Product> {
       map['description'] = Variable<String>(description);
     }
     map['sale_price'] = Variable<double>(salePrice);
-    map['stock'] = Variable<int>(stock);
+    map['stock'] = Variable<double>(stock);
     map['track_stock'] = Variable<bool>(trackStock);
     map['has_sub_products'] = Variable<bool>(hasSubProducts);
     {
@@ -392,7 +392,7 @@ class Product extends DataClass implements Insertable<Product> {
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
       salePrice: serializer.fromJson<double>(json['salePrice']),
-      stock: serializer.fromJson<int>(json['stock']),
+      stock: serializer.fromJson<double>(json['stock']),
       trackStock: serializer.fromJson<bool>(json['trackStock']),
       hasSubProducts: serializer.fromJson<bool>(json['hasSubProducts']),
       status: $ProductsTable.$converterstatus.fromJson(
@@ -411,7 +411,7 @@ class Product extends DataClass implements Insertable<Product> {
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
       'salePrice': serializer.toJson<double>(salePrice),
-      'stock': serializer.toJson<int>(stock),
+      'stock': serializer.toJson<double>(stock),
       'trackStock': serializer.toJson<bool>(trackStock),
       'hasSubProducts': serializer.toJson<bool>(hasSubProducts),
       'status': serializer.toJson<String>(
@@ -428,7 +428,7 @@ class Product extends DataClass implements Insertable<Product> {
     String? name,
     Value<String?> description = const Value.absent(),
     double? salePrice,
-    int? stock,
+    double? stock,
     bool? trackStock,
     bool? hasSubProducts,
     AppActiveStatus? status,
@@ -526,7 +526,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<String> name;
   final Value<String?> description;
   final Value<double> salePrice;
-  final Value<int> stock;
+  final Value<double> stock;
   final Value<bool> trackStock;
   final Value<bool> hasSubProducts;
   final Value<AppActiveStatus> status;
@@ -565,7 +565,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<String>? name,
     Expression<String>? description,
     Expression<double>? salePrice,
-    Expression<int>? stock,
+    Expression<double>? stock,
     Expression<bool>? trackStock,
     Expression<bool>? hasSubProducts,
     Expression<String>? status,
@@ -593,7 +593,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<String>? name,
     Value<String?>? description,
     Value<double>? salePrice,
-    Value<int>? stock,
+    Value<double>? stock,
     Value<bool>? trackStock,
     Value<bool>? hasSubProducts,
     Value<AppActiveStatus>? status,
@@ -634,7 +634,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       map['sale_price'] = Variable<double>(salePrice.value);
     }
     if (stock.present) {
-      map['stock'] = Variable<int>(stock.value);
+      map['stock'] = Variable<double>(stock.value);
     }
     if (trackStock.present) {
       map['track_stock'] = Variable<bool>(trackStock.value);
@@ -6087,7 +6087,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       required String name,
       Value<String?> description,
       Value<double> salePrice,
-      Value<int> stock,
+      Value<double> stock,
       Value<bool> trackStock,
       Value<bool> hasSubProducts,
       Value<AppActiveStatus> status,
@@ -6101,7 +6101,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String?> description,
       Value<double> salePrice,
-      Value<int> stock,
+      Value<double> stock,
       Value<bool> trackStock,
       Value<bool> hasSubProducts,
       Value<AppActiveStatus> status,
@@ -6143,7 +6143,7 @@ class $$ProductsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get stock => $composableBuilder(
+  ColumnFilters<double> get stock => $composableBuilder(
     column: $table.stock,
     builder: (column) => ColumnFilters(column),
   );
@@ -6209,7 +6209,7 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get stock => $composableBuilder(
+  ColumnOrderings<double> get stock => $composableBuilder(
     column: $table.stock,
     builder: (column) => ColumnOrderings(column),
   );
@@ -6268,7 +6268,7 @@ class $$ProductsTableAnnotationComposer
   GeneratedColumn<double> get salePrice =>
       $composableBuilder(column: $table.salePrice, builder: (column) => column);
 
-  GeneratedColumn<int> get stock =>
+  GeneratedColumn<double> get stock =>
       $composableBuilder(column: $table.stock, builder: (column) => column);
 
   GeneratedColumn<bool> get trackStock => $composableBuilder(
@@ -6324,7 +6324,7 @@ class $$ProductsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<double> salePrice = const Value.absent(),
-                Value<int> stock = const Value.absent(),
+                Value<double> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
                 Value<bool> hasSubProducts = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),
@@ -6350,7 +6350,7 @@ class $$ProductsTableTableManager
                 required String name,
                 Value<String?> description = const Value.absent(),
                 Value<double> salePrice = const Value.absent(),
-                Value<int> stock = const Value.absent(),
+                Value<double> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
                 Value<bool> hasSubProducts = const Value.absent(),
                 Value<AppActiveStatus> status = const Value.absent(),

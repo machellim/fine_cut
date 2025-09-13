@@ -111,15 +111,18 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                     ),
                                 ],
                               ),
-                              /*description: Text(
-                                "Stock: $productStock",
-                                style: TextStyle(
-                                  color: productStock <= 0
-                                      ? Colors.red
-                                      : Colors
-                                            .green, // Cambia el color dependiendo del valor
-                                ),
-                              ),*/
+
+                              description: product.trackStock
+                                  ? Text(
+                                      "Stock: ${product.stock}",
+                                      style: TextStyle(
+                                        color: product.stock <= 0
+                                            ? Colors.red
+                                            : Colors
+                                                  .green, // Cambia el color dependiendo del valor
+                                      ),
+                                    )
+                                  : null,
                               onEdit: () async {
                                 // Obtener la categoría completa antes de abrir la pantalla
                                 final repoCategory = context

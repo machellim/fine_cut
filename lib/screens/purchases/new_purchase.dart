@@ -131,7 +131,8 @@ class NewPurchaseScreenState extends State<NewPurchaseScreen> {
                           selectedItem: selectedProduct,
                           items: (filter, loadProps) async {
                             final repo = context.read<ProductsListBloc>();
-                            return await repo.productDao.searchProducts(filter);
+                            return await repo.productDao
+                                .searchSubproductsFilter(filter);
                           },
                           itemAsString: (item) => item.name,
                           compareFn: (item1, item2) => item1.id == item2.id,

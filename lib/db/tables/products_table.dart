@@ -25,8 +25,8 @@ class Products extends Table {
       real().named('sale_price').withDefault(const Constant(0.0))();
 
   // Product stock quantity
-  IntColumn get stock =>
-      integer().named('stock').withDefault(const Constant(0))();
+  RealColumn get stock =>
+      real().named('stock').withDefault(const Constant(0.0))();
 
   // Whether to track stock for this product
   BoolColumn get trackStock => boolean().withDefault(const Constant(true))();

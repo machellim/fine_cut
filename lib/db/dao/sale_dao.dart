@@ -36,27 +36,84 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
     SalesCompanion saleCompanion,
     RecordAction recordAction,
     Product selectedProduct,
-  ) async {
-    saleCompanion = saleCompanion.copyWith(
-      aliasProductName: Value(selectedProduct.name),
-    );
-    if (recordAction == RecordAction.create) {
-      return into(sales).insert(saleCompanion);
-    } else {
-      final id = saleCompanion.id.value;
-      final rowsUpdated = await (update(
-        sales,
-      )..where((tbl) => tbl.id.equals(id))).write(saleCompanion);
-      return rowsUpdated > 0
-          ? id
-          : -1; // retorna id actualizado o -1 si no existe
-    }
+  ) {
+    return transaction(() async {
+      saleCompanion = saleCompanion.copyWith(
+        aliasProductName: Value(selectedProduct.name),
+      );
+
+      if (recordAction == RecordAction.create) {
+        // Update the product stock after creating the sale
+        if (selectedProduct.trackStock) {
+          await db.productDao.updateStockProduct(
+            productId: selectedProduct.id,
+            quantityChange: saleCompanion.quantity.value * -1, // venta → resta
+          );
+        }
+        return into(sales).insert(saleCompanion);
+      } else {
+        final id = saleCompanion.id.value;
+
+        // Get the previous sale to calculate the stock difference
+        final previousSale = await (select(
+          sales,
+        )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+
+        final rowsUpdated = await (update(
+          sales,
+        )..where((tbl) => tbl.id.equals(id))).write(saleCompanion);
+
+        if (rowsUpdated > 0 && previousSale != null) {
+          // Update the product stock based on the difference
+          if (selectedProduct.trackStock) {
+            // Calculate the difference in quantity between new and previous sale
+            final quantityDiff =
+                saleCompanion.quantity.value - previousSale.quantity;
+
+            await db.productDao.updateStockProduct(
+              productId: selectedProduct.id,
+              quantityChange: quantityDiff * -1,
+            );
+          }
+        }
+
+        return rowsUpdated > 0
+            ? id
+            : -1; // retorna id actualizado o -1 si no existe
+      }
+    });
   }
 
   Future<int> softDeleteSale(int id) {
-    return (update(sales)..where((t) => t.id.equals(id))).write(
-      SalesCompanion(status: Value(RecordStatus.deleted)),
-    );
+    return transaction(() async {
+      // 1. Search the sale to be logically deleted
+      final sale = await (select(
+        sales,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
+
+      if (sale == null) return -1; // sale does not exist
+
+      // 2. Search the product associated
+      final product = await (select(
+        db.products,
+      )..where((p) => p.id.equals(sale.productId))).getSingleOrNull();
+
+      if (product == null) return -1; // product does not exist
+
+      // 3. Update the sale as deleted
+      final rowsUpdated = await (update(sales)..where((t) => t.id.equals(id)))
+          .write(SalesCompanion(status: Value(RecordStatus.deleted)));
+
+      // 4. If updated and the product tracks stock → return quantity to inventory
+      if (rowsUpdated > 0 && product.trackStock) {
+        await db.productDao.updateStockProduct(
+          productId: product.id,
+          quantityChange: sale.quantity, // return to inventory
+        );
+      }
+
+      return rowsUpdated > 0 ? id : -1;
+    });
   }
 
   Future<List<Purchase>> getPurchasesBySubproductId(int subproductId) async {

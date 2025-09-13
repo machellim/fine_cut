@@ -20,11 +20,7 @@ class ProductCrudBloc extends Bloc<ProductCrudEvent, ProductCrudState> {
         //await Future.delayed(Duration(seconds: 2));
         if (event.recordAction == RecordAction.create) {
           final product = await productDao.createProduct(
-            categoryId: event.product.categoryId.value,
-            name: event.product.name.value,
-            hasSubProducts: event.product.hasSubProducts.value,
-            description: event.product.description.value,
-            salePrice: event.product.salePrice.value,
+            productCompanion: event.product,
             subproducts: event.subproducts,
           );
           if (product == null) {
@@ -39,13 +35,7 @@ class ProductCrudBloc extends Bloc<ProductCrudEvent, ProductCrudState> {
           }
         } else if (event.recordAction == RecordAction.update) {
           final product = await productDao.updateProduct(
-            id: event.product.id.value,
-            categoryId: event.product.categoryId.value,
-            name: event.product.name.value,
-            hasSubProducts: event.product.hasSubProducts.value,
-            description: event.product.description.value,
-            salePrice: event.product.salePrice.value,
-            status: event.product.status.value,
+            productCompanion: event.product,
             subproducts: event.subproducts,
           );
           if (product == null) {
@@ -63,7 +53,8 @@ class ProductCrudBloc extends Bloc<ProductCrudEvent, ProductCrudState> {
             );
           }
         }
-      } catch (e) {
+      } catch (e, t) {
+        print(e);
         emit(ProductCrudCreationFailure(message: 'Error al crear producto.'));
       }
     });
