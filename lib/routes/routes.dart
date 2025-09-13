@@ -77,6 +77,7 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
         builder: (context) => ViewEditCashRegisterScreen(
           cashRegister: args['cashRegister'] as CashRegister,
           readOnly: args['readOnly'] as bool? ?? false,
+          showDrawer: args['showDrawer'] as bool? ?? true,
         ),
       );
     default:

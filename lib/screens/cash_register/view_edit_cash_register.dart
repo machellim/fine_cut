@@ -37,10 +37,12 @@ import 'package:fine_cut/widgets/app_scaffold.dart';
 class ViewEditCashRegisterScreen extends StatefulWidget {
   final CashRegister cashRegister;
   final bool readOnly;
+  final bool showDrawer;
   const ViewEditCashRegisterScreen({
     super.key,
     required this.cashRegister,
     this.readOnly = false,
+    this.showDrawer = true,
   });
 
   @override
@@ -271,7 +273,7 @@ class _ViewEditCashRegisterScreenState
               ]
             : null,
       ),
-      drawer: AppDrawer(appContext: context),
+      drawer: widget.showDrawer ? AppDrawer(appContext: context) : null,
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 5),
         child: BlocConsumer<CashRegisterCloseBloc, CashRegisterCloseState>(

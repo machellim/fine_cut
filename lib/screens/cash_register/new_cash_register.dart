@@ -133,9 +133,10 @@ class _NewCashRegisterScreenState extends State<NewCashRegisterScreen> {
                             if (state is CreateCashRegisterSuccess) {
                               final cashRegister =
                                   state.cashRegisterResult!.cashRegister;
-                              Navigator.pushNamed(
+                              Navigator.pushNamedAndRemoveUntil(
                                 context,
                                 'view-edit-cash-register',
+                                (route) => false,
                                 arguments: {'cashRegister': cashRegister},
                               );
                             }

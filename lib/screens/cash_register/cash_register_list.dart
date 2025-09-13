@@ -66,11 +66,14 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
                   listener: (context, state) => {
                     if (state is CashRegisterEditCheckLoadSuccess)
                       {
-                        Navigator.pushNamedAndRemoveUntil(
+                        Navigator.pushNamed(
                           context,
                           'view-edit-cash-register',
-                          (route) => false,
-                          arguments: {'cashRegister': state.cashRegister},
+                          //(route) => false,
+                          arguments: {
+                            'cashRegister': state.cashRegister,
+                            'showDrawer': false,
+                          },
                         ),
                       },
                   },
@@ -196,6 +199,7 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
                                             arguments: {
                                               'cashRegister': cashRegister,
                                               'readOnly': true,
+                                              'showDrawer': false,
                                             },
                                           );
                                         },
