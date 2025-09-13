@@ -62,6 +62,18 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _salePriceMeta = const VerificationMeta(
+    'salePrice',
+  );
+  @override
+  late final GeneratedColumn<double> salePrice = GeneratedColumn<double>(
+    'sale_price',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
   static const VerificationMeta _stockMeta = const VerificationMeta('stock');
   @override
   late final GeneratedColumn<int> stock = GeneratedColumn<int>(
@@ -145,6 +157,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     categoryId,
     name,
     description,
+    salePrice,
     stock,
     trackStock,
     hasSubProducts,
@@ -190,6 +203,12 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
           data['description']!,
           _descriptionMeta,
         ),
+      );
+    }
+    if (data.containsKey('sale_price')) {
+      context.handle(
+        _salePriceMeta,
+        salePrice.isAcceptableOrUnknown(data['sale_price']!, _salePriceMeta),
       );
     }
     if (data.containsKey('stock')) {
@@ -250,6 +269,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
+      salePrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}sale_price'],
+      )!,
       stock: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}stock'],
@@ -293,6 +316,7 @@ class Product extends DataClass implements Insertable<Product> {
   final int categoryId;
   final String name;
   final String? description;
+  final double salePrice;
   final int stock;
   final bool trackStock;
   final bool hasSubProducts;
@@ -304,6 +328,7 @@ class Product extends DataClass implements Insertable<Product> {
     required this.categoryId,
     required this.name,
     this.description,
+    required this.salePrice,
     required this.stock,
     required this.trackStock,
     required this.hasSubProducts,
@@ -320,6 +345,7 @@ class Product extends DataClass implements Insertable<Product> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
+    map['sale_price'] = Variable<double>(salePrice);
     map['stock'] = Variable<int>(stock);
     map['track_stock'] = Variable<bool>(trackStock);
     map['has_sub_products'] = Variable<bool>(hasSubProducts);
@@ -343,6 +369,7 @@ class Product extends DataClass implements Insertable<Product> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      salePrice: Value(salePrice),
       stock: Value(stock),
       trackStock: Value(trackStock),
       hasSubProducts: Value(hasSubProducts),
@@ -364,6 +391,7 @@ class Product extends DataClass implements Insertable<Product> {
       categoryId: serializer.fromJson<int>(json['categoryId']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
+      salePrice: serializer.fromJson<double>(json['salePrice']),
       stock: serializer.fromJson<int>(json['stock']),
       trackStock: serializer.fromJson<bool>(json['trackStock']),
       hasSubProducts: serializer.fromJson<bool>(json['hasSubProducts']),
@@ -382,6 +410,7 @@ class Product extends DataClass implements Insertable<Product> {
       'categoryId': serializer.toJson<int>(categoryId),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
+      'salePrice': serializer.toJson<double>(salePrice),
       'stock': serializer.toJson<int>(stock),
       'trackStock': serializer.toJson<bool>(trackStock),
       'hasSubProducts': serializer.toJson<bool>(hasSubProducts),
@@ -398,6 +427,7 @@ class Product extends DataClass implements Insertable<Product> {
     int? categoryId,
     String? name,
     Value<String?> description = const Value.absent(),
+    double? salePrice,
     int? stock,
     bool? trackStock,
     bool? hasSubProducts,
@@ -409,6 +439,7 @@ class Product extends DataClass implements Insertable<Product> {
     categoryId: categoryId ?? this.categoryId,
     name: name ?? this.name,
     description: description.present ? description.value : this.description,
+    salePrice: salePrice ?? this.salePrice,
     stock: stock ?? this.stock,
     trackStock: trackStock ?? this.trackStock,
     hasSubProducts: hasSubProducts ?? this.hasSubProducts,
@@ -426,6 +457,7 @@ class Product extends DataClass implements Insertable<Product> {
       description: data.description.present
           ? data.description.value
           : this.description,
+      salePrice: data.salePrice.present ? data.salePrice.value : this.salePrice,
       stock: data.stock.present ? data.stock.value : this.stock,
       trackStock: data.trackStock.present
           ? data.trackStock.value
@@ -446,6 +478,7 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('salePrice: $salePrice, ')
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
           ..write('hasSubProducts: $hasSubProducts, ')
@@ -462,6 +495,7 @@ class Product extends DataClass implements Insertable<Product> {
     categoryId,
     name,
     description,
+    salePrice,
     stock,
     trackStock,
     hasSubProducts,
@@ -477,6 +511,7 @@ class Product extends DataClass implements Insertable<Product> {
           other.categoryId == this.categoryId &&
           other.name == this.name &&
           other.description == this.description &&
+          other.salePrice == this.salePrice &&
           other.stock == this.stock &&
           other.trackStock == this.trackStock &&
           other.hasSubProducts == this.hasSubProducts &&
@@ -490,6 +525,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int> categoryId;
   final Value<String> name;
   final Value<String?> description;
+  final Value<double> salePrice;
   final Value<int> stock;
   final Value<bool> trackStock;
   final Value<bool> hasSubProducts;
@@ -501,6 +537,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.categoryId = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
+    this.salePrice = const Value.absent(),
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
     this.hasSubProducts = const Value.absent(),
@@ -513,6 +550,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     required int categoryId,
     required String name,
     this.description = const Value.absent(),
+    this.salePrice = const Value.absent(),
     this.stock = const Value.absent(),
     this.trackStock = const Value.absent(),
     this.hasSubProducts = const Value.absent(),
@@ -526,6 +564,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<int>? categoryId,
     Expression<String>? name,
     Expression<String>? description,
+    Expression<double>? salePrice,
     Expression<int>? stock,
     Expression<bool>? trackStock,
     Expression<bool>? hasSubProducts,
@@ -538,6 +577,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (categoryId != null) 'category_id': categoryId,
       if (name != null) 'name': name,
       if (description != null) 'description': description,
+      if (salePrice != null) 'sale_price': salePrice,
       if (stock != null) 'stock': stock,
       if (trackStock != null) 'track_stock': trackStock,
       if (hasSubProducts != null) 'has_sub_products': hasSubProducts,
@@ -552,6 +592,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<int>? categoryId,
     Value<String>? name,
     Value<String?>? description,
+    Value<double>? salePrice,
     Value<int>? stock,
     Value<bool>? trackStock,
     Value<bool>? hasSubProducts,
@@ -564,6 +605,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       categoryId: categoryId ?? this.categoryId,
       name: name ?? this.name,
       description: description ?? this.description,
+      salePrice: salePrice ?? this.salePrice,
       stock: stock ?? this.stock,
       trackStock: trackStock ?? this.trackStock,
       hasSubProducts: hasSubProducts ?? this.hasSubProducts,
@@ -587,6 +629,9 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
+    }
+    if (salePrice.present) {
+      map['sale_price'] = Variable<double>(salePrice.value);
     }
     if (stock.present) {
       map['stock'] = Variable<int>(stock.value);
@@ -618,6 +663,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('salePrice: $salePrice, ')
           ..write('stock: $stock, ')
           ..write('trackStock: $trackStock, ')
           ..write('hasSubProducts: $hasSubProducts, ')
@@ -6040,6 +6086,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       required int categoryId,
       required String name,
       Value<String?> description,
+      Value<double> salePrice,
       Value<int> stock,
       Value<bool> trackStock,
       Value<bool> hasSubProducts,
@@ -6053,6 +6100,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<int> categoryId,
       Value<String> name,
       Value<String?> description,
+      Value<double> salePrice,
       Value<int> stock,
       Value<bool> trackStock,
       Value<bool> hasSubProducts,
@@ -6087,6 +6135,11 @@ class $$ProductsTableFilterComposer
 
   ColumnFilters<String> get description => $composableBuilder(
     column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get salePrice => $composableBuilder(
+    column: $table.salePrice,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6151,6 +6204,11 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get salePrice => $composableBuilder(
+    column: $table.salePrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get stock => $composableBuilder(
     column: $table.stock,
     builder: (column) => ColumnOrderings(column),
@@ -6207,6 +6265,9 @@ class $$ProductsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<double> get salePrice =>
+      $composableBuilder(column: $table.salePrice, builder: (column) => column);
+
   GeneratedColumn<int> get stock =>
       $composableBuilder(column: $table.stock, builder: (column) => column);
 
@@ -6262,6 +6323,7 @@ class $$ProductsTableTableManager
                 Value<int> categoryId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
+                Value<double> salePrice = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
                 Value<bool> hasSubProducts = const Value.absent(),
@@ -6273,6 +6335,7 @@ class $$ProductsTableTableManager
                 categoryId: categoryId,
                 name: name,
                 description: description,
+                salePrice: salePrice,
                 stock: stock,
                 trackStock: trackStock,
                 hasSubProducts: hasSubProducts,
@@ -6286,6 +6349,7 @@ class $$ProductsTableTableManager
                 required int categoryId,
                 required String name,
                 Value<String?> description = const Value.absent(),
+                Value<double> salePrice = const Value.absent(),
                 Value<int> stock = const Value.absent(),
                 Value<bool> trackStock = const Value.absent(),
                 Value<bool> hasSubProducts = const Value.absent(),
@@ -6297,6 +6361,7 @@ class $$ProductsTableTableManager
                 categoryId: categoryId,
                 name: name,
                 description: description,
+                salePrice: salePrice,
                 stock: stock,
                 trackStock: trackStock,
                 hasSubProducts: hasSubProducts,

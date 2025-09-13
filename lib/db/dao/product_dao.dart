@@ -61,6 +61,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     required String name,
     required bool hasSubProducts,
     String? description,
+    double? salePrice,
     bool? trackStock,
     List<ProductSubproductsCompanion> subproducts = const [],
   }) async {
@@ -74,6 +75,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
         name: name,
         hasSubProducts: Value(hasSubProducts),
         description: Value(description),
+        salePrice: Value(salePrice ?? 0),
         trackStock: Value(trackStock ?? true),
       );
 
@@ -103,6 +105,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     required String name,
     required bool hasSubProducts,
     String? description,
+    double? salePrice,
     AppActiveStatus status = AppActiveStatus.active,
     bool? trackStock,
     List<ProductSubproductsCompanion> subproducts = const [],
@@ -115,6 +118,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
       name: Value(name),
       hasSubProducts: Value(hasSubProducts),
       description: Value(description),
+      salePrice: Value(salePrice ?? 0),
       status: Value(status),
       trackStock: Value(trackStock ?? true),
     );

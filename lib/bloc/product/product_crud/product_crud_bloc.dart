@@ -24,6 +24,7 @@ class ProductCrudBloc extends Bloc<ProductCrudEvent, ProductCrudState> {
             name: event.product.name.value,
             hasSubProducts: event.product.hasSubProducts.value,
             description: event.product.description.value,
+            salePrice: event.product.salePrice.value,
             subproducts: event.subproducts,
           );
           if (product == null) {
@@ -43,6 +44,7 @@ class ProductCrudBloc extends Bloc<ProductCrudEvent, ProductCrudState> {
             name: event.product.name.value,
             hasSubProducts: event.product.hasSubProducts.value,
             description: event.product.description.value,
+            salePrice: event.product.salePrice.value,
             status: event.product.status.value,
             subproducts: event.subproducts,
           );

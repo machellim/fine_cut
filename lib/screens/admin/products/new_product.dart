@@ -8,9 +8,11 @@ import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_bool_switch.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
+import 'package:fine_cut/widgets/app_number_field.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
 import 'package:fine_cut/widgets/app_string_switch.dart';
 import 'package:fine_cut/widgets/app_textfield.dart';
@@ -35,6 +37,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
       TextEditingController();
   final TextEditingController _statusController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _salePriceController = TextEditingController();
 
   final dropDownKey = GlobalKey<DropdownSearchState>();
 
@@ -53,6 +56,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
     _hasSubProductsController.dispose();
     _statusController.dispose();
     _descriptionController.dispose();
+    _salePriceController.dispose();
     super.dispose();
   }
 
@@ -90,6 +94,7 @@ class _NewProductScreenState extends State<NewProductScreen> {
         _hasSubProductsController.text = product.hasSubProducts.toString();
         _statusController.text = product.status.name;
         _descriptionController.text = product.description ?? '';
+        _salePriceController.text = product.salePrice.toString();
 
         selectedCategory = category;
         selectedProducts = args['subproducts'];
@@ -206,20 +211,29 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-
-                  AppBoolSwitch(
-                    controller:
-                        _hasSubProductsController, // controller con "true" o "false"
-                    activeText: 'Tiene Sub-productos',
-                    inactiveText: 'No tiene Sub-productos',
-                    onChanged: (value) {
-                      setState(() {
-                        // Guarda directamente como bool en tu companion
-                        productCompanion = productCompanion.copyWith(
-                          hasSubProducts: drift.Value(value),
-                        );
-                      });
-                    },
+                  Row(
+                    children: [
+                      AppBoolSwitch(
+                        controller:
+                            _hasSubProductsController, // controller con "true" o "false"
+                        activeText: 'Tiene Sub-productos',
+                        inactiveText: 'No tiene Sub-productos',
+                        onChanged: (value) {
+                          setState(() {
+                            // Guarda directamente como bool en tu companion
+                            productCompanion = productCompanion.copyWith(
+                              hasSubProducts: drift.Value(value),
+                            );
+                          });
+                        },
+                      ),
+                      if (_hasSubProductsController.text ==
+                          "true") // 👈 se muestra solo cuando es true
+                        AppBadgeStatus(
+                          text: "Primario",
+                          type: BadgeType.success,
+                        ),
+                    ],
                   ),
 
                   if (productCompanion.hasSubProducts.value) ...[
@@ -273,6 +287,19 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     ),
                   ],
 
+                  if (!productCompanion.hasSubProducts.value) ...[
+                    const SizedBox(height: 20),
+                    AppNumberField(
+                      controller: _salePriceController,
+                      label: 'Ingrese el precio de venta',
+                      suffixIcon: Icons.monetization_on_outlined,
+                      onSaved: (value) {
+                        productCompanion = productCompanion.copyWith(
+                          salePrice: drift.Value(double.parse(value)),
+                        );
+                      },
+                    ),
+                  ],
                   const SizedBox(height: 20),
                   AppTextField(
                     label: 'Descripción',

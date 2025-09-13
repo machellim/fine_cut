@@ -7,6 +7,7 @@ import 'package:fine_cut/bloc/sale/sale_parent_product/sale_parent_product_bloc.
 import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/enums/enums.dart';
+import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_button.dart';
@@ -339,9 +340,23 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                           controller: _saleQuantityController,
                           label: 'Ingrese la cantidad',
                           suffixText: 'unidades / libras',
+                          onChanged: (value) {
+                            // recalcula el total en tiempo real
+                            final quantity = double.tryParse(value) ?? 0.0;
+                            final unitPrice = selectedProduct?.salePrice ?? 0.0;
+                            final totalPrice = quantity * unitPrice;
+                            _saleTotalPriceController.text =
+                                AppUtils.formatDouble(totalPrice);
+                            setState(() {});
+                          },
                           onSaved: (value) {
+                            // guarda el valor final en el companion
+                            final quantity = double.tryParse(value) ?? 0.0;
+                            final totalPrice =
+                                quantity * (selectedProduct?.salePrice ?? 0.0);
                             saleCompanion = saleCompanion.copyWith(
-                              quantity: drift.Value(double.parse(value)),
+                              quantity: drift.Value(quantity),
+                              totalPrice: drift.Value(totalPrice),
                             );
                           },
                         ),
@@ -351,9 +366,11 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                           label: 'Ingrese el precio de venta',
                           suffixIcon: Icons.monetization_on_outlined,
                           onSaved: (value) {
+                            final total = double.tryParse(value) ?? 0.0;
                             saleCompanion = saleCompanion.copyWith(
-                              totalPrice: drift.Value(double.parse(value)),
+                              totalPrice: drift.Value(total),
                             );
+                            setState(() {});
                           },
                         ),
                         const SizedBox(height: 30.0),
