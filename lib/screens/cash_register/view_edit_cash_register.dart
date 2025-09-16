@@ -470,26 +470,31 @@ class _ViewEditCashRegisterScreenState
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             if (!_readOnly)
-                              AppButton(
-                                title: 'Agregar Venta',
-                                onPressed: () async {
-                                  _closeBannerSale();
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                ),
+                                child: AppButton(
+                                  title: 'Agregar Venta',
+                                  onPressed: () async {
+                                    _closeBannerSale();
 
-                                  final repoPaymentMethod = context
-                                      .read<PaymentMethodListBloc>();
-                                  final paymentMethod = await repoPaymentMethod
-                                      .paymentMethodDao
-                                      .getPaymentMethodByName('Efectivo');
-                                  Navigator.pushNamed(
-                                    context,
-                                    'new-sale',
-                                    arguments: {
-                                      'defaultSelectedPaymentMethod':
-                                          paymentMethod,
-                                      'cashRegisterId': _cashRegister.id,
-                                    },
-                                  );
-                                },
+                                    final repoPaymentMethod = context
+                                        .read<PaymentMethodListBloc>();
+                                    final paymentMethod =
+                                        await repoPaymentMethod.paymentMethodDao
+                                            .getPaymentMethodByName('Efectivo');
+                                    Navigator.pushNamed(
+                                      context,
+                                      'new-sale',
+                                      arguments: {
+                                        'defaultSelectedPaymentMethod':
+                                            paymentMethod,
+                                        'cashRegisterId': _cashRegister.id,
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             const SizedBox(height: 16),
                             if (_bannerSaleState.show)
@@ -716,26 +721,31 @@ class _ViewEditCashRegisterScreenState
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             if (!_readOnly)
-                              AppButton(
-                                title: 'Agregar Compra',
-                                onPressed: () async {
-                                  _closeBannerPurchase();
-                                  final repoPaymentMethod = context
-                                      .read<PaymentMethodListBloc>();
-                                  final paymentMethod = await repoPaymentMethod
-                                      .paymentMethodDao
-                                      .getPaymentMethodByName('Efectivo');
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                ),
+                                child: AppButton(
+                                  title: 'Agregar Compra',
+                                  onPressed: () async {
+                                    _closeBannerPurchase();
+                                    final repoPaymentMethod = context
+                                        .read<PaymentMethodListBloc>();
+                                    final paymentMethod =
+                                        await repoPaymentMethod.paymentMethodDao
+                                            .getPaymentMethodByName('Efectivo');
 
-                                  Navigator.pushNamed(
-                                    context,
-                                    'new-purchase',
-                                    arguments: {
-                                      'defaultSelectedPaymentMethod':
-                                          paymentMethod,
-                                      'cashRegisterId': _cashRegister.id,
-                                    },
-                                  );
-                                },
+                                    Navigator.pushNamed(
+                                      context,
+                                      'new-purchase',
+                                      arguments: {
+                                        'defaultSelectedPaymentMethod':
+                                            paymentMethod,
+                                        'cashRegisterId': _cashRegister.id,
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             const SizedBox(height: 16),
                             if (_bannerPurchaseState.show)
@@ -928,18 +938,23 @@ class _ViewEditCashRegisterScreenState
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             if (!_readOnly)
-                              AppButton(
-                                title: 'Agregar Gasto',
-                                onPressed: () async {
-                                  _closeBannerExpense();
-                                  Navigator.pushNamed(
-                                    context,
-                                    'new-expense',
-                                    arguments: {
-                                      'cashRegisterId': _cashRegister.id,
-                                    },
-                                  );
-                                },
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                ),
+                                child: AppButton(
+                                  title: 'Agregar Gasto',
+                                  onPressed: () async {
+                                    _closeBannerExpense();
+                                    Navigator.pushNamed(
+                                      context,
+                                      'new-expense',
+                                      arguments: {
+                                        'cashRegisterId': _cashRegister.id,
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             const SizedBox(height: 16),
                             if (_bannerExpenseState.show)
@@ -1089,18 +1104,23 @@ class _ViewEditCashRegisterScreenState
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             if (!_readOnly)
-                              AppButton(
-                                title: 'Agregar Ingreso',
-                                onPressed: () async {
-                                  _closeBannerIncome();
-                                  Navigator.pushNamed(
-                                    context,
-                                    'new-income',
-                                    arguments: {
-                                      'cashRegisterId': _cashRegister.id,
-                                    },
-                                  );
-                                },
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                ),
+                                child: AppButton(
+                                  title: 'Agregar Ingreso',
+                                  onPressed: () async {
+                                    _closeBannerIncome();
+                                    Navigator.pushNamed(
+                                      context,
+                                      'new-income',
+                                      arguments: {
+                                        'cashRegisterId': _cashRegister.id,
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             const SizedBox(height: 16),
                             if (_bannerIncomeState.show)

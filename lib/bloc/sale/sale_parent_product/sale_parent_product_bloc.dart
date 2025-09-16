@@ -11,10 +11,6 @@ class SaleParentProductBloc
   final SaleDao saleDao;
   SaleParentProductBloc({required this.saleDao})
     : super(SaleParentProductInitial()) {
-    on<ResetGetParentProductEvent>((event, emit) {
-      emit(SaleParentProductInitial());
-    });
-
     on<GetParentProductEvent>((event, emit) async {
       try {
         emit(GetParentProductLoading());

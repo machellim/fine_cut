@@ -218,10 +218,21 @@ class AppDrawer extends StatelessWidget {
               Icons.attach_money,
               color: Theme.of(context).colorScheme.primary,
             ),
-            title: Text('Ventas productos principales', style: textStyle),
+            title: Text('Ganancias Productos Principales', style: textStyle),
             onTap: () async {
               Navigator.pop(context);
               Navigator.pushNamed(context, 'parent-product-sales-list');
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.monetization_on,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            title: Text('Ganancias Productos', style: textStyle),
+            onTap: () async {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, 'product-profit-list');
             },
           ),
 

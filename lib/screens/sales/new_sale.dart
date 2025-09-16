@@ -59,7 +59,6 @@ class NewSaleScreenState extends State<NewSaleScreen> {
 
     // restart state
     context.read<SaleCrudBloc>().add(ResetSaleEvent());
-    context.read<SaleParentProductBloc>().add(ResetGetParentProductEvent());
 
     Future.microtask(() {
       if (!mounted) return;

@@ -15,6 +15,7 @@ import 'package:fine_cut/screens/incomes/new_income.dart';
 import 'package:fine_cut/screens/purchases/new_purchase.dart';
 import 'package:fine_cut/screens/purchases/parent_product_stock_list.dart';
 import 'package:fine_cut/screens/reports/parent_product_sales_list.dart';
+import 'package:fine_cut/screens/reports/product_profit_list.dart';
 import 'package:fine_cut/screens/sales/new_sale.dart';
 import 'package:flutter/material.dart';
 
@@ -66,6 +67,9 @@ final Map<String, WidgetBuilder> appRoutes = {
   },
   'parent-product-stock': (BuildContext context) {
     return ParentProductStockListScreen();
+  },
+  'product-profit-list': (BuildContext context) {
+    return ProductProfitListScreen();
   },
 };
 

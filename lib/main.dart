@@ -24,6 +24,7 @@ import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_list/purchase_list_bloc.dart';
 import 'package:fine_cut/bloc/reports/parent_product_purchases_list/parent_product_purchases_list_bloc.dart';
 import 'package:fine_cut/bloc/reports/parent_product_sales_list/parent_product_sales_list_bloc.dart';
+import 'package:fine_cut/bloc/reports/product_profit_list/product_profit_list_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_crud/sale_crud_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_list/sale_list_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_parent_product/sale_parent_product_bloc.dart';
@@ -181,6 +182,9 @@ class AppInitializer extends StatelessWidget {
                   create: (_) => CashRegisterUpdateDateBloc(
                     cashRegisterDao: cashRegisterDao,
                   ),
+                ),
+                BlocProvider<ProductProfitListBloc>(
+                  create: (_) => ProductProfitListBloc(saleDao: saleDao),
                 ),
               ],
               child: FineCutApp(database: database),

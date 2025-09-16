@@ -35,7 +35,7 @@ class _ParentProductSalesListScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reporte de Ventas'),
+        title: const Text('Ganancias Productos Principales'),
         backgroundColor: primaryColor,
       ),
       body: BlocBuilder<ParentProductPurchasesListBloc, ParentProductPurchasesListState>(

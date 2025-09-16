@@ -3,6 +3,7 @@ import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/tables/sales_table.dart';
+import 'package:fine_cut/models/product_profit.dart';
 
 part 'sale_dao.g.dart';
 
@@ -172,5 +173,124 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
 
     final result = await query.getSingleOrNull();
     return result != null;
+  }
+
+  /*Future<double> getProfitByDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    // 1. Calculate purchases
+    final purchasesResult = await customSelect(
+      '''
+    SELECT 
+      SUM(quantity) AS total_quantity, 
+      SUM(total_cost) AS total_cost
+    FROM purchases
+    WHERE purchase_date BETWEEN ? AND ?
+    ''',
+      variables: [
+        Variable.withDateTime(startDate),
+        Variable.withDateTime(endDate),
+      ],
+      readsFrom: {db.purchases},
+    ).getSingle();
+
+    final totalQuantityPurchased =
+        (purchasesResult.data['total_quantity'] as num?)?.toDouble() ?? 0.0;
+    final totalCostPurchased =
+        (purchasesResult.data['total_cost'] as num?)?.toDouble() ?? 0.0;
+
+    final avgCostPerUnit = totalQuantityPurchased > 0
+        ? totalCostPurchased / totalQuantityPurchased
+        : 0.0;
+
+    // 2. Calculate sales
+    final salesResult = await customSelect(
+      '''
+    SELECT 
+      SUM(quantity) AS total_quantity, 
+      SUM(total_price) AS total_price
+    FROM sales
+    WHERE sale_date BETWEEN ? AND ? 
+      AND status = 'active'
+    ''',
+      variables: [
+        Variable.withDateTime(startDate),
+        Variable.withDateTime(endDate),
+      ],
+      readsFrom: {sales},
+    ).getSingle();
+
+    final totalQuantitySold =
+        (salesResult.data['total_quantity'] as num?)?.toDouble() ?? 0.0;
+    final totalSales =
+        (salesResult.data['total_price'] as num?)?.toDouble() ?? 0.0;
+
+    // 3. Calculate cost of goods sold
+    final costOfGoodsSold = totalQuantitySold * avgCostPerUnit;
+
+    // 4. Calculate profit
+    final profit = totalSales - costOfGoodsSold;
+
+    return profit;
+  }*/
+
+  Future<List<ProductProfit>> getProfitByProduct(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    // Consulta combinada por producto
+    final result = await customSelect(
+      '''
+      SELECT 
+        s.product_id,
+        s.alias_product_name AS product,
+        COALESCE(SUM(s.quantity),0) AS total_quantity_sold,
+        COALESCE(SUM(s.total_price),0) AS total_sales,
+        COALESCE(SUM(p.quantity),0) AS total_quantity_purchased,
+        COALESCE(SUM(p.total_cost),0) AS total_cost_purchased
+      FROM sales s
+      LEFT JOIN purchases p
+        ON s.product_id = p.product_id
+          AND p.purchase_date BETWEEN ? AND ?
+      WHERE s.sale_date BETWEEN ? AND ?
+        AND s.status = 'active'
+        AND s.purchase_id IS NULL
+      GROUP BY s.product_id, s.alias_product_name
+    ''',
+      variables: [
+        Variable.withDateTime(startDate),
+        Variable.withDateTime(endDate),
+        Variable.withDateTime(startDate),
+        Variable.withDateTime(endDate),
+      ],
+      readsFrom: {sales, db.purchases},
+    ).get();
+
+    return result.map((row) {
+      final totalQuantityPurchased =
+          (row.data['total_quantity_purchased'] as num?)?.toDouble() ?? 0.0;
+      final totalCostPurchased =
+          (row.data['total_cost_purchased'] as num?)?.toDouble() ?? 0.0;
+      final avgCostPerUnit = totalQuantityPurchased > 0
+          ? totalCostPurchased / totalQuantityPurchased
+          : 0.0;
+
+      final totalQuantitySold =
+          (row.data['total_quantity_sold'] as num?)?.toDouble() ?? 0.0;
+      final totalSales = (row.data['total_sales'] as num?)?.toDouble() ?? 0.0;
+
+      final costOfGoodsSold = totalQuantitySold * avgCostPerUnit;
+      final profit = totalSales - costOfGoodsSold;
+
+      return ProductProfit(
+        productId: row.data['product_id'] as int,
+        productName: row.data['product'] as String,
+        totalQuantitySold: totalQuantitySold,
+        totalSales: totalSales,
+        avgCost: avgCostPerUnit,
+        profit: profit,
+      );
+    }).toList();
   }
 }
