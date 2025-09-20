@@ -1,9 +1,13 @@
 import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/parent_product_stock/parent_product_stock_bloc.dart';
 import 'package:fine_cut/bloc/reports/product_profit_list/product_profit_list_bloc.dart';
+import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
+import 'package:fine_cut/core/utils/helpers.dart';
 import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
+import 'package:fine_cut/widgets/app_button.dart';
+import 'package:fine_cut/widgets/app_date_field.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:flutter/material.dart';
@@ -18,21 +22,21 @@ class ProductProfitListScreen extends StatefulWidget {
 }
 
 class _ProductProfitListScreenState extends State<ProductProfitListScreen> {
-  DateTime? _startDate;
-  DateTime? _endDate;
+  final _formKey = GlobalKey<FormState>();
+  String _startDate = AppUtils.formatDateTimeYMD(DateTime.now());
+  String _endDate = AppUtils.formatDateTimeYMD(DateTime.now());
+
+  late TextEditingController _startDateController;
+  late TextEditingController _endDateController;
+
   @override
   void initState() {
     super.initState();
+    _startDateController = TextEditingController(text: _startDate);
+    _endDateController = TextEditingController(text: _endDate);
 
     context.read<ProductProfitListBloc>().add(
-      LoadProductProfitListEvent(
-        startDate: DateTime(
-          DateTime.now().year,
-          DateTime.now().month - 1,
-          DateTime.now().day,
-        ),
-        endDate: DateTime.now(),
-      ),
+      LoadProductProfitListEvent(startDate: _startDate, endDate: _endDate),
     );
   }
 
@@ -42,105 +46,114 @@ class _ProductProfitListScreenState extends State<ProductProfitListScreen> {
       appBar: AppBarCustom(title: "Ganancias por Producto"),
       body: BlocBuilder<ProductProfitListBloc, ProductProfitListState>(
         builder: (context, state) {
-          if (state is ProductProfitListLoading) {
-            return AppLoadingScreen(
-              message: AppMessages.getPurchaseMessage('messageLoadingPurchase'),
-            );
-          } else if (state is ProductProfitListSuccess) {
-            if (state.productProfitList.isEmpty) {
-              return Center(
-                child: AppMessageType(
-                  message: AppMessages.getAppMessage('emptyList'),
-                  messageType: MessageType.info,
-                ),
-              );
-            }
-            return Column(
+          final isLoading = state is ProductProfitListLoading;
+
+          return SingleChildScrollView(
+            padding: AppConstants.screenPadding,
+            child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
+                Form(
+                  key: _formKey,
+                  child: Column(
                     children: [
                       // Fecha inicio
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () async {
-                            final selected = await showDatePicker(
-                              context: context,
-                              initialDate:
-                                  _startDate ??
-                                  DateTime.now().subtract(
-                                    const Duration(days: 30),
-                                  ),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime.now(),
-                            );
-                            if (selected != null) {
-                              setState(() {
-                                _startDate = selected;
-                              });
-                            }
-                          },
-                          child: Text(
-                            _startDate != null
-                                ? 'Inicio: ${_startDate!.toLocal()}'.split(
-                                    ' ',
-                                  )[0]
-                                : 'Seleccionar fecha inicio',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Fecha fin
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () async {
-                            final selected = await showDatePicker(
-                              context: context,
-                              initialDate: _endDate ?? DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime.now(),
-                            );
-                            if (selected != null) {
-                              setState(() {
-                                _endDate = selected;
-                              });
-                            }
-                          },
-                          child: Text(
-                            _endDate != null
-                                ? 'Fin: ${_endDate!.toLocal()}'.split(' ')[0]
-                                : 'Seleccionar fecha fin',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Botón filtrar
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_startDate != null && _endDate != null) {
-                            context.read<ProductProfitListBloc>().add(
-                              LoadProductProfitListEvent(
-                                startDate: _startDate!,
-                                endDate: _endDate!,
-                              ),
-                            );
-                          } else {
-                            // Opcional: mostrar un mensaje de error
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Selecciona ambas fechas'),
-                              ),
-                            );
-                          }
+                      AppDateField(
+                        label: "Fecha Inicio",
+                        controller: _startDateController,
+                        lastDate: DateTime.now(),
+                        onDateSelected: (date) {
+                          _startDateController.text =
+                              AppUtils.formatDateTimeYMD(date);
+                          _startDate = AppUtils.formatDateTimeYMD(date);
                         },
-                        child: const Text('Filtrar'),
+                        validate: true,
+                        validationMessage: "Selecciona una fecha",
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Fecha fin
+                      AppDateField(
+                        label: "Fecha Fin",
+                        controller: _endDateController,
+                        lastDate: DateTime.now(),
+                        onDateSelected: (date) {
+                          _endDateController.text = AppUtils.formatDateTimeYMD(
+                            date,
+                          );
+                          _endDate = AppUtils.formatDateTimeYMD(date);
+                        },
+                        validate: true,
+                        validationMessage: "Selecciona una fecha",
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Botón filtrar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 32.0,
+                        ),
+                        child: AppButton(
+                          title: 'Filtrar',
+                          isLoading: isLoading,
+                          onPressed: isLoading
+                              ? null
+                              : () {
+                                  if (_formKey.currentState!.validate()) {
+                                    _formKey.currentState!.save();
+                                    context.read<ProductProfitListBloc>().add(
+                                      LoadProductProfitListEvent(
+                                        startDate: _startDate,
+                                        endDate: _endDate,
+                                      ),
+                                    );
+                                  }
+                                },
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: ListView.builder(
+
+                const SizedBox(height: 24),
+
+                // Estados del bloc
+                if (state is ProductProfitListLoading)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: AppLoadingScreen(
+                      message: AppMessages.getProductProfitMessage(
+                        'messageLoadingProductProfit',
+                      ),
+                    ),
+                  ),
+
+                if (state is ProductProfitListFailure)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: Center(
+                      child: AppMessageType(
+                        message: state.message,
+                        messageType: MessageType.error,
+                      ),
+                    ),
+                  ),
+
+                if (state is ProductProfitListSuccess &&
+                    state.productProfitList.isEmpty)
+                  SizedBox(
+                    child: Center(
+                      child: AppMessageType(
+                        message: AppMessages.getAppMessage('emptyList'),
+                        messageType: MessageType.info,
+                      ),
+                    ),
+                  ),
+
+                if (state is ProductProfitListSuccess)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: state.productProfitList.length,
                     itemBuilder: (context, index) {
                       final productProfit = state.productProfitList[index];
@@ -188,25 +201,19 @@ class _ProductProfitListScreenState extends State<ProductProfitListScreen> {
                             ),
                             isThreeLine: true,
                           ),
-
-                          Divider(
-                            color: Colors.grey, // Color de la línea
-                            thickness: 0.4, // Grosor de la línea
-                            indent: 4, // Espaciado desde la izquierda
-                            endIndent: 4, // Espaciado desde la derecha
+                          const Divider(
+                            color: Colors.grey,
+                            thickness: 0.4,
+                            indent: 4,
+                            endIndent: 4,
                           ),
                         ],
                       );
                     },
                   ),
-                ),
               ],
-            );
-          } else if (state is CategoriesListLoadFailure) {
-            return const Center(child: Text('Error al cargar compras.'));
-          } else {
-            return const Center(child: Text('Estado desconocido'));
-          }
+            ),
+          );
         },
       ),
     );

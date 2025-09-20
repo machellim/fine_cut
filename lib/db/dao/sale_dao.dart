@@ -236,34 +236,33 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
   }*/
 
   Future<List<ProductProfit>> getProfitByProduct(
-    DateTime startDate,
-    DateTime endDate,
+    String startDate,
+    String endDate,
   ) async {
     // Consulta combinada por producto
     final result = await customSelect(
       '''
       SELECT 
-        s.product_id,
-        s.alias_product_name AS product,
-        COALESCE(SUM(s.quantity),0) AS total_quantity_sold,
-        COALESCE(SUM(s.total_price),0) AS total_sales,
-        COALESCE(SUM(p.quantity),0) AS total_quantity_purchased,
-        COALESCE(SUM(p.total_cost),0) AS total_cost_purchased
+          s.product_id,
+          s.alias_product_name AS product,
+          COALESCE(SUM(s.quantity), 0) AS total_quantity_sold,
+          COALESCE(SUM(s.total_price), 0) AS total_sales,
+          COALESCE(p.total_quantity_purchased, 0) AS total_quantity_purchased,
+          COALESCE(p.total_cost_purchased, 0) AS total_cost_purchased
       FROM sales s
-      LEFT JOIN purchases p
-        ON s.product_id = p.product_id
-          AND p.purchase_date BETWEEN ? AND ?
-      WHERE s.sale_date BETWEEN ? AND ?
+      LEFT JOIN (
+          SELECT product_id, SUM(quantity) AS total_quantity_purchased, SUM(total_cost) AS total_cost_purchased
+          FROM purchases
+          WHERE status='active'
+          GROUP BY product_id
+      ) p ON s.product_id = p.product_id
+      WHERE DATE(s.sale_date, 'unixepoch') BETWEEN ? AND ?
         AND s.status = 'active'
         AND s.purchase_id IS NULL
-      GROUP BY s.product_id, s.alias_product_name
+        
+      GROUP BY s.product_id, s.alias_product_name, p.total_quantity_purchased, p.total_cost_purchased;
     ''',
-      variables: [
-        Variable.withDateTime(startDate),
-        Variable.withDateTime(endDate),
-        Variable.withDateTime(startDate),
-        Variable.withDateTime(endDate),
-      ],
+      variables: [Variable.withString(startDate), Variable.withString(endDate)],
       readsFrom: {sales, db.purchases},
     ).get();
 

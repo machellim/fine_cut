@@ -22,4 +22,8 @@ class AppUtils {
   static String formatDouble(double value, {int decimals = 2}) {
     return value.toStringAsFixed(decimals);
   }
+
+  static String formatDateTimeYMD(DateTime timestamp) {
+    return DateFormat('yyyy-MM-dd').format(timestamp);
+  }
 }

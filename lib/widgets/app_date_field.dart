@@ -12,6 +12,15 @@ class AppDateField extends StatefulWidget {
   final TextStyle? labelStyle;
   final InputBorder? border;
 
+  /// Nuevo: validador personalizado
+  final FormFieldValidator<String>? validator;
+
+  /// Nuevo: activar validación simple
+  final bool validate;
+
+  /// Nuevo: mensaje para campo requerido
+  final String? validationMessage;
+
   const AppDateField({
     super.key,
     required this.label,
@@ -23,6 +32,9 @@ class AppDateField extends StatefulWidget {
     this.enabled = true,
     this.labelStyle,
     this.border,
+    this.validator,
+    this.validate = false,
+    this.validationMessage,
   });
 
   @override
@@ -44,12 +56,6 @@ class _AppDateFieldState extends State<AppDateField> {
     );
     _controller = widget.controller ?? _internalController;
   }
-
-  /*String _formatDate(DateTime date) {
-    return "${date.year}-${_twoDigits(date.month)}-${_twoDigits(date.day)}";
-  }*/
-
-  //String _twoDigits(int n) => n.toString().padLeft(2, '0');
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -78,12 +84,21 @@ class _AppDateFieldState extends State<AppDateField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return TextFormField(
       controller: _controller,
       readOnly: true,
       enabled: widget.enabled,
+      validator:
+          widget.validator ??
+          (widget.validate
+              ? (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return widget.validationMessage ?? 'Campo requerido';
+                  }
+                  return null;
+                }
+              : null),
       decoration: InputDecoration(
         labelText: widget.label,
         labelStyle: widget.labelStyle,

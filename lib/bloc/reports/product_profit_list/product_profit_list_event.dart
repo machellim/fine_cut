@@ -9,8 +9,8 @@ sealed class ProductProfitListEvent extends Equatable {
 
 // Event to load product profit list
 class LoadProductProfitListEvent extends ProductProfitListEvent {
-  final DateTime startDate;
-  final DateTime endDate;
+  final String startDate;
+  final String endDate;
 
   const LoadProductProfitListEvent({
     required this.startDate,

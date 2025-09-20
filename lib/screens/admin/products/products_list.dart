@@ -111,7 +111,9 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                     ),
                                 ],
                               ),
-
+                              price: product.hasSubProducts
+                                  ? null
+                                  : product.salePrice,
                               description: product.trackStock
                                   ? Text(
                                       "Stock: ${product.stock}",
