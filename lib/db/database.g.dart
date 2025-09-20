@@ -5036,12 +5036,12 @@ class ProductSubproductsCompanion extends UpdateCompanion<ProductSubproduct> {
   }
 }
 
-class $InventoryLossesTable extends InventoryLosses
-    with TableInfo<$InventoryLossesTable, InventoryLossesData> {
+class $InventoryAdjustmentsTable extends InventoryAdjustments
+    with TableInfo<$InventoryAdjustmentsTable, InventoryAdjustment> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $InventoryLossesTable(this.attachedDatabase, [this._alias]);
+  $InventoryAdjustmentsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -5079,17 +5079,17 @@ class $InventoryLossesTable extends InventoryLosses
     requiredDuringInsert: false,
     $customConstraints: 'REFERENCES cash_registers(id) ON DELETE SET NULL',
   );
-  static const VerificationMeta _lossTypeIdMeta = const VerificationMeta(
-    'lossTypeId',
+  static const VerificationMeta _adjustmentTypeIdMeta = const VerificationMeta(
+    'adjustmentTypeId',
   );
   @override
-  late final GeneratedColumn<int> lossTypeId = GeneratedColumn<int>(
-    'loss_type_id',
+  late final GeneratedColumn<int> adjustmentTypeId = GeneratedColumn<int>(
+    'adjustment_type_id',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    $customConstraints: 'REFERENCES loss_types(id) ON DELETE SET NULL',
+    $customConstraints: 'REFERENCES adjustment_types(id) ON DELETE SET NULL',
   );
   static const VerificationMeta _quantityMeta = const VerificationMeta(
     'quantity',
@@ -5131,7 +5131,9 @@ class $InventoryLossesTable extends InventoryLosses
         type: DriftSqlType.string,
         requiredDuringInsert: false,
         defaultValue: Constant(RecordStatus.active.name),
-      ).withConverter<RecordStatus>($InventoryLossesTable.$converterstatus);
+      ).withConverter<RecordStatus>(
+        $InventoryAdjustmentsTable.$converterstatus,
+      );
   static const VerificationMeta _lossDateMeta = const VerificationMeta(
     'lossDate',
   );
@@ -5172,7 +5174,7 @@ class $InventoryLossesTable extends InventoryLosses
     id,
     productId,
     cashRegisterId,
-    lossTypeId,
+    adjustmentTypeId,
     quantity,
     description,
     status,
@@ -5184,10 +5186,10 @@ class $InventoryLossesTable extends InventoryLosses
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'inventory_losses';
+  static const String $name = 'inventory_adjustments';
   @override
   VerificationContext validateIntegrity(
-    Insertable<InventoryLossesData> instance, {
+    Insertable<InventoryAdjustment> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -5212,16 +5214,16 @@ class $InventoryLossesTable extends InventoryLosses
         ),
       );
     }
-    if (data.containsKey('loss_type_id')) {
+    if (data.containsKey('adjustment_type_id')) {
       context.handle(
-        _lossTypeIdMeta,
-        lossTypeId.isAcceptableOrUnknown(
-          data['loss_type_id']!,
-          _lossTypeIdMeta,
+        _adjustmentTypeIdMeta,
+        adjustmentTypeId.isAcceptableOrUnknown(
+          data['adjustment_type_id']!,
+          _adjustmentTypeIdMeta,
         ),
       );
     } else if (isInserting) {
-      context.missing(_lossTypeIdMeta);
+      context.missing(_adjustmentTypeIdMeta);
     }
     if (data.containsKey('quantity')) {
       context.handle(
@@ -5262,9 +5264,9 @@ class $InventoryLossesTable extends InventoryLosses
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  InventoryLossesData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  InventoryAdjustment map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return InventoryLossesData(
+    return InventoryAdjustment(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -5277,9 +5279,9 @@ class $InventoryLossesTable extends InventoryLosses
         DriftSqlType.int,
         data['${effectivePrefix}cash_register_id'],
       ),
-      lossTypeId: attachedDatabase.typeMapping.read(
+      adjustmentTypeId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}loss_type_id'],
+        data['${effectivePrefix}adjustment_type_id'],
       )!,
       quantity: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
@@ -5289,7 +5291,7 @@ class $InventoryLossesTable extends InventoryLosses
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
-      status: $InventoryLossesTable.$converterstatus.fromSql(
+      status: $InventoryAdjustmentsTable.$converterstatus.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
           data['${effectivePrefix}status'],
@@ -5311,31 +5313,31 @@ class $InventoryLossesTable extends InventoryLosses
   }
 
   @override
-  $InventoryLossesTable createAlias(String alias) {
-    return $InventoryLossesTable(attachedDatabase, alias);
+  $InventoryAdjustmentsTable createAlias(String alias) {
+    return $InventoryAdjustmentsTable(attachedDatabase, alias);
   }
 
   static JsonTypeConverter2<RecordStatus, String, String> $converterstatus =
       const EnumNameConverter(RecordStatus.values);
 }
 
-class InventoryLossesData extends DataClass
-    implements Insertable<InventoryLossesData> {
+class InventoryAdjustment extends DataClass
+    implements Insertable<InventoryAdjustment> {
   final int id;
   final int productId;
   final int? cashRegisterId;
-  final int lossTypeId;
+  final int adjustmentTypeId;
   final double quantity;
   final String? description;
   final RecordStatus status;
   final DateTime lossDate;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  const InventoryLossesData({
+  const InventoryAdjustment({
     required this.id,
     required this.productId,
     this.cashRegisterId,
-    required this.lossTypeId,
+    required this.adjustmentTypeId,
     required this.quantity,
     this.description,
     required this.status,
@@ -5351,14 +5353,14 @@ class InventoryLossesData extends DataClass
     if (!nullToAbsent || cashRegisterId != null) {
       map['cash_register_id'] = Variable<int>(cashRegisterId);
     }
-    map['loss_type_id'] = Variable<int>(lossTypeId);
+    map['adjustment_type_id'] = Variable<int>(adjustmentTypeId);
     map['quantity'] = Variable<double>(quantity);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
     {
       map['status'] = Variable<String>(
-        $InventoryLossesTable.$converterstatus.toSql(status),
+        $InventoryAdjustmentsTable.$converterstatus.toSql(status),
       );
     }
     map['loss_date'] = Variable<DateTime>(lossDate);
@@ -5369,14 +5371,14 @@ class InventoryLossesData extends DataClass
     return map;
   }
 
-  InventoryLossesCompanion toCompanion(bool nullToAbsent) {
-    return InventoryLossesCompanion(
+  InventoryAdjustmentsCompanion toCompanion(bool nullToAbsent) {
+    return InventoryAdjustmentsCompanion(
       id: Value(id),
       productId: Value(productId),
       cashRegisterId: cashRegisterId == null && nullToAbsent
           ? const Value.absent()
           : Value(cashRegisterId),
-      lossTypeId: Value(lossTypeId),
+      adjustmentTypeId: Value(adjustmentTypeId),
       quantity: Value(quantity),
       description: description == null && nullToAbsent
           ? const Value.absent()
@@ -5390,19 +5392,19 @@ class InventoryLossesData extends DataClass
     );
   }
 
-  factory InventoryLossesData.fromJson(
+  factory InventoryAdjustment.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return InventoryLossesData(
+    return InventoryAdjustment(
       id: serializer.fromJson<int>(json['id']),
       productId: serializer.fromJson<int>(json['productId']),
       cashRegisterId: serializer.fromJson<int?>(json['cashRegisterId']),
-      lossTypeId: serializer.fromJson<int>(json['lossTypeId']),
+      adjustmentTypeId: serializer.fromJson<int>(json['adjustmentTypeId']),
       quantity: serializer.fromJson<double>(json['quantity']),
       description: serializer.fromJson<String?>(json['description']),
-      status: $InventoryLossesTable.$converterstatus.fromJson(
+      status: $InventoryAdjustmentsTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
       ),
       lossDate: serializer.fromJson<DateTime>(json['lossDate']),
@@ -5417,11 +5419,11 @@ class InventoryLossesData extends DataClass
       'id': serializer.toJson<int>(id),
       'productId': serializer.toJson<int>(productId),
       'cashRegisterId': serializer.toJson<int?>(cashRegisterId),
-      'lossTypeId': serializer.toJson<int>(lossTypeId),
+      'adjustmentTypeId': serializer.toJson<int>(adjustmentTypeId),
       'quantity': serializer.toJson<double>(quantity),
       'description': serializer.toJson<String?>(description),
       'status': serializer.toJson<String>(
-        $InventoryLossesTable.$converterstatus.toJson(status),
+        $InventoryAdjustmentsTable.$converterstatus.toJson(status),
       ),
       'lossDate': serializer.toJson<DateTime>(lossDate),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -5429,24 +5431,24 @@ class InventoryLossesData extends DataClass
     };
   }
 
-  InventoryLossesData copyWith({
+  InventoryAdjustment copyWith({
     int? id,
     int? productId,
     Value<int?> cashRegisterId = const Value.absent(),
-    int? lossTypeId,
+    int? adjustmentTypeId,
     double? quantity,
     Value<String?> description = const Value.absent(),
     RecordStatus? status,
     DateTime? lossDate,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
-  }) => InventoryLossesData(
+  }) => InventoryAdjustment(
     id: id ?? this.id,
     productId: productId ?? this.productId,
     cashRegisterId: cashRegisterId.present
         ? cashRegisterId.value
         : this.cashRegisterId,
-    lossTypeId: lossTypeId ?? this.lossTypeId,
+    adjustmentTypeId: adjustmentTypeId ?? this.adjustmentTypeId,
     quantity: quantity ?? this.quantity,
     description: description.present ? description.value : this.description,
     status: status ?? this.status,
@@ -5454,16 +5456,16 @@ class InventoryLossesData extends DataClass
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
-  InventoryLossesData copyWithCompanion(InventoryLossesCompanion data) {
-    return InventoryLossesData(
+  InventoryAdjustment copyWithCompanion(InventoryAdjustmentsCompanion data) {
+    return InventoryAdjustment(
       id: data.id.present ? data.id.value : this.id,
       productId: data.productId.present ? data.productId.value : this.productId,
       cashRegisterId: data.cashRegisterId.present
           ? data.cashRegisterId.value
           : this.cashRegisterId,
-      lossTypeId: data.lossTypeId.present
-          ? data.lossTypeId.value
-          : this.lossTypeId,
+      adjustmentTypeId: data.adjustmentTypeId.present
+          ? data.adjustmentTypeId.value
+          : this.adjustmentTypeId,
       quantity: data.quantity.present ? data.quantity.value : this.quantity,
       description: data.description.present
           ? data.description.value
@@ -5477,11 +5479,11 @@ class InventoryLossesData extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('InventoryLossesData(')
+    return (StringBuffer('InventoryAdjustment(')
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('cashRegisterId: $cashRegisterId, ')
-          ..write('lossTypeId: $lossTypeId, ')
+          ..write('adjustmentTypeId: $adjustmentTypeId, ')
           ..write('quantity: $quantity, ')
           ..write('description: $description, ')
           ..write('status: $status, ')
@@ -5497,7 +5499,7 @@ class InventoryLossesData extends DataClass
     id,
     productId,
     cashRegisterId,
-    lossTypeId,
+    adjustmentTypeId,
     quantity,
     description,
     status,
@@ -5508,11 +5510,11 @@ class InventoryLossesData extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is InventoryLossesData &&
+      (other is InventoryAdjustment &&
           other.id == this.id &&
           other.productId == this.productId &&
           other.cashRegisterId == this.cashRegisterId &&
-          other.lossTypeId == this.lossTypeId &&
+          other.adjustmentTypeId == this.adjustmentTypeId &&
           other.quantity == this.quantity &&
           other.description == this.description &&
           other.status == this.status &&
@@ -5521,22 +5523,23 @@ class InventoryLossesData extends DataClass
           other.updatedAt == this.updatedAt);
 }
 
-class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
+class InventoryAdjustmentsCompanion
+    extends UpdateCompanion<InventoryAdjustment> {
   final Value<int> id;
   final Value<int> productId;
   final Value<int?> cashRegisterId;
-  final Value<int> lossTypeId;
+  final Value<int> adjustmentTypeId;
   final Value<double> quantity;
   final Value<String?> description;
   final Value<RecordStatus> status;
   final Value<DateTime> lossDate;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
-  const InventoryLossesCompanion({
+  const InventoryAdjustmentsCompanion({
     this.id = const Value.absent(),
     this.productId = const Value.absent(),
     this.cashRegisterId = const Value.absent(),
-    this.lossTypeId = const Value.absent(),
+    this.adjustmentTypeId = const Value.absent(),
     this.quantity = const Value.absent(),
     this.description = const Value.absent(),
     this.status = const Value.absent(),
@@ -5544,11 +5547,11 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
-  InventoryLossesCompanion.insert({
+  InventoryAdjustmentsCompanion.insert({
     this.id = const Value.absent(),
     required int productId,
     this.cashRegisterId = const Value.absent(),
-    required int lossTypeId,
+    required int adjustmentTypeId,
     this.quantity = const Value.absent(),
     this.description = const Value.absent(),
     this.status = const Value.absent(),
@@ -5556,12 +5559,12 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : productId = Value(productId),
-       lossTypeId = Value(lossTypeId);
-  static Insertable<InventoryLossesData> custom({
+       adjustmentTypeId = Value(adjustmentTypeId);
+  static Insertable<InventoryAdjustment> custom({
     Expression<int>? id,
     Expression<int>? productId,
     Expression<int>? cashRegisterId,
-    Expression<int>? lossTypeId,
+    Expression<int>? adjustmentTypeId,
     Expression<double>? quantity,
     Expression<String>? description,
     Expression<String>? status,
@@ -5573,7 +5576,7 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
       if (id != null) 'id': id,
       if (productId != null) 'product_id': productId,
       if (cashRegisterId != null) 'cash_register_id': cashRegisterId,
-      if (lossTypeId != null) 'loss_type_id': lossTypeId,
+      if (adjustmentTypeId != null) 'adjustment_type_id': adjustmentTypeId,
       if (quantity != null) 'quantity': quantity,
       if (description != null) 'description': description,
       if (status != null) 'status': status,
@@ -5583,11 +5586,11 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
     });
   }
 
-  InventoryLossesCompanion copyWith({
+  InventoryAdjustmentsCompanion copyWith({
     Value<int>? id,
     Value<int>? productId,
     Value<int?>? cashRegisterId,
-    Value<int>? lossTypeId,
+    Value<int>? adjustmentTypeId,
     Value<double>? quantity,
     Value<String?>? description,
     Value<RecordStatus>? status,
@@ -5595,11 +5598,11 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
-    return InventoryLossesCompanion(
+    return InventoryAdjustmentsCompanion(
       id: id ?? this.id,
       productId: productId ?? this.productId,
       cashRegisterId: cashRegisterId ?? this.cashRegisterId,
-      lossTypeId: lossTypeId ?? this.lossTypeId,
+      adjustmentTypeId: adjustmentTypeId ?? this.adjustmentTypeId,
       quantity: quantity ?? this.quantity,
       description: description ?? this.description,
       status: status ?? this.status,
@@ -5621,8 +5624,8 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
     if (cashRegisterId.present) {
       map['cash_register_id'] = Variable<int>(cashRegisterId.value);
     }
-    if (lossTypeId.present) {
-      map['loss_type_id'] = Variable<int>(lossTypeId.value);
+    if (adjustmentTypeId.present) {
+      map['adjustment_type_id'] = Variable<int>(adjustmentTypeId.value);
     }
     if (quantity.present) {
       map['quantity'] = Variable<double>(quantity.value);
@@ -5632,7 +5635,7 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
     }
     if (status.present) {
       map['status'] = Variable<String>(
-        $InventoryLossesTable.$converterstatus.toSql(status.value),
+        $InventoryAdjustmentsTable.$converterstatus.toSql(status.value),
       );
     }
     if (lossDate.present) {
@@ -5649,11 +5652,11 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
 
   @override
   String toString() {
-    return (StringBuffer('InventoryLossesCompanion(')
+    return (StringBuffer('InventoryAdjustmentsCompanion(')
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('cashRegisterId: $cashRegisterId, ')
-          ..write('lossTypeId: $lossTypeId, ')
+          ..write('adjustmentTypeId: $adjustmentTypeId, ')
           ..write('quantity: $quantity, ')
           ..write('description: $description, ')
           ..write('status: $status, ')
@@ -5665,12 +5668,12 @@ class InventoryLossesCompanion extends UpdateCompanion<InventoryLossesData> {
   }
 }
 
-class $LossTypesTable extends LossTypes
-    with TableInfo<$LossTypesTable, LossType> {
+class $AdjustmentTypesTable extends AdjustmentTypes
+    with TableInfo<$AdjustmentTypesTable, AdjustmentType> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $LossTypesTable(this.attachedDatabase, [this._alias]);
+  $AdjustmentTypesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -5713,6 +5716,21 @@ class $LossTypesTable extends LossTypes
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _increasesStockMeta = const VerificationMeta(
+    'increasesStock',
+  );
+  @override
+  late final GeneratedColumn<bool> increasesStock = GeneratedColumn<bool>(
+    'increases_stock',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("increases_stock" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -5741,6 +5759,7 @@ class $LossTypesTable extends LossTypes
     id,
     name,
     description,
+    increasesStock,
     createdAt,
     updatedAt,
   ];
@@ -5748,10 +5767,10 @@ class $LossTypesTable extends LossTypes
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'loss_types';
+  static const String $name = 'adjustment_types';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LossType> instance, {
+    Insertable<AdjustmentType> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -5776,6 +5795,15 @@ class $LossTypesTable extends LossTypes
         ),
       );
     }
+    if (data.containsKey('increases_stock')) {
+      context.handle(
+        _increasesStockMeta,
+        increasesStock.isAcceptableOrUnknown(
+          data['increases_stock']!,
+          _increasesStockMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -5794,9 +5822,9 @@ class $LossTypesTable extends LossTypes
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LossType map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AdjustmentType map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LossType(
+    return AdjustmentType(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -5809,6 +5837,10 @@ class $LossTypesTable extends LossTypes
         DriftSqlType.string,
         data['${effectivePrefix}description'],
       ),
+      increasesStock: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}increases_stock'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -5821,21 +5853,23 @@ class $LossTypesTable extends LossTypes
   }
 
   @override
-  $LossTypesTable createAlias(String alias) {
-    return $LossTypesTable(attachedDatabase, alias);
+  $AdjustmentTypesTable createAlias(String alias) {
+    return $AdjustmentTypesTable(attachedDatabase, alias);
   }
 }
 
-class LossType extends DataClass implements Insertable<LossType> {
+class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
   final int id;
   final String name;
   final String? description;
+  final bool increasesStock;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  const LossType({
+  const AdjustmentType({
     required this.id,
     required this.name,
     this.description,
+    required this.increasesStock,
     required this.createdAt,
     this.updatedAt,
   });
@@ -5847,6 +5881,7 @@ class LossType extends DataClass implements Insertable<LossType> {
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
+    map['increases_stock'] = Variable<bool>(increasesStock);
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -5854,13 +5889,14 @@ class LossType extends DataClass implements Insertable<LossType> {
     return map;
   }
 
-  LossTypesCompanion toCompanion(bool nullToAbsent) {
-    return LossTypesCompanion(
+  AdjustmentTypesCompanion toCompanion(bool nullToAbsent) {
+    return AdjustmentTypesCompanion(
       id: Value(id),
       name: Value(name),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      increasesStock: Value(increasesStock),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -5868,15 +5904,16 @@ class LossType extends DataClass implements Insertable<LossType> {
     );
   }
 
-  factory LossType.fromJson(
+  factory AdjustmentType.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LossType(
+    return AdjustmentType(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
+      increasesStock: serializer.fromJson<bool>(json['increasesStock']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
@@ -5888,31 +5925,37 @@ class LossType extends DataClass implements Insertable<LossType> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
+      'increasesStock': serializer.toJson<bool>(increasesStock),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
   }
 
-  LossType copyWith({
+  AdjustmentType copyWith({
     int? id,
     String? name,
     Value<String?> description = const Value.absent(),
+    bool? increasesStock,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
-  }) => LossType(
+  }) => AdjustmentType(
     id: id ?? this.id,
     name: name ?? this.name,
     description: description.present ? description.value : this.description,
+    increasesStock: increasesStock ?? this.increasesStock,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
-  LossType copyWithCompanion(LossTypesCompanion data) {
-    return LossType(
+  AdjustmentType copyWithCompanion(AdjustmentTypesCompanion data) {
+    return AdjustmentType(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       description: data.description.present
           ? data.description.value
           : this.description,
+      increasesStock: data.increasesStock.present
+          ? data.increasesStock.value
+          : this.increasesStock,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -5920,10 +5963,11 @@ class LossType extends DataClass implements Insertable<LossType> {
 
   @override
   String toString() {
-    return (StringBuffer('LossType(')
+    return (StringBuffer('AdjustmentType(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('increasesStock: $increasesStock, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -5931,42 +5975,48 @@ class LossType extends DataClass implements Insertable<LossType> {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, description, createdAt, updatedAt);
+  int get hashCode =>
+      Object.hash(id, name, description, increasesStock, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LossType &&
+      (other is AdjustmentType &&
           other.id == this.id &&
           other.name == this.name &&
           other.description == this.description &&
+          other.increasesStock == this.increasesStock &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
 
-class LossTypesCompanion extends UpdateCompanion<LossType> {
+class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
   final Value<int> id;
   final Value<String> name;
   final Value<String?> description;
+  final Value<bool> increasesStock;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
-  const LossTypesCompanion({
+  const AdjustmentTypesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.description = const Value.absent(),
+    this.increasesStock = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
-  LossTypesCompanion.insert({
+  AdjustmentTypesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.description = const Value.absent(),
+    this.increasesStock = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : name = Value(name);
-  static Insertable<LossType> custom({
+  static Insertable<AdjustmentType> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? description,
+    Expression<bool>? increasesStock,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -5974,22 +6024,25 @@ class LossTypesCompanion extends UpdateCompanion<LossType> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (description != null) 'description': description,
+      if (increasesStock != null) 'increases_stock': increasesStock,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
 
-  LossTypesCompanion copyWith({
+  AdjustmentTypesCompanion copyWith({
     Value<int>? id,
     Value<String>? name,
     Value<String?>? description,
+    Value<bool>? increasesStock,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
-    return LossTypesCompanion(
+    return AdjustmentTypesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
+      increasesStock: increasesStock ?? this.increasesStock,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -6007,6 +6060,9 @@ class LossTypesCompanion extends UpdateCompanion<LossType> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (increasesStock.present) {
+      map['increases_stock'] = Variable<bool>(increasesStock.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -6018,10 +6074,11 @@ class LossTypesCompanion extends UpdateCompanion<LossType> {
 
   @override
   String toString() {
-    return (StringBuffer('LossTypesCompanion(')
+    return (StringBuffer('AdjustmentTypesCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('description: $description, ')
+          ..write('increasesStock: $increasesStock, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -6042,10 +6099,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $IncomesTable incomes = $IncomesTable(this);
   late final $ProductSubproductsTable productSubproducts =
       $ProductSubproductsTable(this);
-  late final $InventoryLossesTable inventoryLosses = $InventoryLossesTable(
+  late final $InventoryAdjustmentsTable inventoryAdjustments =
+      $InventoryAdjustmentsTable(this);
+  late final $AdjustmentTypesTable adjustmentTypes = $AdjustmentTypesTable(
     this,
   );
-  late final $LossTypesTable lossTypes = $LossTypesTable(this);
   late final PaymentMethodDao paymentMethodDao = PaymentMethodDao(
     this as AppDatabase,
   );
@@ -6075,8 +6133,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     paymentMethods,
     incomes,
     productSubproducts,
-    inventoryLosses,
-    lossTypes,
+    inventoryAdjustments,
+    adjustmentTypes,
   ];
 }
 
@@ -8501,12 +8559,12 @@ typedef $$ProductSubproductsTableProcessedTableManager =
       ProductSubproduct,
       PrefetchHooks Function()
     >;
-typedef $$InventoryLossesTableCreateCompanionBuilder =
-    InventoryLossesCompanion Function({
+typedef $$InventoryAdjustmentsTableCreateCompanionBuilder =
+    InventoryAdjustmentsCompanion Function({
       Value<int> id,
       required int productId,
       Value<int?> cashRegisterId,
-      required int lossTypeId,
+      required int adjustmentTypeId,
       Value<double> quantity,
       Value<String?> description,
       Value<RecordStatus> status,
@@ -8514,12 +8572,12 @@ typedef $$InventoryLossesTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
-typedef $$InventoryLossesTableUpdateCompanionBuilder =
-    InventoryLossesCompanion Function({
+typedef $$InventoryAdjustmentsTableUpdateCompanionBuilder =
+    InventoryAdjustmentsCompanion Function({
       Value<int> id,
       Value<int> productId,
       Value<int?> cashRegisterId,
-      Value<int> lossTypeId,
+      Value<int> adjustmentTypeId,
       Value<double> quantity,
       Value<String?> description,
       Value<RecordStatus> status,
@@ -8528,9 +8586,9 @@ typedef $$InventoryLossesTableUpdateCompanionBuilder =
       Value<DateTime?> updatedAt,
     });
 
-class $$InventoryLossesTableFilterComposer
-    extends Composer<_$AppDatabase, $InventoryLossesTable> {
-  $$InventoryLossesTableFilterComposer({
+class $$InventoryAdjustmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $InventoryAdjustmentsTable> {
+  $$InventoryAdjustmentsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -8552,8 +8610,8 @@ class $$InventoryLossesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get lossTypeId => $composableBuilder(
-    column: $table.lossTypeId,
+  ColumnFilters<int> get adjustmentTypeId => $composableBuilder(
+    column: $table.adjustmentTypeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8589,9 +8647,9 @@ class $$InventoryLossesTableFilterComposer
   );
 }
 
-class $$InventoryLossesTableOrderingComposer
-    extends Composer<_$AppDatabase, $InventoryLossesTable> {
-  $$InventoryLossesTableOrderingComposer({
+class $$InventoryAdjustmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $InventoryAdjustmentsTable> {
+  $$InventoryAdjustmentsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -8613,8 +8671,8 @@ class $$InventoryLossesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get lossTypeId => $composableBuilder(
-    column: $table.lossTypeId,
+  ColumnOrderings<int> get adjustmentTypeId => $composableBuilder(
+    column: $table.adjustmentTypeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -8649,9 +8707,9 @@ class $$InventoryLossesTableOrderingComposer
   );
 }
 
-class $$InventoryLossesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $InventoryLossesTable> {
-  $$InventoryLossesTableAnnotationComposer({
+class $$InventoryAdjustmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InventoryAdjustmentsTable> {
+  $$InventoryAdjustmentsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -8669,8 +8727,8 @@ class $$InventoryLossesTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get lossTypeId => $composableBuilder(
-    column: $table.lossTypeId,
+  GeneratedColumn<int> get adjustmentTypeId => $composableBuilder(
+    column: $table.adjustmentTypeId,
     builder: (column) => column,
   );
 
@@ -8695,58 +8753,64 @@ class $$InventoryLossesTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$InventoryLossesTableTableManager
+class $$InventoryAdjustmentsTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $InventoryLossesTable,
-          InventoryLossesData,
-          $$InventoryLossesTableFilterComposer,
-          $$InventoryLossesTableOrderingComposer,
-          $$InventoryLossesTableAnnotationComposer,
-          $$InventoryLossesTableCreateCompanionBuilder,
-          $$InventoryLossesTableUpdateCompanionBuilder,
+          $InventoryAdjustmentsTable,
+          InventoryAdjustment,
+          $$InventoryAdjustmentsTableFilterComposer,
+          $$InventoryAdjustmentsTableOrderingComposer,
+          $$InventoryAdjustmentsTableAnnotationComposer,
+          $$InventoryAdjustmentsTableCreateCompanionBuilder,
+          $$InventoryAdjustmentsTableUpdateCompanionBuilder,
           (
-            InventoryLossesData,
+            InventoryAdjustment,
             BaseReferences<
               _$AppDatabase,
-              $InventoryLossesTable,
-              InventoryLossesData
+              $InventoryAdjustmentsTable,
+              InventoryAdjustment
             >,
           ),
-          InventoryLossesData,
+          InventoryAdjustment,
           PrefetchHooks Function()
         > {
-  $$InventoryLossesTableTableManager(
+  $$InventoryAdjustmentsTableTableManager(
     _$AppDatabase db,
-    $InventoryLossesTable table,
+    $InventoryAdjustmentsTable table,
   ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$InventoryLossesTableFilterComposer($db: db, $table: table),
+              $$InventoryAdjustmentsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$InventoryLossesTableOrderingComposer($db: db, $table: table),
+              $$InventoryAdjustmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
           createComputedFieldComposer: () =>
-              $$InventoryLossesTableAnnotationComposer($db: db, $table: table),
+              $$InventoryAdjustmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> productId = const Value.absent(),
                 Value<int?> cashRegisterId = const Value.absent(),
-                Value<int> lossTypeId = const Value.absent(),
+                Value<int> adjustmentTypeId = const Value.absent(),
                 Value<double> quantity = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> lossDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
-              }) => InventoryLossesCompanion(
+              }) => InventoryAdjustmentsCompanion(
                 id: id,
                 productId: productId,
                 cashRegisterId: cashRegisterId,
-                lossTypeId: lossTypeId,
+                adjustmentTypeId: adjustmentTypeId,
                 quantity: quantity,
                 description: description,
                 status: status,
@@ -8759,18 +8823,18 @@ class $$InventoryLossesTableTableManager
                 Value<int> id = const Value.absent(),
                 required int productId,
                 Value<int?> cashRegisterId = const Value.absent(),
-                required int lossTypeId,
+                required int adjustmentTypeId,
                 Value<double> quantity = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> lossDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
-              }) => InventoryLossesCompanion.insert(
+              }) => InventoryAdjustmentsCompanion.insert(
                 id: id,
                 productId: productId,
                 cashRegisterId: cashRegisterId,
-                lossTypeId: lossTypeId,
+                adjustmentTypeId: adjustmentTypeId,
                 quantity: quantity,
                 description: description,
                 status: status,
@@ -8786,47 +8850,49 @@ class $$InventoryLossesTableTableManager
       );
 }
 
-typedef $$InventoryLossesTableProcessedTableManager =
+typedef $$InventoryAdjustmentsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $InventoryLossesTable,
-      InventoryLossesData,
-      $$InventoryLossesTableFilterComposer,
-      $$InventoryLossesTableOrderingComposer,
-      $$InventoryLossesTableAnnotationComposer,
-      $$InventoryLossesTableCreateCompanionBuilder,
-      $$InventoryLossesTableUpdateCompanionBuilder,
+      $InventoryAdjustmentsTable,
+      InventoryAdjustment,
+      $$InventoryAdjustmentsTableFilterComposer,
+      $$InventoryAdjustmentsTableOrderingComposer,
+      $$InventoryAdjustmentsTableAnnotationComposer,
+      $$InventoryAdjustmentsTableCreateCompanionBuilder,
+      $$InventoryAdjustmentsTableUpdateCompanionBuilder,
       (
-        InventoryLossesData,
+        InventoryAdjustment,
         BaseReferences<
           _$AppDatabase,
-          $InventoryLossesTable,
-          InventoryLossesData
+          $InventoryAdjustmentsTable,
+          InventoryAdjustment
         >,
       ),
-      InventoryLossesData,
+      InventoryAdjustment,
       PrefetchHooks Function()
     >;
-typedef $$LossTypesTableCreateCompanionBuilder =
-    LossTypesCompanion Function({
+typedef $$AdjustmentTypesTableCreateCompanionBuilder =
+    AdjustmentTypesCompanion Function({
       Value<int> id,
       required String name,
       Value<String?> description,
+      Value<bool> increasesStock,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
-typedef $$LossTypesTableUpdateCompanionBuilder =
-    LossTypesCompanion Function({
+typedef $$AdjustmentTypesTableUpdateCompanionBuilder =
+    AdjustmentTypesCompanion Function({
       Value<int> id,
       Value<String> name,
       Value<String?> description,
+      Value<bool> increasesStock,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
 
-class $$LossTypesTableFilterComposer
-    extends Composer<_$AppDatabase, $LossTypesTable> {
-  $$LossTypesTableFilterComposer({
+class $$AdjustmentTypesTableFilterComposer
+    extends Composer<_$AppDatabase, $AdjustmentTypesTable> {
+  $$AdjustmentTypesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -8848,6 +8914,11 @@ class $$LossTypesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get increasesStock => $composableBuilder(
+    column: $table.increasesStock,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
@@ -8859,9 +8930,9 @@ class $$LossTypesTableFilterComposer
   );
 }
 
-class $$LossTypesTableOrderingComposer
-    extends Composer<_$AppDatabase, $LossTypesTable> {
-  $$LossTypesTableOrderingComposer({
+class $$AdjustmentTypesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AdjustmentTypesTable> {
+  $$AdjustmentTypesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -8883,6 +8954,11 @@ class $$LossTypesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get increasesStock => $composableBuilder(
+    column: $table.increasesStock,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -8894,9 +8970,9 @@ class $$LossTypesTableOrderingComposer
   );
 }
 
-class $$LossTypesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $LossTypesTable> {
-  $$LossTypesTableAnnotationComposer({
+class $$AdjustmentTypesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AdjustmentTypesTable> {
+  $$AdjustmentTypesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -8914,6 +8990,11 @@ class $$LossTypesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get increasesStock => $composableBuilder(
+    column: $table.increasesStock,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -8921,43 +9002,54 @@ class $$LossTypesTableAnnotationComposer
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$LossTypesTableTableManager
+class $$AdjustmentTypesTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $LossTypesTable,
-          LossType,
-          $$LossTypesTableFilterComposer,
-          $$LossTypesTableOrderingComposer,
-          $$LossTypesTableAnnotationComposer,
-          $$LossTypesTableCreateCompanionBuilder,
-          $$LossTypesTableUpdateCompanionBuilder,
-          (LossType, BaseReferences<_$AppDatabase, $LossTypesTable, LossType>),
-          LossType,
+          $AdjustmentTypesTable,
+          AdjustmentType,
+          $$AdjustmentTypesTableFilterComposer,
+          $$AdjustmentTypesTableOrderingComposer,
+          $$AdjustmentTypesTableAnnotationComposer,
+          $$AdjustmentTypesTableCreateCompanionBuilder,
+          $$AdjustmentTypesTableUpdateCompanionBuilder,
+          (
+            AdjustmentType,
+            BaseReferences<
+              _$AppDatabase,
+              $AdjustmentTypesTable,
+              AdjustmentType
+            >,
+          ),
+          AdjustmentType,
           PrefetchHooks Function()
         > {
-  $$LossTypesTableTableManager(_$AppDatabase db, $LossTypesTable table)
-    : super(
+  $$AdjustmentTypesTableTableManager(
+    _$AppDatabase db,
+    $AdjustmentTypesTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$LossTypesTableFilterComposer($db: db, $table: table),
+              $$AdjustmentTypesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$LossTypesTableOrderingComposer($db: db, $table: table),
+              $$AdjustmentTypesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$LossTypesTableAnnotationComposer($db: db, $table: table),
+              $$AdjustmentTypesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
+                Value<bool> increasesStock = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
-              }) => LossTypesCompanion(
+              }) => AdjustmentTypesCompanion(
                 id: id,
                 name: name,
                 description: description,
+                increasesStock: increasesStock,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -8966,12 +9058,14 @@ class $$LossTypesTableTableManager
                 Value<int> id = const Value.absent(),
                 required String name,
                 Value<String?> description = const Value.absent(),
+                Value<bool> increasesStock = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
-              }) => LossTypesCompanion.insert(
+              }) => AdjustmentTypesCompanion.insert(
                 id: id,
                 name: name,
                 description: description,
+                increasesStock: increasesStock,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -8983,18 +9077,21 @@ class $$LossTypesTableTableManager
       );
 }
 
-typedef $$LossTypesTableProcessedTableManager =
+typedef $$AdjustmentTypesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $LossTypesTable,
-      LossType,
-      $$LossTypesTableFilterComposer,
-      $$LossTypesTableOrderingComposer,
-      $$LossTypesTableAnnotationComposer,
-      $$LossTypesTableCreateCompanionBuilder,
-      $$LossTypesTableUpdateCompanionBuilder,
-      (LossType, BaseReferences<_$AppDatabase, $LossTypesTable, LossType>),
-      LossType,
+      $AdjustmentTypesTable,
+      AdjustmentType,
+      $$AdjustmentTypesTableFilterComposer,
+      $$AdjustmentTypesTableOrderingComposer,
+      $$AdjustmentTypesTableAnnotationComposer,
+      $$AdjustmentTypesTableCreateCompanionBuilder,
+      $$AdjustmentTypesTableUpdateCompanionBuilder,
+      (
+        AdjustmentType,
+        BaseReferences<_$AppDatabase, $AdjustmentTypesTable, AdjustmentType>,
+      ),
+      AdjustmentType,
       PrefetchHooks Function()
     >;
 
@@ -9019,8 +9116,8 @@ class $AppDatabaseManager {
       $$IncomesTableTableManager(_db, _db.incomes);
   $$ProductSubproductsTableTableManager get productSubproducts =>
       $$ProductSubproductsTableTableManager(_db, _db.productSubproducts);
-  $$InventoryLossesTableTableManager get inventoryLosses =>
-      $$InventoryLossesTableTableManager(_db, _db.inventoryLosses);
-  $$LossTypesTableTableManager get lossTypes =>
-      $$LossTypesTableTableManager(_db, _db.lossTypes);
+  $$InventoryAdjustmentsTableTableManager get inventoryAdjustments =>
+      $$InventoryAdjustmentsTableTableManager(_db, _db.inventoryAdjustments);
+  $$AdjustmentTypesTableTableManager get adjustmentTypes =>
+      $$AdjustmentTypesTableTableManager(_db, _db.adjustmentTypes);
 }

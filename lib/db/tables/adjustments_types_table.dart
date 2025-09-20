@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 
-class LossTypes extends Table {
+class AdjustmentTypes extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   // Unique name for the loss type
@@ -12,6 +12,10 @@ class LossTypes extends Table {
   // Optional description for clarity
   TextColumn get description =>
       text().nullable().withLength(min: 0, max: 255).named('description')();
+
+  // Indicates if this adjustment increases stock (true) or decreases stock (false)
+  BoolColumn get increasesStock =>
+      boolean().named('increases_stock').withDefault(const Constant(false))();
 
   DateTimeColumn get createdAt =>
       dateTime().named('created_at').withDefault(currentDateAndTime)();

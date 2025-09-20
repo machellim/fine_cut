@@ -4,53 +4,6 @@ import 'package:fine_cut/db/database.dart';
 import 'package:drift/drift.dart';
 
 Future<void> insertInitialData(AppDatabase db) async {
-  // Insert unit types if they don't exist
-  // Example:Units
-  /*final unitExists = await (db.select(
-    db.units,
-  )..where((u) => u.name.equals('Unidades'))).getSingleOrNull();
-  if (unitExists == null) {
-    await db
-        .into(db.units)
-        .insert(
-          UnitsCompanion.insert(
-            name: 'Unidades',
-            symbol: 'uds', // Encriptar idealmente
-          ),
-        );
-  }
-
-  // Example: Pounds
-  final lbExists = await (db.select(
-    db.units,
-  )..where((u) => u.name.equals('Libras'))).getSingleOrNull();
-
-  if (lbExists == null) {
-    await db
-        .into(db.units)
-        .insert(UnitsCompanion.insert(name: 'Libras', symbol: 'lb'));
-  }
-  // Example: Kilograms
-  final kgExists = await (db.select(
-    db.units,
-  )..where((u) => u.name.equals('Kilogramos'))).getSingleOrNull();
-
-  if (kgExists == null) {
-    await db
-        .into(db.units)
-        .insert(UnitsCompanion.insert(name: 'Kilogramos', symbol: 'kg'));
-  }
-
-  // Example: Ounces
-  final ozExists = await (db.select(
-    db.units,
-  )..where((u) => u.name.equals('Onzas'))).getSingleOrNull();
-  if (ozExists == null) {
-    await db
-        .into(db.units)
-        .insert(UnitsCompanion.insert(name: 'Onzas', symbol: 'oz'));
-  }*/
-
   // Insert payment methods if they don't exist
   final cashExists = await (db.select(
     db.paymentMethods,
@@ -83,20 +36,41 @@ Future<void> insertInitialData(AppDatabase db) async {
         );
   }
 
-  // ================= Insert Loss Types =================
-  final lossTypes = [
-    'Dañado', // Product damaged physically
-    'Vencido', // Product expired or perished
-    'Robado', // Product lost due to theft
-    'Perdido', // Product lost (not found in stock)
-    'Otro', // Other type of loss
+  // ================= Insert Adjustments Types =================
+  final adjustmentTypes = [
+    // Types that decrease stock
+    {'name': 'Pérdida por daño', 'increasesStock': false}, // Product damaged
+    {
+      'name': 'Pérdida por vencimiento',
+      'increasesStock': false,
+    }, // Product expired
+    {'name': 'Pérdida por robo', 'increasesStock': false}, // Product stolen
+    {
+      'name': 'Devolución no recuperable',
+      'increasesStock': false,
+    }, // Cannot be resold
+    {'name': 'Uso interno', 'increasesStock': false}, // Internal consumption
+    {'name': 'Ajuste negativo', 'increasesStock': false}, // Manual reduction
+    // Types that increase stock
+    {'name': 'Devolución recuperable', 'increasesStock': true}, // Can be resold
+    {'name': 'Reposición', 'increasesStock': true}, // Stock added
+    {'name': 'Ajuste positivo', 'increasesStock': true}, // Manual addition
   ];
-  for (var type in lossTypes) {
+
+  for (var type in adjustmentTypes) {
     final exists = await (db.select(
-      db.lossTypes,
-    )..where((lt) => lt.name.equals(type))).getSingleOrNull();
+      db.adjustmentTypes,
+    )..where((lt) => lt.name.equals(type['name'] as String))).getSingleOrNull();
+
     if (exists == null) {
-      await db.into(db.lossTypes).insert(LossTypesCompanion.insert(name: type));
+      await db
+          .into(db.adjustmentTypes)
+          .insert(
+            AdjustmentTypesCompanion.insert(
+              name: type['name'] as String,
+              increasesStock: Value(type['increasesStock'] as bool),
+            ),
+          );
     }
   }
 }

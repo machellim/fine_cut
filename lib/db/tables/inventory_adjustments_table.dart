@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:fine_cut/core/enums/enums.dart' show RecordStatus, LossType;
+import 'package:fine_cut/core/enums/enums.dart' show RecordStatus;
 
-class InventoryLosses extends Table {
+class InventoryAdjustments extends Table {
   // Primary key auto-increment
   IntColumn get id => integer().autoIncrement()();
 
@@ -17,9 +17,9 @@ class InventoryLosses extends Table {
       .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
 
   // Type of loss (damaged, expired, stolen, etc.)
-  IntColumn get lossTypeId => integer()
-      .named('loss_type_id')
-      .customConstraint('REFERENCES loss_types(id) ON DELETE SET NULL')();
+  IntColumn get adjustmentTypeId => integer()
+      .named('adjustment_type_id')
+      .customConstraint('REFERENCES adjustment_types(id) ON DELETE SET NULL')();
 
   // Quantity of lost product
   RealColumn get quantity =>
