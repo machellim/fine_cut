@@ -61,6 +61,9 @@ class _ProductProfitListScreenState extends State<ProductProfitListScreen> {
                         label: "Fecha Inicio",
                         controller: _startDateController,
                         lastDate: DateTime.now(),
+                        firstDate: DateTime.now().subtract(
+                          const Duration(days: 60),
+                        ),
                         onDateSelected: (date) {
                           _startDateController.text =
                               AppUtils.formatDateTimeYMD(date);
