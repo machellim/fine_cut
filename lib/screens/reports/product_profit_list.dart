@@ -75,7 +75,7 @@ class _ProductProfitListScreenState extends State<ProductProfitListScreen> {
                       AppDateField(
                         label: "Fecha Fin",
                         controller: _endDateController,
-                        lastDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 1)),
                         onDateSelected: (date) {
                           _endDateController.text = AppUtils.formatDateTimeYMD(
                             date,

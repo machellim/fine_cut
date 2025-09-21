@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fine_cut/core/enums/enums.dart';
 
 class AdjustmentTypes extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -16,6 +17,13 @@ class AdjustmentTypes extends Table {
   // Indicates if this adjustment increases stock (true) or decreases stock (false)
   BoolColumn get increasesStock =>
       boolean().named('increases_stock').withDefault(const Constant(false))();
+
+  // Status: active/inactive
+  TextColumn get status => text()
+      .named('status')
+      .withLength(min: 1, max: 50)
+      .map(const EnumNameConverter(RecordStatus.values))
+      .withDefault(Constant(RecordStatus.active.name))();
 
   DateTimeColumn get createdAt =>
       dateTime().named('created_at').withDefault(currentDateAndTime)();

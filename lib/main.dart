@@ -15,6 +15,8 @@ import 'package:fine_cut/bloc/expense/expense_crud/expense_crud_bloc.dart';
 import 'package:fine_cut/bloc/expense/expense_list/expense_list_bloc.dart';
 import 'package:fine_cut/bloc/income/income_crud/income_crud_bloc.dart';
 import 'package:fine_cut/bloc/income/income_list/income_list_bloc.dart';
+import 'package:fine_cut/bloc/inventory_adjustment/inventory_adjustment_crud/inventory_adjustment_crud_bloc.dart';
+import 'package:fine_cut/bloc/inventory_adjustment/inventory_adjustment_list/inventory_adjustment_list_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_crud/payment_method_crud_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/product_crud/product_crud_bloc.dart';
@@ -82,6 +84,7 @@ class AppInitializer extends StatelessWidget {
           final saleDao = database.saleDao;
           final expenseDao = database.expenseDao;
           final incomeDao = database.incomeDao;
+          final inventoryAdjustmentDao = database.inventoryAdjustmentDao;
           return MultiRepositoryProvider(
             providers: [
               RepositoryProvider<AppDatabase>(create: (_) => database),
@@ -185,6 +188,16 @@ class AppInitializer extends StatelessWidget {
                 ),
                 BlocProvider<ProductProfitListBloc>(
                   create: (_) => ProductProfitListBloc(saleDao: saleDao),
+                ),
+                BlocProvider<InventoryAdjustmentCrudBloc>(
+                  create: (_) => InventoryAdjustmentCrudBloc(
+                    inventoryAdjustmentDao: inventoryAdjustmentDao,
+                  ),
+                ),
+                BlocProvider<InventoryAdjustmentListBloc>(
+                  create: (_) => InventoryAdjustmentListBloc(
+                    inventoryAdjustmentDao: inventoryAdjustmentDao,
+                  ),
                 ),
               ],
               child: FineCutApp(database: database),

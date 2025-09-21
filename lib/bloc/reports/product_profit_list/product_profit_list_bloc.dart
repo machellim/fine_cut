@@ -24,7 +24,6 @@ class ProductProfitListBloc
         );
         emit(ProductProfitListSuccess(productProfitList));
       } catch (e) {
-        print(e);
         emit(ProductProfitListFailure(message: e.toString()));
       }
     });

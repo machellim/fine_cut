@@ -5,6 +5,7 @@ class AppBadgeStatus extends StatelessWidget {
   final BadgeType type;
   final EdgeInsetsGeometry padding;
   final double borderRadius;
+  final TextStyle? textStyle;
 
   const AppBadgeStatus({
     super.key,
@@ -12,6 +13,7 @@ class AppBadgeStatus extends StatelessWidget {
     required this.type,
     this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
     this.borderRadius = 12,
+    this.textStyle,
   });
 
   @override
@@ -39,10 +41,12 @@ class AppBadgeStatus extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
+        style:
+            textStyle ??
+            theme.textTheme.bodySmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }

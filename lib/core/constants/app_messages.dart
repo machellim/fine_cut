@@ -53,6 +53,12 @@ class AppMessages {
     'messageLoadingProductProfit': 'Cargando ganancias por producto',
   };
 
+  static const _inventoryAdjustmentMessages = {
+    'messageLoadingInventoryAdjustment': 'Cargando ajustes de inventario',
+    'messageNewInventoryAdjustmentScreen': 'Crear Nuevo Ajuste de Inventario',
+    'messageEditInventoryAdjustmentScreen': 'Editando ajuste de inventario',
+  };
+
   static const appMessages = {'emptyList': 'No hay información.'};
 
   static String getPaymentMethodMessage(String key) {
@@ -93,5 +99,9 @@ class AppMessages {
 
   static String getProductProfitMessage(String key) {
     return _productProfitMessages[key] ?? 'mensaje no parametrizado';
+  }
+
+  static String getInventoryAdjustmentMessage(String key) {
+    return _inventoryAdjustmentMessages[key] ?? 'mensaje no parametrizado';
   }
 }

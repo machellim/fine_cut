@@ -258,9 +258,8 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
       ) p ON s.product_id = p.product_id
       WHERE DATE(s.sale_date, 'unixepoch') BETWEEN ? AND ?
         AND s.status = 'active'
-        AND s.purchase_id IS NULL
-        
-      GROUP BY s.product_id, s.alias_product_name, p.total_quantity_purchased, p.total_cost_purchased;
+        AND s.purchase_id IS NULL        
+        GROUP BY s.product_id, s.alias_product_name, p.total_quantity_purchased, p.total_cost_purchased;
     ''',
       variables: [Variable.withString(startDate), Variable.withString(endDate)],
       readsFrom: {sales, db.purchases},

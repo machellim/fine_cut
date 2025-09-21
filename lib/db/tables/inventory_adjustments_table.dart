@@ -10,22 +10,22 @@ class InventoryAdjustments extends Table {
       .named('product_id')
       .customConstraint('REFERENCES products(id) ON DELETE CASCADE')();
 
-  // Foreign key to cash register (when the loss is registered)
+  // Foreign key to cash register (when the adjustment is registered)
   IntColumn get cashRegisterId => integer()
       .nullable()
       .named('cash_register_id')
       .customConstraint('REFERENCES cash_registers(id) ON DELETE SET NULL')();
 
-  // Type of loss (damaged, expired, stolen, etc.)
+  // Type of adjustment (damaged, expired, stolen, etc.)
   IntColumn get adjustmentTypeId => integer()
       .named('adjustment_type_id')
       .customConstraint('REFERENCES adjustment_types(id) ON DELETE SET NULL')();
 
-  // Quantity of lost product
+  // Quantity of adjusted product
   RealColumn get quantity =>
       real().named('quantity').withDefault(const Constant(0.0))();
 
-  // Optional description of the loss
+  // Optional description of the adjustment
   TextColumn get description =>
       text().nullable().named('description').withLength(min: 0, max: 1000)();
 
@@ -36,9 +36,9 @@ class InventoryAdjustments extends Table {
       .map(const EnumNameConverter(RecordStatus.values))
       .withDefault(Constant(RecordStatus.active.name))();
 
-  // Date of the loss
-  DateTimeColumn get lossDate =>
-      dateTime().named('loss_date').withDefault(currentDateAndTime)();
+  // Date of the adjustment
+  DateTimeColumn get adjustmentDate =>
+      dateTime().named('adjustment_date').withDefault(currentDateAndTime)();
 
   // Creation date
   DateTimeColumn get createdAt =>

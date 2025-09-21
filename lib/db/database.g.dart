@@ -5134,18 +5134,19 @@ class $InventoryAdjustmentsTable extends InventoryAdjustments
       ).withConverter<RecordStatus>(
         $InventoryAdjustmentsTable.$converterstatus,
       );
-  static const VerificationMeta _lossDateMeta = const VerificationMeta(
-    'lossDate',
+  static const VerificationMeta _adjustmentDateMeta = const VerificationMeta(
+    'adjustmentDate',
   );
   @override
-  late final GeneratedColumn<DateTime> lossDate = GeneratedColumn<DateTime>(
-    'loss_date',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
+  late final GeneratedColumn<DateTime> adjustmentDate =
+      GeneratedColumn<DateTime>(
+        'adjustment_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+        defaultValue: currentDateAndTime,
+      );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -5178,7 +5179,7 @@ class $InventoryAdjustmentsTable extends InventoryAdjustments
     quantity,
     description,
     status,
-    lossDate,
+    adjustmentDate,
     createdAt,
     updatedAt,
   ];
@@ -5240,10 +5241,13 @@ class $InventoryAdjustmentsTable extends InventoryAdjustments
         ),
       );
     }
-    if (data.containsKey('loss_date')) {
+    if (data.containsKey('adjustment_date')) {
       context.handle(
-        _lossDateMeta,
-        lossDate.isAcceptableOrUnknown(data['loss_date']!, _lossDateMeta),
+        _adjustmentDateMeta,
+        adjustmentDate.isAcceptableOrUnknown(
+          data['adjustment_date']!,
+          _adjustmentDateMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -5297,9 +5301,9 @@ class $InventoryAdjustmentsTable extends InventoryAdjustments
           data['${effectivePrefix}status'],
         )!,
       ),
-      lossDate: attachedDatabase.typeMapping.read(
+      adjustmentDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}loss_date'],
+        data['${effectivePrefix}adjustment_date'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -5330,7 +5334,7 @@ class InventoryAdjustment extends DataClass
   final double quantity;
   final String? description;
   final RecordStatus status;
-  final DateTime lossDate;
+  final DateTime adjustmentDate;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const InventoryAdjustment({
@@ -5341,7 +5345,7 @@ class InventoryAdjustment extends DataClass
     required this.quantity,
     this.description,
     required this.status,
-    required this.lossDate,
+    required this.adjustmentDate,
     required this.createdAt,
     this.updatedAt,
   });
@@ -5363,7 +5367,7 @@ class InventoryAdjustment extends DataClass
         $InventoryAdjustmentsTable.$converterstatus.toSql(status),
       );
     }
-    map['loss_date'] = Variable<DateTime>(lossDate);
+    map['adjustment_date'] = Variable<DateTime>(adjustmentDate);
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -5384,7 +5388,7 @@ class InventoryAdjustment extends DataClass
           ? const Value.absent()
           : Value(description),
       status: Value(status),
-      lossDate: Value(lossDate),
+      adjustmentDate: Value(adjustmentDate),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -5407,7 +5411,7 @@ class InventoryAdjustment extends DataClass
       status: $InventoryAdjustmentsTable.$converterstatus.fromJson(
         serializer.fromJson<String>(json['status']),
       ),
-      lossDate: serializer.fromJson<DateTime>(json['lossDate']),
+      adjustmentDate: serializer.fromJson<DateTime>(json['adjustmentDate']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
@@ -5425,7 +5429,7 @@ class InventoryAdjustment extends DataClass
       'status': serializer.toJson<String>(
         $InventoryAdjustmentsTable.$converterstatus.toJson(status),
       ),
-      'lossDate': serializer.toJson<DateTime>(lossDate),
+      'adjustmentDate': serializer.toJson<DateTime>(adjustmentDate),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
@@ -5439,7 +5443,7 @@ class InventoryAdjustment extends DataClass
     double? quantity,
     Value<String?> description = const Value.absent(),
     RecordStatus? status,
-    DateTime? lossDate,
+    DateTime? adjustmentDate,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => InventoryAdjustment(
@@ -5452,7 +5456,7 @@ class InventoryAdjustment extends DataClass
     quantity: quantity ?? this.quantity,
     description: description.present ? description.value : this.description,
     status: status ?? this.status,
-    lossDate: lossDate ?? this.lossDate,
+    adjustmentDate: adjustmentDate ?? this.adjustmentDate,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
@@ -5471,7 +5475,9 @@ class InventoryAdjustment extends DataClass
           ? data.description.value
           : this.description,
       status: data.status.present ? data.status.value : this.status,
-      lossDate: data.lossDate.present ? data.lossDate.value : this.lossDate,
+      adjustmentDate: data.adjustmentDate.present
+          ? data.adjustmentDate.value
+          : this.adjustmentDate,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -5487,7 +5493,7 @@ class InventoryAdjustment extends DataClass
           ..write('quantity: $quantity, ')
           ..write('description: $description, ')
           ..write('status: $status, ')
-          ..write('lossDate: $lossDate, ')
+          ..write('adjustmentDate: $adjustmentDate, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -5503,7 +5509,7 @@ class InventoryAdjustment extends DataClass
     quantity,
     description,
     status,
-    lossDate,
+    adjustmentDate,
     createdAt,
     updatedAt,
   );
@@ -5518,7 +5524,7 @@ class InventoryAdjustment extends DataClass
           other.quantity == this.quantity &&
           other.description == this.description &&
           other.status == this.status &&
-          other.lossDate == this.lossDate &&
+          other.adjustmentDate == this.adjustmentDate &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -5532,7 +5538,7 @@ class InventoryAdjustmentsCompanion
   final Value<double> quantity;
   final Value<String?> description;
   final Value<RecordStatus> status;
-  final Value<DateTime> lossDate;
+  final Value<DateTime> adjustmentDate;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const InventoryAdjustmentsCompanion({
@@ -5543,7 +5549,7 @@ class InventoryAdjustmentsCompanion
     this.quantity = const Value.absent(),
     this.description = const Value.absent(),
     this.status = const Value.absent(),
-    this.lossDate = const Value.absent(),
+    this.adjustmentDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -5555,7 +5561,7 @@ class InventoryAdjustmentsCompanion
     this.quantity = const Value.absent(),
     this.description = const Value.absent(),
     this.status = const Value.absent(),
-    this.lossDate = const Value.absent(),
+    this.adjustmentDate = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : productId = Value(productId),
@@ -5568,7 +5574,7 @@ class InventoryAdjustmentsCompanion
     Expression<double>? quantity,
     Expression<String>? description,
     Expression<String>? status,
-    Expression<DateTime>? lossDate,
+    Expression<DateTime>? adjustmentDate,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -5580,7 +5586,7 @@ class InventoryAdjustmentsCompanion
       if (quantity != null) 'quantity': quantity,
       if (description != null) 'description': description,
       if (status != null) 'status': status,
-      if (lossDate != null) 'loss_date': lossDate,
+      if (adjustmentDate != null) 'adjustment_date': adjustmentDate,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -5594,7 +5600,7 @@ class InventoryAdjustmentsCompanion
     Value<double>? quantity,
     Value<String?>? description,
     Value<RecordStatus>? status,
-    Value<DateTime>? lossDate,
+    Value<DateTime>? adjustmentDate,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -5606,7 +5612,7 @@ class InventoryAdjustmentsCompanion
       quantity: quantity ?? this.quantity,
       description: description ?? this.description,
       status: status ?? this.status,
-      lossDate: lossDate ?? this.lossDate,
+      adjustmentDate: adjustmentDate ?? this.adjustmentDate,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -5638,8 +5644,8 @@ class InventoryAdjustmentsCompanion
         $InventoryAdjustmentsTable.$converterstatus.toSql(status.value),
       );
     }
-    if (lossDate.present) {
-      map['loss_date'] = Variable<DateTime>(lossDate.value);
+    if (adjustmentDate.present) {
+      map['adjustment_date'] = Variable<DateTime>(adjustmentDate.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -5660,7 +5666,7 @@ class InventoryAdjustmentsCompanion
           ..write('quantity: $quantity, ')
           ..write('description: $description, ')
           ..write('status: $status, ')
-          ..write('lossDate: $lossDate, ')
+          ..write('adjustmentDate: $adjustmentDate, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -5731,6 +5737,20 @@ class $AdjustmentTypesTable extends AdjustmentTypes
     ),
     defaultValue: const Constant(false),
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<RecordStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 50,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(RecordStatus.active.name),
+      ).withConverter<RecordStatus>($AdjustmentTypesTable.$converterstatus);
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -5760,6 +5780,7 @@ class $AdjustmentTypesTable extends AdjustmentTypes
     name,
     description,
     increasesStock,
+    status,
     createdAt,
     updatedAt,
   ];
@@ -5841,6 +5862,12 @@ class $AdjustmentTypesTable extends AdjustmentTypes
         DriftSqlType.bool,
         data['${effectivePrefix}increases_stock'],
       )!,
+      status: $AdjustmentTypesTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -5856,6 +5883,9 @@ class $AdjustmentTypesTable extends AdjustmentTypes
   $AdjustmentTypesTable createAlias(String alias) {
     return $AdjustmentTypesTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<RecordStatus, String, String> $converterstatus =
+      const EnumNameConverter(RecordStatus.values);
 }
 
 class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
@@ -5863,6 +5893,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
   final String name;
   final String? description;
   final bool increasesStock;
+  final RecordStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
   const AdjustmentType({
@@ -5870,6 +5901,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
     required this.name,
     this.description,
     required this.increasesStock,
+    required this.status,
     required this.createdAt,
     this.updatedAt,
   });
@@ -5882,6 +5914,11 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
       map['description'] = Variable<String>(description);
     }
     map['increases_stock'] = Variable<bool>(increasesStock);
+    {
+      map['status'] = Variable<String>(
+        $AdjustmentTypesTable.$converterstatus.toSql(status),
+      );
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -5897,6 +5934,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
           ? const Value.absent()
           : Value(description),
       increasesStock: Value(increasesStock),
+      status: Value(status),
       createdAt: Value(createdAt),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
@@ -5914,6 +5952,9 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String?>(json['description']),
       increasesStock: serializer.fromJson<bool>(json['increasesStock']),
+      status: $AdjustmentTypesTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
@@ -5926,6 +5967,9 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String?>(description),
       'increasesStock': serializer.toJson<bool>(increasesStock),
+      'status': serializer.toJson<String>(
+        $AdjustmentTypesTable.$converterstatus.toJson(status),
+      ),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
@@ -5936,6 +5980,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
     String? name,
     Value<String?> description = const Value.absent(),
     bool? increasesStock,
+    RecordStatus? status,
     DateTime? createdAt,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => AdjustmentType(
@@ -5943,6 +5988,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
     name: name ?? this.name,
     description: description.present ? description.value : this.description,
     increasesStock: increasesStock ?? this.increasesStock,
+    status: status ?? this.status,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
@@ -5956,6 +6002,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
       increasesStock: data.increasesStock.present
           ? data.increasesStock.value
           : this.increasesStock,
+      status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -5968,6 +6015,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('increasesStock: $increasesStock, ')
+          ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -5975,8 +6023,15 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, description, increasesStock, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    description,
+    increasesStock,
+    status,
+    createdAt,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5985,6 +6040,7 @@ class AdjustmentType extends DataClass implements Insertable<AdjustmentType> {
           other.name == this.name &&
           other.description == this.description &&
           other.increasesStock == this.increasesStock &&
+          other.status == this.status &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -5994,6 +6050,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
   final Value<String> name;
   final Value<String?> description;
   final Value<bool> increasesStock;
+  final Value<RecordStatus> status;
   final Value<DateTime> createdAt;
   final Value<DateTime?> updatedAt;
   const AdjustmentTypesCompanion({
@@ -6001,6 +6058,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     this.increasesStock = const Value.absent(),
+    this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -6009,6 +6067,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
     required String name,
     this.description = const Value.absent(),
     this.increasesStock = const Value.absent(),
+    this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : name = Value(name);
@@ -6017,6 +6076,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
     Expression<String>? name,
     Expression<String>? description,
     Expression<bool>? increasesStock,
+    Expression<String>? status,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -6025,6 +6085,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
       if (name != null) 'name': name,
       if (description != null) 'description': description,
       if (increasesStock != null) 'increases_stock': increasesStock,
+      if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -6035,6 +6096,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
     Value<String>? name,
     Value<String?>? description,
     Value<bool>? increasesStock,
+    Value<RecordStatus>? status,
     Value<DateTime>? createdAt,
     Value<DateTime?>? updatedAt,
   }) {
@@ -6043,6 +6105,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
       name: name ?? this.name,
       description: description ?? this.description,
       increasesStock: increasesStock ?? this.increasesStock,
+      status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -6063,6 +6126,11 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
     if (increasesStock.present) {
       map['increases_stock'] = Variable<bool>(increasesStock.value);
     }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $AdjustmentTypesTable.$converterstatus.toSql(status.value),
+      );
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -6079,6 +6147,7 @@ class AdjustmentTypesCompanion extends UpdateCompanion<AdjustmentType> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('increasesStock: $increasesStock, ')
+          ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -6119,6 +6188,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final SaleDao saleDao = SaleDao(this as AppDatabase);
   late final ExpenseDao expenseDao = ExpenseDao(this as AppDatabase);
   late final IncomeDao incomeDao = IncomeDao(this as AppDatabase);
+  late final InventoryAdjustmentDao inventoryAdjustmentDao =
+      InventoryAdjustmentDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -8568,7 +8639,7 @@ typedef $$InventoryAdjustmentsTableCreateCompanionBuilder =
       Value<double> quantity,
       Value<String?> description,
       Value<RecordStatus> status,
-      Value<DateTime> lossDate,
+      Value<DateTime> adjustmentDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -8581,7 +8652,7 @@ typedef $$InventoryAdjustmentsTableUpdateCompanionBuilder =
       Value<double> quantity,
       Value<String?> description,
       Value<RecordStatus> status,
-      Value<DateTime> lossDate,
+      Value<DateTime> adjustmentDate,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -8631,8 +8702,8 @@ class $$InventoryAdjustmentsTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
-  ColumnFilters<DateTime> get lossDate => $composableBuilder(
-    column: $table.lossDate,
+  ColumnFilters<DateTime> get adjustmentDate => $composableBuilder(
+    column: $table.adjustmentDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8691,8 +8762,8 @@ class $$InventoryAdjustmentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get lossDate => $composableBuilder(
-    column: $table.lossDate,
+  ColumnOrderings<DateTime> get adjustmentDate => $composableBuilder(
+    column: $table.adjustmentDate,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -8743,8 +8814,10 @@ class $$InventoryAdjustmentsTableAnnotationComposer
   GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get lossDate =>
-      $composableBuilder(column: $table.lossDate, builder: (column) => column);
+  GeneratedColumn<DateTime> get adjustmentDate => $composableBuilder(
+    column: $table.adjustmentDate,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -8803,7 +8876,7 @@ class $$InventoryAdjustmentsTableTableManager
                 Value<double> quantity = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
-                Value<DateTime> lossDate = const Value.absent(),
+                Value<DateTime> adjustmentDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => InventoryAdjustmentsCompanion(
@@ -8814,7 +8887,7 @@ class $$InventoryAdjustmentsTableTableManager
                 quantity: quantity,
                 description: description,
                 status: status,
-                lossDate: lossDate,
+                adjustmentDate: adjustmentDate,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -8827,7 +8900,7 @@ class $$InventoryAdjustmentsTableTableManager
                 Value<double> quantity = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<RecordStatus> status = const Value.absent(),
-                Value<DateTime> lossDate = const Value.absent(),
+                Value<DateTime> adjustmentDate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => InventoryAdjustmentsCompanion.insert(
@@ -8838,7 +8911,7 @@ class $$InventoryAdjustmentsTableTableManager
                 quantity: quantity,
                 description: description,
                 status: status,
-                lossDate: lossDate,
+                adjustmentDate: adjustmentDate,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -8877,6 +8950,7 @@ typedef $$AdjustmentTypesTableCreateCompanionBuilder =
       required String name,
       Value<String?> description,
       Value<bool> increasesStock,
+      Value<RecordStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -8886,6 +8960,7 @@ typedef $$AdjustmentTypesTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String?> description,
       Value<bool> increasesStock,
+      Value<RecordStatus> status,
       Value<DateTime> createdAt,
       Value<DateTime?> updatedAt,
     });
@@ -8917,6 +8992,12 @@ class $$AdjustmentTypesTableFilterComposer
   ColumnFilters<bool> get increasesStock => $composableBuilder(
     column: $table.increasesStock,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<RecordStatus, RecordStatus, String>
+  get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
@@ -8959,6 +9040,11 @@ class $$AdjustmentTypesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -8994,6 +9080,9 @@ class $$AdjustmentTypesTableAnnotationComposer
     column: $table.increasesStock,
     builder: (column) => column,
   );
+
+  GeneratedColumnWithTypeConverter<RecordStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -9043,6 +9132,7 @@ class $$AdjustmentTypesTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<bool> increasesStock = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => AdjustmentTypesCompanion(
@@ -9050,6 +9140,7 @@ class $$AdjustmentTypesTableTableManager
                 name: name,
                 description: description,
                 increasesStock: increasesStock,
+                status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -9059,6 +9150,7 @@ class $$AdjustmentTypesTableTableManager
                 required String name,
                 Value<String?> description = const Value.absent(),
                 Value<bool> increasesStock = const Value.absent(),
+                Value<RecordStatus> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => AdjustmentTypesCompanion.insert(
@@ -9066,6 +9158,7 @@ class $$AdjustmentTypesTableTableManager
                 name: name,
                 description: description,
                 increasesStock: increasesStock,
+                status: status,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),

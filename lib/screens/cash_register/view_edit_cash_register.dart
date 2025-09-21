@@ -139,6 +139,25 @@ class _ViewEditCashRegisterScreenState
     });
   }
 
+  // ===== banner inventory adjustment ========
+  BannerState _bannerInventoryAdjustmentState = BannerState.initial();
+  void _showTopBannerInventoryAdjustment(
+    String message, {
+    AppBannerType type = AppBannerType.success,
+  }) {
+    setState(() {
+      _bannerInventoryAdjustmentState = _bannerInventoryAdjustmentState
+          .copyWith(show: true, message: message, type: type);
+    });
+  }
+
+  void _closeBannerInventoryAdjustment() {
+    setState(() {
+      _bannerInventoryAdjustmentState = _bannerInventoryAdjustmentState
+          .copyWith(show: false);
+    });
+  }
+
   // ===== banner cash register update date ========
   BannerState _bannerUpdateDateState = BannerState.initial();
   void _showTopBannerUpdateDate(
@@ -1260,12 +1279,45 @@ class _ViewEditCashRegisterScreenState
 
                     ExpansionPanelRadio(
                       value: 4,
-                      headerBuilder: (context, isExpanded) =>
-                          const ListTile(title: AppTitle(text: 'Pérdidas')),
-                      body: const Padding(
+                      headerBuilder: (context, isExpanded) => const ListTile(
+                        title: AppTitle(text: 'Ajustes de Inventario'),
+                      ),
+                      body: Padding(
                         padding: AppConstants.gridPadding,
-                        child: Text(
-                          'Productos dañados, robados, perdidos, etc.',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if (!_readOnly)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                ),
+                                child: AppButton(
+                                  title: 'Agregar Ajuste',
+                                  onPressed: () async {
+                                    _closeBannerInventoryAdjustment();
+                                    Navigator.pushNamed(
+                                      context,
+                                      'new-inventory-adjustment',
+                                      arguments: {
+                                        'cashRegisterId': _cashRegister.id,
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            const SizedBox(height: 16),
+                            if (_bannerInventoryAdjustmentState.show)
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: AppTopBanner(
+                                  message:
+                                      _bannerInventoryAdjustmentState.message,
+                                  type: _bannerInventoryAdjustmentState.type,
+                                  onClose: _closeBannerInventoryAdjustment,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ),
