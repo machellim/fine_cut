@@ -7,7 +7,6 @@ import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_date_field.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart';
 import 'package:fine_cut/widgets/app_message_type.dart';
-import 'package:fine_cut/widgets/app_number_field.dart';
 
 import 'package:fine_cut/widgets/app_scaffold.dart';
 import 'package:fine_cut/widgets/app_textfield.dart';

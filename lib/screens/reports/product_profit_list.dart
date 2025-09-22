@@ -1,10 +1,7 @@
-import 'package:fine_cut/bloc/category/categories_list/categories_list_bloc.dart';
-import 'package:fine_cut/bloc/purchase/parent_product_stock/parent_product_stock_bloc.dart';
 import 'package:fine_cut/bloc/reports/product_profit_list/product_profit_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_constants.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
-import 'package:fine_cut/widgets/app_badge_status.dart';
 import 'package:fine_cut/widgets/app_bar_custom.dart';
 import 'package:fine_cut/widgets/app_button.dart';
 import 'package:fine_cut/widgets/app_date_field.dart';

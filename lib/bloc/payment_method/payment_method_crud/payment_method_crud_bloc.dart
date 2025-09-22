@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/dao/payment_method_dao.dart';
 import 'package:fine_cut/db/database.dart';
 

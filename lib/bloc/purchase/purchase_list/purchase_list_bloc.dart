@@ -10,10 +10,6 @@ part 'purchase_list_state.dart';
 class PurchaseListBloc extends Bloc<PurchaseListEvent, PurchaseListState> {
   final PurchaseDao purchaseDao;
   PurchaseListBloc({required this.purchaseDao}) : super(PurchaseListInitial()) {
-    on<PurchaseListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<LoadPurchasesListEvent>((event, emit) async {
       try {
         emit(PurchaseListLoading());

@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:fine_cut/bloc/expense/expense_crud/expense_crud_bloc.dart';
-import 'package:fine_cut/bloc/expense/expense_list/expense_list_bloc.dart';
 import 'package:fine_cut/bloc/inventory_adjustment/inventory_adjustment_crud/inventory_adjustment_crud_bloc.dart';
 import 'package:fine_cut/bloc/inventory_adjustment/inventory_adjustment_list/inventory_adjustment_list_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
@@ -226,9 +224,8 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
                             selectedItem: selectedProduct,
                             items: (filter, loadProps) async {
                               final repo = context.read<ProductsListBloc>();
-                              return await repo.productDao.searchSubProducts(
-                                filter,
-                              );
+                              return await repo.productDao
+                                  .searchNoSubproductsFilter(filter);
                             },
                             itemAsString: (item) => item.name,
                             compareFn: (item1, item2) => item1.id == item2.id,

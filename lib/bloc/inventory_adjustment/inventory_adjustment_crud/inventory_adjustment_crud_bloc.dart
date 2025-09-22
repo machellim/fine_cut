@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/db/dao/inventory_adjustment_dao.dart';
 import 'package:fine_cut/db/database.dart';

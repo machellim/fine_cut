@@ -11,9 +11,6 @@ class ParentProductSalesListBloc
   final SaleDao saleDao;
   ParentProductSalesListBloc({required this.saleDao})
     : super(ParentProductSalesListInitial()) {
-    on<ParentProductSalesListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
     on<ParentProductSalesEvent>((event, emit) async {
       try {
         emit(ParentProductSalesListLoading());

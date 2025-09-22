@@ -11,10 +11,6 @@ class SearchCategoriesBloc
   final CategoryDao categoryDao;
   SearchCategoriesBloc({required this.categoryDao})
     : super(SearchCategoriesInitial()) {
-    on<SearchCategoriesEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<FilterCategoriesEvent>((event, emit) async {
       try {
         emit(FilterCategoriesLoading());

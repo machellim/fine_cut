@@ -12,10 +12,6 @@ class ParentProductPurchasesListBloc
   final PurchaseDao purchaseDao;
   ParentProductPurchasesListBloc({required this.purchaseDao})
     : super(ParentProductPurchasesListInitial()) {
-    on<ParentProductPurchasesListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<LoadParentProductPurchasesEvent>((event, emit) async {
       try {
         emit(ParentProductPurchasesListLoading());

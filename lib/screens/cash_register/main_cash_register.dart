@@ -2,11 +2,9 @@ import 'package:fine_cut/bloc/cash_register/cash_register_last_closed/cash_regis
 import 'package:fine_cut/core/constants/app_messages.dart' show AppMessages;
 import 'package:fine_cut/core/enums/enums.dart';
 import 'package:fine_cut/core/utils/helpers.dart';
-import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/widgets/app_body.dart';
 import 'package:fine_cut/widgets/app_drawer.dart';
 import 'package:fine_cut/widgets/app_loading_screen.dart' show AppLoadingScreen;
-import 'package:fine_cut/widgets/app_message_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

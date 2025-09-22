@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart' as drift;
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:fine_cut/bloc/expense/expense_crud/expense_crud_bloc.dart';
 import 'package:fine_cut/bloc/expense/expense_list/expense_list_bloc.dart';
 import 'package:fine_cut/core/constants/app_messages.dart';

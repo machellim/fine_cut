@@ -10,10 +10,6 @@ part 'products_list_state.dart';
 class ProductsListBloc extends Bloc<ProductsListEvent, ProductsListState> {
   final ProductDao productDao;
   ProductsListBloc({required this.productDao}) : super(ProductListInitial()) {
-    on<ProductsListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<LoadProductsListEvent>((event, emit) async {
       try {
         emit(ProductsListLoading());

@@ -13,10 +13,6 @@ class CategoriesListBloc
 
   CategoriesListBloc({required this.categoryDao})
     : super(CategoriesListInitial()) {
-    on<CategoriesListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     // list categories
     on<LoadCategoriesListEvent>((event, emit) async {
       try {

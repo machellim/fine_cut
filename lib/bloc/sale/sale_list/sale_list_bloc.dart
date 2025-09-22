@@ -10,10 +10,6 @@ part 'sale_list_state.dart';
 class SaleListBloc extends Bloc<SaleListEvent, SaleListState> {
   final SaleDao saleDao;
   SaleListBloc({required this.saleDao}) : super(SaleListInitial()) {
-    on<SaleListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<LoadSalesListEvent>((event, emit) async {
       try {
         emit(SaleListLoading());

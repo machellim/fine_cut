@@ -10,10 +10,6 @@ part 'purchase_crud_state.dart';
 class PurchaseCrudBloc extends Bloc<PurchaseCrudEvent, PurchaseCrudState> {
   final PurchaseDao purchaseDao;
   PurchaseCrudBloc({required this.purchaseDao}) : super(PurchaseCrudInitial()) {
-    on<PurchaseCrudEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<CreatePurchaseEvent>((event, emit) async {
       try {
         emit(PurchaseCreationInProgress());

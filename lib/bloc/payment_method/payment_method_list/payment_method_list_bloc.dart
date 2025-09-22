@@ -12,10 +12,6 @@ class PaymentMethodListBloc
   final PaymentMethodDao paymentMethodDao;
   PaymentMethodListBloc({required this.paymentMethodDao})
     : super(PaymentMethodInitial()) {
-    on<PaymentMethodListEvent>((event, emit) {
-      // TODO: implement event handler
-    });
-
     on<LoadPaymentMethodsEvent>((event, emit) async {
       emit(PaymentMethodsLoading());
       //await Future.delayed(Duration(seconds: 3));
