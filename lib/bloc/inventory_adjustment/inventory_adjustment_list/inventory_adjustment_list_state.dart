@@ -16,7 +16,7 @@ final class InventoryAdjustmentListLoading
 
 final class InventoryAdjustmentListLoadSuccess
     extends InventoryAdjustmentListState {
-  final List<InventoryAdjustment> inventoryAdjustments;
+  final List<Map<String, dynamic>> inventoryAdjustments;
   final AppEventSource eventSource;
 
   const InventoryAdjustmentListLoadSuccess(

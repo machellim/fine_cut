@@ -31,6 +31,9 @@ class AppBadgeStatus extends StatelessWidget {
       case BadgeType.success:
         backgroundColor = Colors.green;
         break;
+      case BadgeType.info:
+        backgroundColor = Colors.blue;
+        break;
     }
 
     return Container(
@@ -52,4 +55,4 @@ class AppBadgeStatus extends StatelessWidget {
   }
 }
 
-enum BadgeType { error, warning, success }
+enum BadgeType { error, warning, success, info }

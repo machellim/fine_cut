@@ -55,21 +55,23 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
     Future.microtask(() {
       if (!mounted) return;
 
-      final args = ModalRoute.of(context)?.settings.arguments as Map;
-      final adjustment = (args['adjustment']) as InventoryAdjustment?;
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+      if (args == null) return;
+
+      final adjustmentMap = args['adjustment'] as Map<String, dynamic>?;
       selectedProduct = (args['selectedProduct']) as Product?;
       selectedAdjustmentType =
           (args['selectedAdjustmentType']) as AdjustmentType?;
       cashRegisterId = args['cashRegisterId'];
 
-      if (adjustment != null) {
+      if (adjustmentMap != null) {
         inventoryAdjustmentCompanion = inventoryAdjustmentCompanion.copyWith(
-          id: drift.Value(adjustment.id),
-          quantity: drift.Value(adjustment.quantity),
-          description: drift.Value(adjustment.description),
+          id: drift.Value(adjustmentMap['id']),
         );
-        _quantityController.text = adjustment.quantity.toString();
-        _descriptionController.text = adjustment.description ?? '';
+        _quantityController.text = adjustmentMap['quantity'].toString();
+        _descriptionController.text = adjustmentMap['description'] ?? '';
         setState(() {
           isNewInventoryAdjustment = false;
         });
@@ -267,6 +269,37 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
                                   ),
                                 );
                               },
+                              itemBuilder:
+                                  (context, item, isDisabled, isSelected) {
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      color: isSelected
+                                          ? theme.colorScheme.primary.withAlpha(
+                                              (0.2 * 255).round(),
+                                            )
+                                          : null, // resaltar el item seleccionado
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              item.name,
+                                              style: theme.textTheme.bodyMedium,
+                                            ),
+                                          ),
+
+                                          AppBadgeStatus(
+                                            text: 'Stock actual: ${item.stock}',
+                                            type: BadgeType.info,
+                                            textStyle:
+                                                theme.textTheme.bodyMedium,
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                             ),
                           ),
                           const SizedBox(height: 30),
@@ -291,6 +324,7 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
                                   );
                             },
                             isMultiline: true,
+                            validate: false,
                           ),
                           const SizedBox(height: 30),
                           BlocConsumer<

@@ -12,8 +12,25 @@ class InventoryAdjustmentListBloc
   final InventoryAdjustmentDao inventoryAdjustmentDao;
   InventoryAdjustmentListBloc({required this.inventoryAdjustmentDao})
     : super(InventoryAdjustmentListInitial()) {
-    on<InventoryAdjustmentListEvent>((event, emit) {
-      // TODO: implement event handler
+    on<LoadInventoryAdjustmentListEvent>((event, emit) async {
+      try {
+        emit(InventoryAdjustmentListLoading());
+        // await Future.delayed(Duration(seconds: 3));
+        final inventoryAdjustments = await inventoryAdjustmentDao
+            .getInventoryAdjustmentsWithDetails(event.cashRegisterId);
+        emit(
+          InventoryAdjustmentListLoadSuccess(
+            inventoryAdjustments,
+            event.eventSource,
+          ),
+        );
+      } catch (e) {
+        emit(
+          InventoryAdjustmentListLoadFailure(
+            message: 'Error al cargar las compras.',
+          ),
+        );
+      }
     });
   }
 }

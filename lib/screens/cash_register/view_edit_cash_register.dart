@@ -5,6 +5,8 @@ import 'package:fine_cut/bloc/expense/expense_crud/expense_crud_bloc.dart';
 import 'package:fine_cut/bloc/expense/expense_list/expense_list_bloc.dart';
 import 'package:fine_cut/bloc/income/income_crud/income_crud_bloc.dart';
 import 'package:fine_cut/bloc/income/income_list/income_list_bloc.dart';
+import 'package:fine_cut/bloc/inventory_adjustment/inventory_adjustment_crud/inventory_adjustment_crud_bloc.dart';
+import 'package:fine_cut/bloc/inventory_adjustment/inventory_adjustment_list/inventory_adjustment_list_bloc.dart';
 import 'package:fine_cut/bloc/payment_method/payment_method_list/payment_method_list_bloc.dart';
 import 'package:fine_cut/bloc/product/products_list/products_list_bloc.dart';
 import 'package:fine_cut/bloc/purchase/purchase_crud/purchase_crud_bloc.dart';
@@ -220,6 +222,11 @@ class _ViewEditCashRegisterScreenState
     // Load Incomes
     context.read<IncomeListBloc>().add(
       LoadIncomesListEvent(AppEventSource.list, _cashRegister.id),
+    );
+
+    // Load Inventory Adjustments
+    context.read<InventoryAdjustmentListBloc>().add(
+      LoadInventoryAdjustmentListEvent(AppEventSource.list, _cashRegister.id),
     );
   }
 
@@ -1296,6 +1303,7 @@ class _ViewEditCashRegisterScreenState
                                   title: 'Agregar Ajuste',
                                   onPressed: () async {
                                     _closeBannerInventoryAdjustment();
+
                                     Navigator.pushNamed(
                                       context,
                                       'new-inventory-adjustment',
@@ -1317,6 +1325,208 @@ class _ViewEditCashRegisterScreenState
                                   onClose: _closeBannerInventoryAdjustment,
                                 ),
                               ),
+                            MultiBlocListener(
+                              listeners: [
+                                BlocListener<
+                                  InventoryAdjustmentCrudBloc,
+                                  InventoryAdjustmentCrudState
+                                >(
+                                  listener: (context, state) {
+                                    if (state
+                                        is InventoryAdjustmentDeletionSuccess) {
+                                      context
+                                          .read<InventoryAdjustmentListBloc>()
+                                          .add(
+                                            LoadInventoryAdjustmentListEvent(
+                                              AppEventSource.list,
+                                              _cashRegister.id,
+                                            ),
+                                          );
+                                    }
+                                    if (state
+                                        is InventoryAdjustmentDeletionFailure) {
+                                      _showTopBannerInventoryAdjustment(
+                                        'Error al eliminar ajuste',
+                                        type: AppBannerType.error,
+                                      );
+                                    }
+                                  },
+                                ),
+                                BlocListener<
+                                  InventoryAdjustmentListBloc,
+                                  InventoryAdjustmentListState
+                                >(
+                                  listener: (context, state) {
+                                    if (state
+                                        is InventoryAdjustmentListLoadSuccess) {
+                                      if (state.eventSource ==
+                                          AppEventSource.create) {
+                                        _showTopBannerInventoryAdjustment(
+                                          'Ajuste creado con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.update) {
+                                        _showTopBannerInventoryAdjustment(
+                                          'Ajuste actualizado con éxito',
+                                        );
+                                      } else if (state.eventSource ==
+                                          AppEventSource.delete) {
+                                        _showTopBannerInventoryAdjustment(
+                                          'Ajuste eliminado con éxito',
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                              child:
+                                  BlocBuilder<
+                                    InventoryAdjustmentListBloc,
+                                    InventoryAdjustmentListState
+                                  >(
+                                    builder: (context, state) {
+                                      if (state
+                                          is InventoryAdjustmentListLoading) {
+                                        return AppLoadingScreen(
+                                          message:
+                                              AppMessages.getInventoryAdjustmentMessage(
+                                                'messageLoadingInventoryAdjustments',
+                                              ),
+                                        );
+                                      } else if (state
+                                          is InventoryAdjustmentListLoadSuccess) {
+                                        if (state
+                                            .inventoryAdjustments
+                                            .isEmpty) {
+                                          return AppSimpleCenterText(
+                                            message: 'No hay información.',
+                                          );
+                                        } else {
+                                          return ListView.builder(
+                                            shrinkWrap: true,
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            itemCount: state
+                                                .inventoryAdjustments
+                                                .length,
+                                            itemBuilder: (context, index) {
+                                              final inventoryAdjustment = state
+                                                  .inventoryAdjustments[index];
+                                              return AppListItem(
+                                                title: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      inventoryAdjustment['productName'],
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    if (inventoryAdjustment['adjustmentTypeIncreasesStock'] ==
+                                                        true)
+                                                      Text(
+                                                        '* ${inventoryAdjustment['adjustmentTypeName']} - Aumenta stock (${inventoryAdjustment['quantity']})',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.green,
+                                                        ),
+                                                      ),
+                                                    if (inventoryAdjustment['adjustmentTypeIncreasesStock'] ==
+                                                        false)
+                                                      Text(
+                                                        '* ${inventoryAdjustment['adjustmentTypeName']} - Disminuye stock (${inventoryAdjustment['quantity']})',
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          color:
+                                                              Colors.deepOrange,
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                                description: Text(
+                                                  inventoryAdjustment['description'] ??
+                                                      '',
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                onEdit: !_readOnly
+                                                    ? () async {
+                                                        _closeBannerIncome();
+
+                                                        // get selected product
+                                                        final repoProduct =
+                                                            context
+                                                                .read<
+                                                                  ProductsListBloc
+                                                                >();
+                                                        final selectedProduct =
+                                                            await repoProduct
+                                                                .productDao
+                                                                .getById(
+                                                                  inventoryAdjustment['productId'],
+                                                                );
+
+                                                        // get selected adjustment type
+                                                        final repoAdjustmentType =
+                                                            context
+                                                                .read<
+                                                                  InventoryAdjustmentListBloc
+                                                                >();
+                                                        final selectedAdjustmentType =
+                                                            await repoAdjustmentType
+                                                                .inventoryAdjustmentDao
+                                                                .getById(
+                                                                  inventoryAdjustment['adjustmentTypeId'],
+                                                                );
+
+                                                        Navigator.pushNamed(
+                                                          context,
+                                                          'new-inventory-adjustment',
+                                                          arguments: {
+                                                            'adjustment':
+                                                                inventoryAdjustment,
+                                                            'selectedProduct':
+                                                                selectedProduct,
+                                                            'selectedAdjustmentType':
+                                                                selectedAdjustmentType,
+                                                            'cashRegisterId':
+                                                                _cashRegister
+                                                                    .id,
+                                                          },
+                                                        );
+                                                      }
+                                                    : null,
+                                                onDelete: !_readOnly
+                                                    ? () {
+                                                        _showDeleteConfirmationInventoryAdjustment(
+                                                          context,
+                                                          inventoryAdjustment['id'],
+                                                        );
+                                                      }
+                                                    : null,
+                                              );
+                                            },
+                                          );
+                                        }
+                                      } else if (state
+                                          is InventoryAdjustmentListLoadFailure) {
+                                        return const Center(
+                                          child: Text(
+                                            'Error al cargar ajustes de inventario',
+                                          ),
+                                        );
+                                      } else {
+                                        return const Center(
+                                          child: Text('Estado desconocido'),
+                                        );
+                                      }
+                                    },
+                                  ),
+                            ),
                           ],
                         ),
                       ),
@@ -1403,6 +1613,30 @@ class _ViewEditCashRegisterScreenState
           onConfirm: () {
             // Acción de confirmar
             context.read<IncomeCrudBloc>().add(DeleteIncomeEvent(expenseId));
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationInventoryAdjustment(
+    BuildContext context,
+    int inventoryAdjustmentId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppAlertDialog(
+          title: '¿Seguro que desea eliminar este ajuste de inventario?',
+          content: 'Esta acción no se puede deshacer.',
+          onCancel: () {
+            // close dialog
+          },
+          onConfirm: () {
+            // Acción de confirmar
+            context.read<InventoryAdjustmentCrudBloc>().add(
+              DeleteInventoryAdjustmentEvent(inventoryAdjustmentId),
+            );
           },
         );
       },
