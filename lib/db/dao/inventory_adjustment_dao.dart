@@ -20,7 +20,7 @@ class InventoryAdjustmentDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  Future<int> createOrUpdateInventoryAdjustment(
+  /*Future<int> createOrUpdateInventoryAdjustment(
     InventoryAdjustmentsCompanion inventoryAdjustmentCompanion,
     RecordAction recordAction,
   ) async {
@@ -59,6 +59,123 @@ class InventoryAdjustmentDao extends DatabaseAccessor<AppDatabase>
         return into(inventoryAdjustments).insert(inventoryAdjustmentCompanion);
       } else {
         final id = inventoryAdjustmentCompanion.id.value;
+        final rowsUpdated =
+            await (update(inventoryAdjustments)
+                  ..where((tbl) => tbl.id.equals(id)))
+                .write(inventoryAdjustmentCompanion);
+
+        return rowsUpdated > 0 ? id : -1;
+      }
+    });
+  }*/
+
+  Future<int> createOrUpdateInventoryAdjustment(
+    InventoryAdjustmentsCompanion inventoryAdjustmentCompanion,
+    RecordAction recordAction,
+  ) async {
+    return transaction(() async {
+      // Datos del ajuste nuevo
+      final newProduct =
+          await (select(db.products)..where(
+                (t) =>
+                    t.id.equals(inventoryAdjustmentCompanion.productId.value),
+              ))
+              .getSingleOrNull();
+      final newAdjustmentType =
+          await (select(db.adjustmentTypes)..where(
+                (t) => t.id.equals(
+                  inventoryAdjustmentCompanion.adjustmentTypeId.value,
+                ),
+              ))
+              .getSingleOrNull();
+
+      if (newProduct == null || newAdjustmentType == null) return -1;
+
+      // Helper: valor con signo del ajuste: +qty si increasesStock, -qty si no
+      double signedFor(bool increases, double qty) => increases ? qty : -qty;
+
+      if (recordAction == RecordAction.create) {
+        // CREATE: aplicar efecto del ajuste nuevo
+        if (newProduct.trackStock) {
+          final qtyChange = signedFor(
+            newAdjustmentType.increasesStock,
+            inventoryAdjustmentCompanion.quantity.value,
+          );
+          await db.productDao.updateStockProduct(
+            productId: newProduct.id,
+            quantityChange: qtyChange,
+          );
+        }
+        return into(inventoryAdjustments).insert(inventoryAdjustmentCompanion);
+      } else {
+        // UPDATE: necesitamos el ajuste anterior para calcular la diferencia
+        final id = inventoryAdjustmentCompanion.id.value;
+        final previous = await (select(
+          inventoryAdjustments,
+        )..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+
+        if (previous == null) return -1;
+
+        final prevAdjustmentType =
+            await (select(db.adjustmentTypes)
+                  ..where((t) => t.id.equals(previous.adjustmentTypeId)))
+                .getSingleOrNull();
+
+        if (prevAdjustmentType == null) return -1;
+
+        // Caso 1: mismo producto -> aplicar cambio neto
+        if (previous.productId ==
+            inventoryAdjustmentCompanion.productId.value) {
+          final prevSigned = signedFor(
+            prevAdjustmentType.increasesStock,
+            previous.quantity,
+          );
+          final newSigned = signedFor(
+            newAdjustmentType.increasesStock,
+            inventoryAdjustmentCompanion.quantity.value,
+          );
+          final netChange =
+              newSigned -
+              prevSigned; // si positivo => sumar, si negativo => restar
+
+          if (newProduct.trackStock && netChange != 0) {
+            await db.productDao.updateStockProduct(
+              productId: newProduct.id,
+              quantityChange: netChange,
+            );
+          }
+        } else {
+          // Caso 2: cambió el producto -> revertir efecto en producto anterior y aplicar en producto nuevo
+          final prevProduct = await (select(
+            db.products,
+          )..where((t) => t.id.equals(previous.productId))).getSingleOrNull();
+
+          // Revertir en producto anterior (si aún existe y trackStock = true)
+          if (prevProduct != null && prevProduct.trackStock) {
+            final prevEffect = signedFor(
+              prevAdjustmentType.increasesStock,
+              previous.quantity,
+            );
+            // Para revertir aplicamos el negativo de lo que se aplicó antes
+            await db.productDao.updateStockProduct(
+              productId: prevProduct.id,
+              quantityChange: -prevEffect,
+            );
+          }
+
+          // Aplicar en producto nuevo
+          if (newProduct.trackStock) {
+            final newEffect = signedFor(
+              newAdjustmentType.increasesStock,
+              inventoryAdjustmentCompanion.quantity.value,
+            );
+            await db.productDao.updateStockProduct(
+              productId: newProduct.id,
+              quantityChange: newEffect,
+            );
+          }
+        }
+
         final rowsUpdated =
             await (update(inventoryAdjustments)
                   ..where((tbl) => tbl.id.equals(id)))

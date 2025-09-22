@@ -1,5 +1,6 @@
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/screens/home_wrapper.dart';
+import 'package:fine_cut/widgets/app_alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -272,8 +273,92 @@ class AppDrawer extends StatelessWidget {
             ),
             title: Text('Respaldar información', style: textStyle),
           ),
+          ListTile(
+            leading: Icon(Icons.refresh),
+            title: Text('Borrar toda la información'),
+            onTap: () => _showConfirmationClearDatabase(context),
+          ),
         ],
       ),
+    );
+  }
+
+  void _showConfirmationClearDatabase(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('¿Seguro que desea borrar toda la información?'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Esta acción no se puede deshacer.'),
+              const SizedBox(height: 16),
+              const Text('Para confirmar, escriba el número: 12345'),
+              const SizedBox(height: 8),
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: '',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (controller.text.trim() == '12345') {
+                  final database = RepositoryProvider.of<AppDatabase>(context);
+
+                  // Clear DB
+                  await database.settingDao.clearDb();
+
+                  if (!context.mounted) return;
+
+                  // Close dialog
+                  Navigator.pop(dialogContext);
+
+                  if (!context.mounted) return;
+
+                  // Show success message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Información eliminada correctamente'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+
+                  // Navigate to home
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (c) => HomeWrapper(database: database),
+                    ),
+                    (route) => false,
+                  );
+                } else {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Debe ingresar 12345 para confirmar'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Confirmar'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

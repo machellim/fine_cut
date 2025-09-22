@@ -69,6 +69,10 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
       if (adjustmentMap != null) {
         inventoryAdjustmentCompanion = inventoryAdjustmentCompanion.copyWith(
           id: drift.Value(adjustmentMap['id']),
+          quantity: drift.Value(adjustmentMap['quantity']),
+          description: drift.Value(adjustmentMap['description']),
+          adjustmentTypeId: drift.Value(adjustmentMap['adjustmentTypeId']),
+          productId: drift.Value(adjustmentMap['productId']),
         );
         _quantityController.text = adjustmentMap['quantity'].toString();
         _descriptionController.text = adjustmentMap['description'] ?? '';

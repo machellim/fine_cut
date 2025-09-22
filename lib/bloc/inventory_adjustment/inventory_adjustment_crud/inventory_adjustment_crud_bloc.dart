@@ -47,6 +47,7 @@ class InventoryAdjustmentCrudBloc
           }
         }
       } catch (e) {
+        print(e);
         emit(
           InventoryAdjustmentCreationFailure(
             message: 'Error al crear el ajuste',
