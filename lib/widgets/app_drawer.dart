@@ -274,7 +274,10 @@ class AppDrawer extends StatelessWidget {
             title: Text('Respaldar información', style: textStyle),
           ),
           ListTile(
-            leading: Icon(Icons.refresh),
+            leading: Icon(
+              Icons.refresh_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             title: Text('Borrar toda la información'),
             onTap: () => _showConfirmationClearDatabase(context),
           ),
