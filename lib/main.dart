@@ -1,5 +1,3 @@
-import 'package:drift/drift.dart';
-import 'package:fine_cut/bloc/bloc_observer.dart';
 import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_can_edit/cash_register_can_edit_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';

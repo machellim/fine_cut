@@ -32,6 +32,7 @@ import 'package:fine_cut/widgets/app_simple_center_text.dart';
 import 'package:fine_cut/widgets/app_title.dart';
 import 'package:fine_cut/widgets/app_top_banner.dart';
 import 'package:fine_cut/widgets/app_total_footer.dart';
+import 'package:fine_cut/widgets/emoji_popup/show_floating_emoji.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fine_cut/widgets/app_scaffold.dart';
@@ -568,6 +569,7 @@ class _ViewEditCashRegisterScreenState
                                         _showTopBannerSale(
                                           'Venta creada con éxito',
                                         );
+                                        showFloatingEmoji(context, emoji: "👍");
                                       } else if (state.eventSource ==
                                           AppEventSource.update) {
                                         _showTopBannerSale(
