@@ -286,6 +286,7 @@ class FineCutApp extends StatelessWidget {
           // o .dark, .light
           debugShowCheckedModeBanner: false,
           home: HomeWrapper(database: database),
+          initialRoute: 'splash',
           routes: appRoutes,
           onGenerateRoute: generateRoute,
         );

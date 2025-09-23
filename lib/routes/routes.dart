@@ -18,9 +18,11 @@ import 'package:fine_cut/screens/purchases/parent_product_stock_list.dart';
 import 'package:fine_cut/screens/reports/parent_product_sales_list.dart';
 import 'package:fine_cut/screens/reports/product_profit_list.dart';
 import 'package:fine_cut/screens/sales/new_sale.dart';
+import 'package:fine_cut/widgets/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
+  'splash': (_) => const SplashScreen(),
   'main-cash-register': (BuildContext context) {
     return MainCashRegisterScreen();
   },
