@@ -51,7 +51,6 @@ class _HomeWrapperState extends State<HomeWrapper> with WidgetsBindingObserver {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (bool didPop, dynamic result) {
-        print('ok1');
         if (didPop) {
           return;
         }

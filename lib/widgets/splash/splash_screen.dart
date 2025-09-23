@@ -1,4 +1,7 @@
+import 'package:fine_cut/db/database.dart';
+import 'package:fine_cut/screens/home_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,7 +19,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _navigateToHome() async {
     await Future.delayed(const Duration(seconds: 1));
-    Navigator.pushReplacementNamed(context, 'main-cash-register');
+    if (!mounted) return;
+    final database = RepositoryProvider.of<AppDatabase>(context);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomeWrapper(database: database)),
+    );
   }
 
   @override
