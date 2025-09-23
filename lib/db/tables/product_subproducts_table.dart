@@ -5,10 +5,10 @@ class ProductSubproducts extends Table {
   IntColumn get productId =>
       integer().customConstraint('REFERENCES products(id) ON DELETE CASCADE')();
 
-  // Reference to the subproduct
+  // Reference to the subproduct (PK, único)
   IntColumn get subproductId =>
       integer().customConstraint('REFERENCES products(id) ON DELETE CASCADE')();
 
   @override
-  Set<Column> get primaryKey => {productId, subproductId};
+  Set<Column> get primaryKey => {subproductId};
 }

@@ -235,7 +235,7 @@ class FineCutApp extends StatelessWidget {
                   onPrimary: Colors.white,
                   secondary: Colors.deepPurpleAccent,
                   onSecondary: Colors.white,
-                  surface: Colors.white,
+                  surface: Colors.deepPurple[50]!,
                   onSurface: Colors.black,
                   brightness: Brightness.light,
                 ),
