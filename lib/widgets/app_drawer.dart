@@ -1,6 +1,8 @@
+import 'package:fine_cut/bloc/theme/theme_cubit.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/screens/home_wrapper.dart';
 import 'package:fine_cut/widgets/app_alert_dialog.dart';
+import 'package:fine_cut/widgets/theme/theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -280,6 +282,31 @@ class AppDrawer extends StatelessWidget {
             ),
             title: Text('Borrar toda la información'),
             onTap: () => _showConfirmationClearDatabase(context),
+          ),
+          BlocBuilder<ThemeCubit, ThemeCubitState>(
+            builder: (context, state) {
+              final themeMode = (state is ThemeUpdated)
+                  ? state.themeMode
+                  : ThemeMode.system;
+
+              final isDark = themeMode == ThemeMode.dark;
+
+              return ListTile(
+                leading: Icon(
+                  isDark ? Icons.dark_mode : Icons.light_mode,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                title: Text(isDark ? 'Modo oscuro' : 'Modo claro'),
+                trailing: Switch(
+                  value: isDark,
+                  onChanged: (value) {
+                    final newMode = value ? ThemeMode.dark : ThemeMode.light;
+                    context.read<ThemeCubit>().setTheme(newMode);
+                  },
+                ),
+                onTap: () {},
+              );
+            },
           ),
         ],
       ),

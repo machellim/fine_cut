@@ -28,6 +28,7 @@ import 'package:fine_cut/bloc/reports/product_profit_list/product_profit_list_bl
 import 'package:fine_cut/bloc/sale/sale_crud/sale_crud_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_list/sale_list_bloc.dart';
 import 'package:fine_cut/bloc/sale/sale_parent_product/sale_parent_product_bloc.dart';
+import 'package:fine_cut/bloc/theme/theme_cubit.dart';
 import 'package:fine_cut/db/database.dart';
 import 'package:fine_cut/db/database_initializer.dart';
 import 'package:fine_cut/routes/routes.dart';
@@ -89,6 +90,7 @@ class AppInitializer extends StatelessWidget {
             ],
             child: MultiBlocProvider(
               providers: [
+                BlocProvider<ThemeCubit>(create: (_) => ThemeCubit()),
                 BlocProvider<CashRegisterDataBloc>(
                   create: (_) =>
                       CashRegisterDataBloc(cashRegisterDao: cashRegisterDao),
@@ -220,70 +222,74 @@ class FineCutApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Cajamiga',
+    return BlocBuilder<ThemeCubit, ThemeCubitState>(
+      builder: (context, state) {
+        return MaterialApp(
+          title: 'Cajamiga',
 
-      // Light Theme
-      theme:
-          ThemeData.from(
-            colorScheme: ColorScheme.light(
-              primary: Colors.purple,
-              onPrimary: Colors.white,
-              secondary: Colors.deepPurpleAccent,
-              onSecondary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
-              brightness: Brightness.light,
-            ),
-            textTheme: ThemeData.light().textTheme,
-          ).copyWith(
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple, // botón claro
-                foregroundColor: Colors.white, // texto blanco
+          // Light Theme
+          theme:
+              ThemeData.from(
+                colorScheme: ColorScheme.light(
+                  primary: Colors.purple,
+                  onPrimary: Colors.white,
+                  secondary: Colors.deepPurpleAccent,
+                  onSecondary: Colors.white,
+                  surface: Colors.white,
+                  onSurface: Colors.black,
+                  brightness: Brightness.light,
+                ),
+                textTheme: ThemeData.light().textTheme,
+              ).copyWith(
+                elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple, // botón claro
+                    foregroundColor: Colors.white, // texto blanco
+                  ),
+                ),
+                inputDecorationTheme: const InputDecorationTheme(
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 15,
+                  ),
+                ),
               ),
-            ),
-            inputDecorationTheme: const InputDecorationTheme(
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 15,
+          darkTheme:
+              ThemeData.from(
+                colorScheme: ColorScheme.dark(
+                  primary: Colors.indigoAccent,
+                  onPrimary: Colors.black,
+                  secondary: Colors.deepPurpleAccent,
+                  onSecondary: Colors.deepPurple,
+                  surface: Colors.black, //
+                  onSurface: Colors.white,
+                  brightness: Brightness.dark,
+                ),
+                textTheme: ThemeData.dark().textTheme,
+              ).copyWith(
+                scaffoldBackgroundColor: Colors.grey[800], //
+                elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigoAccent, // botón oscuro
+                    foregroundColor: Colors.black, // texto oscuro
+                  ),
+                ),
+                inputDecorationTheme: const InputDecorationTheme(
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 15,
+                  ),
+                ),
               ),
-            ),
-          ),
-      darkTheme:
-          ThemeData.from(
-            colorScheme: ColorScheme.dark(
-              primary: Colors.indigoAccent,
-              onPrimary: Colors.black,
-              secondary: Colors.deepPurpleAccent,
-              onSecondary: Colors.black,
-              surface: Colors.black,
-              onSurface: Colors.white,
-              brightness: Brightness.dark,
-            ),
-            textTheme: ThemeData.dark().textTheme,
-          ).copyWith(
-            scaffoldBackgroundColor: Colors.black,
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigoAccent, // botón oscuro
-                foregroundColor: Colors.black, // texto oscuro
-              ),
-            ),
-            inputDecorationTheme: const InputDecorationTheme(
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 15,
-              ),
-            ),
-          ),
-      themeMode: ThemeMode.system,
+          themeMode: state.themeMode,
 
-      // o .dark, .light
-      debugShowCheckedModeBanner: false,
-      home: HomeWrapper(database: database),
-      routes: appRoutes,
-      onGenerateRoute: generateRoute,
+          // o .dark, .light
+          debugShowCheckedModeBanner: false,
+          home: HomeWrapper(database: database),
+          routes: appRoutes,
+          onGenerateRoute: generateRoute,
+        );
+      },
     );
   }
 }
