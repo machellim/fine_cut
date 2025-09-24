@@ -44,7 +44,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
       drawer: AppDrawer(appContext: context),
       body: AppBody(
         child: Padding(
-          padding: const EdgeInsets.only(top: 64, right: 16, left: 16),
+          padding: const EdgeInsets.only(top: 32, right: 16, left: 16),
           child: Column(
             children: [
               BlocBuilder<
@@ -111,7 +111,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 20),
 
                             // Fecha y Status destacados
                             Row(
@@ -137,10 +137,10 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
-                                    vertical: 6,
+                                    vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.2),
+                                    color: Colors.white.withValues(alpha: 0.25),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
@@ -156,7 +156,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 20),
 
                             // Saldo inicial / final
                             Row(
@@ -178,7 +178,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 20),
 
                             // Total Income
                             Row(
@@ -213,7 +213,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 8),
 
                             // Total Expenses
                             Row(
@@ -248,7 +248,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 20),
                             // Notas
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -258,7 +258,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                   color: Colors.white70,
                                   size: 22,
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
 
                                 Text(
                                   cashRegister.notes ?? '',
@@ -372,11 +372,11 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
       width: 140,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
+        color: Colors.white.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             label,
