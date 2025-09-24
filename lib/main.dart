@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:fine_cut/bloc/cash_register/available_balance/available_balance_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_can_edit/cash_register_can_edit_bloc.dart';
 import 'package:fine_cut/bloc/cash_register/cash_register_close/cash_register_close_bloc.dart';
@@ -70,10 +69,10 @@ class AppInitializer extends StatelessWidget {
           final database = snapshot.data!;
 
           // to create db if not exists in the directory
-          database.allTables.forEach((TableInfo table) async {
+          /*database.allTables.forEach((TableInfo table) async {
             final count = await database.select(table).get();
             print('${table.actualTableName}');
-          });
+          });*/
 
           // daos
           final paymentMethodDao = database.paymentMethodDao;
