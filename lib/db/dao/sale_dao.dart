@@ -171,8 +171,8 @@ class SaleDao extends DatabaseAccessor<AppDatabase> with _$SaleDaoMixin {
     final query = select(db.productSubproducts)
       ..where((tbl) => tbl.subproductId.equals(productId));
 
-    final result = await query.getSingleOrNull();
-    return result != null;
+    final result = await query.get();
+    return result.isNotEmpty;
   }
 
   /*Future<double> getProfitByDateRange(

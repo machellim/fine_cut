@@ -569,7 +569,7 @@ class _ViewEditCashRegisterScreenState
                                         _showTopBannerSale(
                                           'Venta creada con éxito',
                                         );
-                                        showFloatingEmoji(context, emoji: "👍");
+                                        // showFloatingEmoji(context, emoji: "👍");
                                       } else if (state.eventSource ==
                                           AppEventSource.update) {
                                         _showTopBannerSale(

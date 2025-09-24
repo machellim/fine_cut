@@ -66,6 +66,13 @@ class _CashRegisterListScreenState extends State<CashRegisterListScreen> {
                   listener: (context, state) => {
                     if (state is CashRegisterEditCheckLoadSuccess)
                       {
+                        // refresh list
+                        if (state.isReopen)
+                          {
+                            context.read<CashRegisterListBloc>().add(
+                              LoadCashRegisterListEvent(AppEventSource.list),
+                            ),
+                          },
                         Navigator.pushNamed(
                           context,
                           'view-edit-cash-register',

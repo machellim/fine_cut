@@ -161,6 +161,20 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                               selectedProduct = selProduct;
                               selectedPurchase = null;
 
+                              //=========== calculate total price =============
+                              final quantity = double.parse(
+                                _saleQuantityController.text.trim() != ''
+                                    ? _saleQuantityController.text.trim()
+                                    : '0',
+                              );
+                              final unitPrice =
+                                  selectedProduct?.salePrice ?? 0.0;
+                              final totalPrice = quantity * unitPrice;
+                              _saleTotalPriceController.text =
+                                  AppUtils.formatDouble(totalPrice);
+                              setState(() {});
+                              // =======================
+
                               context.read<SaleParentProductBloc>().add(
                                 GetParentProductEvent(selectedProduct!),
                               );

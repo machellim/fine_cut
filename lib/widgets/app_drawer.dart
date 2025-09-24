@@ -190,7 +190,7 @@ class AppDrawer extends StatelessWidget {
               Icons.numbers,
               color: Theme.of(context).colorScheme.primary,
             ),
-            title: Text('Stock Productos Principales', style: textStyle),
+            title: Text('Stock Productos Primarios', style: textStyle),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, 'parent-product-stock');
@@ -221,7 +221,7 @@ class AppDrawer extends StatelessWidget {
               Icons.attach_money,
               color: Theme.of(context).colorScheme.primary,
             ),
-            title: Text('Ganancias Productos Principales', style: textStyle),
+            title: Text('Ganancias Productos Primarios', style: textStyle),
             onTap: () async {
               Navigator.pop(context);
               Navigator.pushNamed(context, 'parent-product-sales-list');

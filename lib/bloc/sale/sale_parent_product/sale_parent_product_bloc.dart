@@ -28,6 +28,7 @@ class SaleParentProductBloc
           emit(SaleParentProductInitial());
         }
       } catch (e) {
+        print(e);
         emit(
           GetParentProductFailure(
             message: 'Error al obtener productos padres.',

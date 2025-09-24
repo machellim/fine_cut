@@ -35,7 +35,10 @@ class CashRegisterCanEditBloc
             }
           }
           emit(
-            CashRegisterEditCheckLoadSuccess(cashRegister: updatedCashRegister),
+            CashRegisterEditCheckLoadSuccess(
+              cashRegister: updatedCashRegister,
+              isReopen: event.isReopen,
+            ),
           );
         } else {
           emit(

@@ -17,7 +17,10 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   Future<List<Product>> getAllProducts() {
     return (select(products)
           ..limit(AppConstants.listResultsLimit)
-          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+          ..orderBy([
+            (t) => OrderingTerm.desc(t.trackStock),
+            (t) => OrderingTerm.asc(t.hasSubProducts),
+          ]))
         .get();
   }
 
@@ -287,7 +290,6 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
     int categoryId,
   ) {
     final trimmedQuery = query.trim();
-    print(categoryId);
     return (select(products)
           ..where(
             (c) =>

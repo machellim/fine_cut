@@ -14,8 +14,12 @@ class CashRegisterEditCheckLoading extends CashRegisterCanEditState {}
 
 class CashRegisterEditCheckLoadSuccess extends CashRegisterCanEditState {
   final CashRegister cashRegister;
+  final bool isReopen;
 
-  const CashRegisterEditCheckLoadSuccess({required this.cashRegister});
+  const CashRegisterEditCheckLoadSuccess({
+    required this.cashRegister,
+    required this.isReopen,
+  });
 }
 
 class CashRegisterEditCheckLoadFailure extends CashRegisterCanEditState {
