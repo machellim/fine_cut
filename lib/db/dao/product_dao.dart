@@ -282,13 +282,12 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
         .get();
   }
 
-  Future<List<Product>> findAvailableSubProducts(String query) {
+  Future<List<Product>> searchSubProductsByCategory(
+    String query,
+    int categoryId,
+  ) {
     final trimmedQuery = query.trim();
-
-    // Full subquery selecting subproductId
-    final subquery = selectOnly(productSubproducts)
-      ..addColumns([productSubproducts.subproductId]);
-
+    print(categoryId);
     return (select(products)
           ..where(
             (c) =>
@@ -298,8 +297,8 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
                 c.status.equals(AppActiveStatus.active.name) &
                 // products that don't have subproducts
                 c.hasSubProducts.equals(false) &
-                // exclude products already present as subproductId in ProductSubproducts
-                c.id.isInQuery(subquery).not(),
+                // filter by category
+                c.categoryId.equals(categoryId),
           )
           ..orderBy([(t) => OrderingTerm.asc(t.name)])
           ..limit(AppConstants.searchResultsLimit))

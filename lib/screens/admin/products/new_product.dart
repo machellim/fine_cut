@@ -160,10 +160,11 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     },
                     itemAsString: (item) => item.name,
                     compareFn: (item1, item2) => item1.id == item2.id,
-                    onChanged: (selectedCategory) {
-                      if (selectedCategory != null) {
+                    onChanged: (selCategory) {
+                      selectedCategory = selCategory;
+                      if (selCategory != null) {
                         productCompanion = productCompanion.copyWith(
-                          categoryId: drift.Value(selectedCategory.id),
+                          categoryId: drift.Value(selCategory.id),
                         );
                       }
                     },
@@ -241,9 +242,11 @@ class _NewProductScreenState extends State<NewProductScreen> {
                     DropdownSearch<Product>.multiSelection(
                       items: (filter, loadProps) async {
                         final repo = context.read<ProductsListBloc>();
-                        return await repo.productDao.findAvailableSubProducts(
-                          filter,
-                        );
+                        return await repo.productDao
+                            .searchSubProductsByCategory(
+                              filter,
+                              selectedCategory?.id ?? 0,
+                            );
                       },
                       selectedItems: [...selectedProducts],
                       itemAsString: (item) => item.name,
