@@ -47,7 +47,7 @@ class _PaymentMethodListScreenState extends State<PaymentMethodListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Lista de Formas de Pago")),
+      appBar: AppBar(title: const Text("Formas de Pago")),
       body: BlocConsumer<PaymentMethodListBloc, PaymentMethodListState>(
         listener: (context, state) => {
           if (state is PaymentMethodsLoadSuccess)

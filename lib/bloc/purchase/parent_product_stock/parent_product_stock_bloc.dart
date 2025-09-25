@@ -20,7 +20,7 @@ class ParentProductStockBloc
       } catch (e) {
         emit(
           ParentProductStockListLoadFailure(
-            message: 'Error al cargar las productos principales.',
+            message: 'Error al cargar las productos primarios.',
           ),
         );
       }
@@ -38,7 +38,7 @@ class ParentProductStockBloc
       } catch (e) {
         emit(
           ParentProductStockListLoadFailure(
-            message: 'Error al cargar las productos principales.',
+            message: 'Error al cargar las productos primarios.',
           ),
         );
       }

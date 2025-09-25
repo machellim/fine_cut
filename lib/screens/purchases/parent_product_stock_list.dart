@@ -30,7 +30,7 @@ class _ParentProductStockListScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarCustom(title: "Stock de Producto Principal"),
+      appBar: AppBarCustom(title: "Stock Producto Primario"),
       body: BlocBuilder<ParentProductStockBloc, ParentProductStockState>(
         builder: (context, state) {
           if (state is ParentProductStockListLoading) {

@@ -34,7 +34,27 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("Información Caja Anterior"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.point_of_sale, // ícono de caja/venta
+              size: 28,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            SizedBox(width: 8),
+            Text(
+              "Cajamiga",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                letterSpacing: 2.0,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.menu),
@@ -96,12 +116,6 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.point_of_sale,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                                const SizedBox(width: 8),
                                 Text(
                                   "Última Caja",
                                   style: theme.textTheme.titleLarge?.copyWith(

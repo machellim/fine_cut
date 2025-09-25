@@ -296,12 +296,12 @@ class NewSaleScreenState extends State<NewSaleScreen> {
                                     validator: (value) =>
                                         (value == null ||
                                             value.aliasProductName.isEmpty)
-                                        ? 'Seleccione el producto principal.'
+                                        ? 'Seleccione el producto primario.'
                                         : null,
                                     decoratorProps: DropDownDecoratorProps(
                                       decoration: InputDecoration(
                                         labelText:
-                                            '🛍️ Elija un producto principal',
+                                            '🛍️ Elija un producto primario',
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                             8.0,

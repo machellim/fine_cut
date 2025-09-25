@@ -232,7 +232,7 @@ class AppDrawer extends StatelessWidget {
               Icons.monetization_on,
               color: Theme.of(context).colorScheme.primary,
             ),
-            title: Text('Ganancias Productos', style: textStyle),
+            title: Text('Ganancias por Productos', style: textStyle),
             onTap: () async {
               Navigator.pop(context);
               Navigator.pushNamed(context, 'product-profit-list');
