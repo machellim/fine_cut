@@ -31,7 +31,7 @@ flutter:
   fonts:
     - family: Poppins
       fonts:
-        - asset: assets/fonts/Poppins-Bold.ttf
+        - asset: assets/fonts/Poppins-MediumItalic.ttf
 
 flutter_icons:
   android: true

@@ -122,7 +122,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(
-              Icons.point_of_sale,
+              Icons.add_circle,
               color: Theme.of(context).colorScheme.primary,
             ),
             title: Text('Crear Nueva Caja', style: textStyle),

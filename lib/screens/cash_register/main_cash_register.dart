@@ -34,26 +34,25 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.point_of_sale, // ícono de caja/venta
-              size: 28,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-            SizedBox(width: 8),
-            Text(
-              "Cajamiga",
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-                letterSpacing: 2.0,
-                color: Theme.of(context).colorScheme.onSurface,
+        backgroundColor: Theme.of(context).primaryColor, // usa el tema
+        //foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Cajamiga, siempre al día!",
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.normal,
+                  fontSize: 24,
+                  letterSpacing: 1.5,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -121,6 +120,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                                   style: theme.textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
+                                    fontSize: 20,
                                   ),
                                 ),
                               ],
@@ -353,7 +353,7 @@ class _MainCashRegisterScreenState extends State<MainCashRegisterScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.point_of_sale,
+                              Icons.add_circle,
                               size: 32,
                               color: Theme.of(context).colorScheme.onPrimary,
                             ),
